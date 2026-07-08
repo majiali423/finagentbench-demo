@@ -5,11 +5,11 @@ from pathlib import Path
 from typing import Any
 
 from .base import TraceAdapter
+from .agent_state import AgentStateAdapter
 from .generic_json import GenericJsonAdapter
-from .lumenfin import LumenFinAdapter
 
 
-ADAPTERS: tuple[TraceAdapter, ...] = (GenericJsonAdapter(), LumenFinAdapter())
+ADAPTERS: tuple[TraceAdapter, ...] = (GenericJsonAdapter(), AgentStateAdapter())
 
 
 def load_run_file(path: str | Path, adapter_name: str = "auto") -> dict[str, Any]:

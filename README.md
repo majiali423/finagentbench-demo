@@ -12,6 +12,10 @@ FinAgentBench does not run an LLM and does not depend on a specific agent
 framework. Agents export a small `FinRun` JSON artifact, adapters normalize raw
 runtime traces into that shape, and deterministic metrics score the run.
 
+This repository is intended to stand alone as a benchmark and reliability
+harness. A financial agent project can use it as a downstream quality gate, but
+FinAgentBench does not import or require any specific agent codebase.
+
 ## What It Checks
 
 - Entity coverage: expected companies are present.
@@ -53,7 +57,7 @@ The core benchmark expects a normalized `FinRun` shape, but raw agent traces can
 come from different systems. Adapters keep that boundary explicit.
 
 ```powershell
-python -m finagentbench evaluate fixtures\lumenfin_state_sample.json --adapter lumenfin --case fixtures\case_compare_rd.json --out outputs\lumenfin
+python -m finagentbench evaluate fixtures\agent_state_sample.json --adapter agent-state --case fixtures\case_compare_rd.json --out outputs\agent-state
 ```
 
 See `docs/adapter_guide.md` for the adapter contract.

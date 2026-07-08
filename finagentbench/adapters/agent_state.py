@@ -3,15 +3,15 @@ from __future__ import annotations
 from typing import Any
 
 
-class LumenFinAdapter:
-    name = "lumenfin"
+class AgentStateAdapter:
+    name = "agent-state"
 
     def can_parse(self, payload: dict[str, Any]) -> bool:
         return "final_report" in payload or "financial_metrics" in payload or "audit_log" in payload
 
     def normalize(self, payload: dict[str, Any]) -> dict[str, Any]:
         return {
-            "run_id": str(payload.get("run_id") or payload.get("thread_id") or "lumenfin-run"),
+            "run_id": str(payload.get("run_id") or payload.get("thread_id") or "agent-state-run"),
             "query": payload.get("query", ""),
             "entities": _entities(payload),
             "steps": _steps(payload.get("audit_log", [])),
@@ -47,6 +47,7 @@ def _metrics(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
             {
                 "entity": str(company),
                 "name": str(metric_name),
+                "period": item.get("period"),
                 "value": item.get("value"),
                 "formula": item.get("formula"),
                 "inputs": item.get("inputs", {}),
@@ -65,6 +66,9 @@ def _evidence(items: list[dict[str, Any]]) -> list[dict[str, str]]:
                 {
                     "entity": str(entity),
                     "citation": str(citation),
+                    "period": str(item.get("period") or ""),
+                    "source_type": str(item.get("source_type") or ""),
+                    "provider": str(item.get("provider") or ""),
                     "text": str(item.get("text") or item.get("snippet") or ""),
                 }
             )
@@ -80,6 +84,8 @@ def _market_data(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 {
                     "entity": str(entity),
                     "status": str(item.get("status", "ok")),
+                    "provider": item.get("provider", ""),
+                    "as_of": item.get("as_of", ""),
                     "error": item.get("error", ""),
                 }
             )

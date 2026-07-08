@@ -3,6 +3,11 @@
 FinAgentBench is a replay-first reliability harness for financial AI agents.
 It evaluates exported traces instead of calling an LLM directly.
 
+It is designed as a standalone second project: the benchmark defines its own
+schema, fixtures, metrics, reports, and CI gate. Agent projects integrate by
+exporting traces or writing adapters; the benchmark does not depend on their
+runtime code.
+
 ## Core Idea
 
 Financial agents fail in different places: entity extraction, retrieval,
@@ -20,9 +25,10 @@ small normalized `FinRun` artifact, then runs deterministic checks on each part.
 
 ## Why This Is Not Coupled To One Agent
 
-The core evaluator knows nothing about LumenFin, LangGraph, AutoGen, or another
-runtime. Runtime-specific details stay in `finagentbench.adapters`. Adding a new
-agent only requires a new adapter, not a rewrite of the scoring logic.
+The core evaluator knows nothing about LangGraph, AutoGen, internal company
+agents, or another runtime. Runtime-specific details stay in
+`finagentbench.adapters`. Adding a new agent only requires a new adapter, not a
+rewrite of the scoring logic.
 
 ## Why This Is More Useful Than Pure E2E Evaluation
 
@@ -43,7 +49,7 @@ That makes the output actionable for debugging and for CI regression gates.
 ## Extension Points
 
 Adapters are selected with `--adapter`. The default `auto` mode can parse native
-`FinRun` JSON and the demo LumenFin state format.
+`FinRun` JSON and a generic agent-state trace format.
 
 Metrics are resolved through a registry. A benchmark case can set
 `enabled_metrics` to run a subset, which is useful when a team wants to gate only

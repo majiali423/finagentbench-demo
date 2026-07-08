@@ -1,7 +1,8 @@
 # Adapter Guide
 
 Adapters let FinAgentBench evaluate different agent runtimes without coupling
-the scoring logic to LangGraph, AutoGen, LumenFin, or another framework.
+the scoring logic to LangGraph, AutoGen, an internal company agent, or another
+framework.
 
 ## Responsibility
 
