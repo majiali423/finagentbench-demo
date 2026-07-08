@@ -1,0 +1,9 @@
+{
+  "id": "compare_rd_001",
+  "query": "Compare NVIDIA and AMD FY2025 R&D intensity and supply-chain risk.",
+  "expected_entities": ["NVIDIA", "AMD"],
+  "required_steps": ["retrieval", "quant", "synthesis"],
+  "numeric_tolerance": 0.001,
+  "min_score": 85,
+  "regression_tolerance": 5
+}

@@ -1,0 +1,79 @@
+{
+  "thread_id": "lumenfin-sample-001",
+  "query": "Compare NVIDIA and AMD R&D intensity using auditable evidence.",
+  "companies": [
+    "NVIDIA",
+    "AMD"
+  ],
+  "audit_log": [
+    {
+      "step": "planning",
+      "status": "completed"
+    },
+    {
+      "step": "retrieval",
+      "status": "completed"
+    },
+    {
+      "step": "quant",
+      "status": "completed"
+    },
+    {
+      "step": "risk",
+      "status": "completed"
+    },
+    {
+      "step": "synthesis",
+      "status": "completed"
+    },
+    {
+      "step": "compliance",
+      "status": "completed"
+    }
+  ],
+  "financial_metrics": [
+    {
+      "company": "NVIDIA",
+      "metric": "r_and_d_intensity",
+      "value": 0.098084,
+      "formula": "research_and_development / revenue",
+      "inputs": {
+        "research_and_development": 8675,
+        "revenue": 88447
+      }
+    },
+    {
+      "company": "AMD",
+      "metric": "r_and_d_intensity",
+      "value": 0.244545,
+      "formula": "research_and_development / revenue",
+      "inputs": {
+        "research_and_development": 5872,
+        "revenue": 24001
+      }
+    }
+  ],
+  "rag_evidence": [
+    {
+      "company": "NVIDIA",
+      "citation": "NVIDIA FY2024 Form 10-K",
+      "text": "Revenue and research and development expenses used for the ratio."
+    },
+    {
+      "company": "AMD",
+      "citation": "AMD FY2024 Form 10-K",
+      "text": "Revenue and research and development expenses used for the ratio."
+    }
+  ],
+  "market_snapshots": [
+    {
+      "company": "NVIDIA",
+      "status": "ok"
+    },
+    {
+      "company": "AMD",
+      "status": "ok"
+    }
+  ],
+  "final_report": "NVIDIA and AMD are compared using cited annual report data. This is not investment advice."
+}

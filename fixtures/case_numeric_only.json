@@ -1,0 +1,14 @@
+{
+  "id": "numeric_only_001",
+  "query": "Check deterministic formula correctness only.",
+  "expected_entities": [
+    "NVIDIA",
+    "AMD"
+  ],
+  "required_steps": [],
+  "enabled_metrics": [
+    "numeric_correctness"
+  ],
+  "numeric_tolerance": 0.001,
+  "min_score": 100
+}

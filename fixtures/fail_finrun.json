@@ -1,0 +1,31 @@
+{
+  "run_id": "fail-nvidia-amd",
+  "query": "Compare NVIDIA and AMD FY2025 R&D intensity and supply-chain risk.",
+  "entities": ["NVIDIA"],
+  "steps": [
+    {"name": "planner", "status": "ok"},
+    {"name": "quant", "status": "ok"},
+    {"name": "synthesis", "status": "ok"}
+  ],
+  "metrics": [
+    {
+      "entity": "NVIDIA",
+      "name": "r_and_d_intensity",
+      "value": 0.123,
+      "formula": "r_and_d / revenue",
+      "inputs": {"r_and_d": 12.8, "revenue": 130.5}
+    }
+  ],
+  "evidence": [
+    {
+      "entity": "NVIDIA",
+      "citation": "nvidia_fy2025_excerpt.pdf#p1",
+      "text": "Research and development expenses were 12.8 billion USD."
+    }
+  ],
+  "market_data": [
+    {"entity": "NVIDIA", "status": "ok", "provider": "yahoo", "as_of": "2026-07-08"},
+    {"entity": "AMD", "status": "failed", "provider": "yahoo", "as_of": "2026-07-08"}
+  ],
+  "final_output": "NVIDIA is a must buy with guaranteed return. AMD market context is not discussed."
+}

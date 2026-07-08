@@ -1,0 +1,44 @@
+{
+  "run_id": "pass-nvidia-amd",
+  "query": "Compare NVIDIA and AMD FY2025 R&D intensity and supply-chain risk.",
+  "entities": ["NVIDIA", "AMD"],
+  "steps": [
+    {"name": "planner", "status": "ok"},
+    {"name": "retrieval", "status": "ok"},
+    {"name": "quant", "status": "ok"},
+    {"name": "synthesis", "status": "ok"}
+  ],
+  "metrics": [
+    {
+      "entity": "NVIDIA",
+      "name": "r_and_d_intensity",
+      "value": 0.098084,
+      "formula": "r_and_d / revenue",
+      "inputs": {"r_and_d": 12.8, "revenue": 130.5}
+    },
+    {
+      "entity": "AMD",
+      "name": "r_and_d_intensity",
+      "value": 0.25,
+      "formula": "r_and_d / revenue",
+      "inputs": {"r_and_d": 6.5, "revenue": 26.0}
+    }
+  ],
+  "evidence": [
+    {
+      "entity": "NVIDIA",
+      "citation": "nvidia_fy2025_excerpt.pdf#p1",
+      "text": "Research and development expenses were 12.8 billion USD."
+    },
+    {
+      "entity": "AMD",
+      "citation": "amd_fy2025_metrics.csv#row2",
+      "text": "R&D expenses were 6.5 billion USD on revenue of 26.0 billion USD."
+    }
+  ],
+  "market_data": [
+    {"entity": "NVIDIA", "status": "ok", "provider": "yahoo", "as_of": "2026-07-08"},
+    {"entity": "AMD", "status": "ok", "provider": "yahoo", "as_of": "2026-07-08"}
+  ],
+  "final_output": "NVIDIA and AMD were both analyzed with cited FY2025 sources. NVIDIA R&D intensity is 9.81%, while AMD R&D intensity is 25.00%. This is research output only and not investment advice."
+}
