@@ -51,6 +51,19 @@ wording.
 python -m finagentbench evaluate fixtures\pass_bigtech_finrun.json --case fixtures\case_bigtech_fcf.json --out outputs\bigtech
 ```
 
+## Reference Runtime
+
+The repository also includes a small reference financial-agent runtime. It is not
+the main product, but it demonstrates orchestration, tool calling, retrieval,
+caching, retry, and trace export.
+
+```powershell
+python -m finagentbench run-reference --out outputs\reference-agent-run.json
+python -m finagentbench evaluate outputs\reference-agent-run.json --case fixtures\case_bigtech_fcf.json --out outputs\reference-agent-eval
+```
+
+See `docs/reference_runtime.md` and `docs/regression_log.md`.
+
 ## Adapter Demo
 
 The core benchmark expects a normalized `FinRun` shape, but raw agent traces can
@@ -86,6 +99,7 @@ coupled to the agent runtime or prompt implementation.
 - `finagentbench.metrics`: independent checks that can be enabled per case.
 - `finagentbench.runner`: validates inputs and aggregates metric results.
 - `finagentbench.report`: writes machine-readable and human-readable reports.
+- `finagentbench.reference_runtime`: minimal agent runtime that exports `FinRun`.
 - `fixtures`: small pass/fail traces and benchmark cases.
 
 ## CI Gate

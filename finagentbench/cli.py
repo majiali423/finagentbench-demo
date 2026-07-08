@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 from .adapters import load_run_file
+from .reference_runtime import run_reference_agent
 from .report import write_compare_report, write_eval_report
 from .runner import compare_runs, evaluate_run
 
@@ -32,6 +33,10 @@ def main() -> int:
     gate_parser.add_argument("--out", default="outputs/gate")
     gate_parser.add_argument("--adapter", default="auto")
 
+    runtime_parser = sub.add_parser("run-reference")
+    runtime_parser.add_argument("--out", default="outputs/reference-agent-run.json")
+    runtime_parser.add_argument("--query", default=None)
+
     args = parser.parse_args()
     if args.command == "evaluate":
         run = load_run_file(args.run_json, args.adapter)
@@ -54,6 +59,14 @@ def main() -> int:
             print(f"{'PASS' if report.passed else 'FAIL'} {report.run_id} score={report.score}")
             print(json.dumps(paths, ensure_ascii=False, indent=2))
         return 1 if failed else 0
+
+    if args.command == "run-reference":
+        run = run_reference_agent(args.query)
+        out_path = Path(args.out)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(json.dumps(run, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"WROTE {out_path}")
+        return 0
 
     baseline = load_run_file(args.baseline_json, args.adapter)
     current = load_run_file(args.current_json, args.adapter)

@@ -26,3 +26,8 @@ jobs:
 
       - name: Run big tech FCF benchmark gate
         run: python -m finagentbench gate fixtures/pass_bigtech_finrun.json --case fixtures/case_bigtech_fcf.json --out outputs/ci-bigtech-gate
+
+      - name: Run reference runtime and evaluate exported trace
+        run: |
+          python -m finagentbench run-reference --out outputs/reference-agent-run.json
+          python -m finagentbench evaluate outputs/reference-agent-run.json --case fixtures/case_bigtech_fcf.json --out outputs/reference-agent-eval
