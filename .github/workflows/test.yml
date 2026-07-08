@@ -30,6 +30,17 @@ jobs:
       - name: Run due diligence benchmark gate
         run: python -m finagentbench gate fixtures/pass_due_diligence_finrun.json --case fixtures/case_due_diligence.json --out outputs/ci-dd-gate
 
+      - name: Assert failing due diligence run is blocked
+        run: |
+          set +e
+          python -m finagentbench evaluate fixtures/fail_due_diligence_finrun.json --case fixtures/case_due_diligence.json --out outputs/ci-dd-fail
+          status=$?
+          set -e
+          if [ "$status" -eq 0 ]; then
+            echo "Expected fail_due_diligence_finrun.json to fail, but it passed."
+            exit 1
+          fi
+
       - name: Run reference runtime and evaluate exported trace
         run: |
           python -m finagentbench run-reference --out outputs/reference-agent-run.json

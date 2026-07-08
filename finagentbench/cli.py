@@ -8,6 +8,7 @@ from .adapters import load_run_file
 from .reference_runtime import run_reference_agent
 from .report import write_compare_report, write_eval_report
 from .runner import compare_runs, evaluate_run
+from .suggest import build_suggestions
 
 
 def main() -> int:
@@ -36,6 +37,12 @@ def main() -> int:
     runtime_parser = sub.add_parser("run-reference")
     runtime_parser.add_argument("--out", default="outputs/reference-agent-run.json")
     runtime_parser.add_argument("--query", default=None)
+
+    suggest_parser = sub.add_parser("suggest")
+    suggest_parser.add_argument("run_json")
+    suggest_parser.add_argument("--case", required=True)
+    suggest_parser.add_argument("--out", default="outputs/suggest.json")
+    suggest_parser.add_argument("--adapter", default="auto")
 
     args = parser.parse_args()
     if args.command == "evaluate":
@@ -66,6 +73,17 @@ def main() -> int:
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(json.dumps(run, ensure_ascii=False, indent=2), encoding="utf-8")
         print(f"WROTE {out_path}")
+        return 0
+
+    if args.command == "suggest":
+        run = load_run_file(args.run_json, args.adapter)
+        case = _load_json(args.case)
+        report = evaluate_run(run, case)
+        payload = build_suggestions(report)
+        out_path = Path(args.out)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
         return 0
 
     baseline = load_run_file(args.baseline_json, args.adapter)

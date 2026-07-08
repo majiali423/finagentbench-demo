@@ -16,6 +16,18 @@ This repository is intended to stand alone as a benchmark and reliability
 harness. A financial agent project can use it as a downstream quality gate, but
 FinAgentBench does not import or require any specific agent codebase.
 
+## Relationship To The Financial Agent Project
+
+This is my second project, not an extension module inside the first one. The
+financial agent project is responsible for generation: LLM calls, RAG, tools, and
+report writing. FinAgentBench is responsible for calibration: checking exported
+`FinRun` traces with deterministic metrics, regression gates, and repair
+suggestions.
+
+The two projects connect only through files or adapters. The agent can export a
+JSON trace, and FinAgentBench can evaluate it without importing the agent runtime.
+That keeps the benchmark reusable for other financial agents as well.
+
 ## What It Checks
 
 - Entity coverage: expected companies are present.
@@ -60,6 +72,15 @@ alignment, risk disclosure, and compliance language.
 ```powershell
 python -m finagentbench evaluate fixtures\pass_due_diligence_finrun.json --case fixtures\case_due_diligence.json --out outputs\dd-pass
 python -m finagentbench evaluate fixtures\due_diligence_state_sample.json --adapter due-diligence --case fixtures\case_due_diligence.json --out outputs\dd-state
+```
+
+## Repair Suggestions
+
+`suggest` converts findings into structured repair actions that an agent or
+human review queue can consume.
+
+```powershell
+python -m finagentbench suggest fixtures\fail_due_diligence_finrun.json --case fixtures\case_due_diligence.json --out outputs\dd-suggest.json
 ```
 
 ## Reference Runtime
