@@ -49,31 +49,64 @@
     {
       "entity": "AAPL",
       "name": "free_cash_flow_margin",
+      "period": "FY2025",
       "value": 0.260188,
       "formula": "free_cash_flow / revenue",
       "inputs": {
-        "free_cash_flow": 99.6,
-        "revenue": 382.7
+        "free_cash_flow": {
+          "value": 99.6,
+          "unit": "billion",
+          "currency": "USD",
+          "period": "FY2025"
+        },
+        "revenue": {
+          "value": 382.7,
+          "unit": "billion",
+          "currency": "USD",
+          "period": "FY2025"
+        }
       }
     },
     {
       "entity": "MSFT",
       "name": "free_cash_flow_margin",
+      "period": "FY2025",
       "value": 0.305333,
       "formula": "free_cash_flow / revenue",
       "inputs": {
-        "free_cash_flow": 73.28,
-        "revenue": 240.0
+        "free_cash_flow": {
+          "value": 73.28,
+          "unit": "billion",
+          "currency": "USD",
+          "period": "FY2025"
+        },
+        "revenue": {
+          "value": 240.0,
+          "unit": "billion",
+          "currency": "USD",
+          "period": "FY2025"
+        }
       }
     },
     {
       "entity": "NVDA",
       "name": "free_cash_flow_margin",
+      "period": "FY2025",
       "value": 0.519356,
       "formula": "free_cash_flow / revenue",
       "inputs": {
-        "free_cash_flow": 67.77,
-        "revenue": 130.48
+        "free_cash_flow": {
+          "value": 67.77,
+          "unit": "billion",
+          "currency": "USD",
+          "period": "FY2025"
+        },
+        "revenue": {
+          "value": 130.48,
+          "unit": "billion",
+          "currency": "USD",
+          "period": "FY2025"
+        }
       }
     }
   ],
@@ -81,16 +114,25 @@
     {
       "entity": "AAPL",
       "citation": "aapl_10k_2025.pdf#cashflow",
+      "period": "FY2025",
+      "source_type": "annual_report",
+      "provider": "company_filing",
       "text": "Revenue and operating cash flow tables used to estimate free cash flow margin."
     },
     {
       "entity": "MSFT",
       "citation": "msft_10k_2025.pdf#financials",
+      "period": "FY2025",
+      "source_type": "annual_report",
+      "provider": "company_filing",
       "text": "Revenue and free cash flow values used for the calculation."
     },
     {
       "entity": "NVDA",
       "citation": "nvda_10k_2025.pdf#liquidity",
+      "period": "FY2025",
+      "source_type": "annual_report",
+      "provider": "company_filing",
       "text": "Revenue and free cash flow values used for the calculation."
     }
   ],

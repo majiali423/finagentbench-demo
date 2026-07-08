@@ -54,10 +54,21 @@ evaluator independent from a specific agent architecture.
   "entity": "NVIDIA",
   "name": "free_cash_flow_margin",
   "value": 0.35,
+  "period": "FY2025",
   "formula": "free_cash_flow / revenue",
   "inputs": {
-    "free_cash_flow": 45.3,
-    "revenue": 130.5
+    "free_cash_flow": {
+      "value": 45.3,
+      "unit": "billion",
+      "currency": "USD",
+      "period": "FY2025"
+    },
+    "revenue": {
+      "value": 130.5,
+      "unit": "billion",
+      "currency": "USD",
+      "period": "FY2025"
+    }
   }
 }
 ```
@@ -66,12 +77,19 @@ FinAgentBench uses the formula and inputs to recompute deterministic values. If
 a metric has no formula, it can still be preserved for reporting, but the numeric
 correctness check will skip it.
 
+For production-like financial cases, include `period`, `unit`, and `currency`
+so temporal and unit/currency checks can detect mixed accounting periods or
+million/billion and currency mistakes.
+
 ## Evidence Shape
 
 ```json
 {
   "entity": "NVIDIA",
   "citation": "nvidia_10k_2025.pdf#p42",
+  "period": "FY2025",
+  "source_type": "annual_report",
+  "provider": "company_filing",
   "text": "Free cash flow and revenue values used by the agent."
 }
 ```

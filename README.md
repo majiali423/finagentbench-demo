@@ -18,6 +18,9 @@ runtime traces into that shape, and deterministic metrics score the run.
 - Numeric correctness: reported financial ratios match formulas and inputs.
 - Evidence coverage: entities and important dimensions have cited evidence.
 - Market data disclosure: failed market data is disclosed in the final output.
+- Temporal consistency: financial periods and market-data dates are explicit.
+- Unit/currency consistency: calculations do not mix units or currencies.
+- Risk disclosure: outputs include limitations and research/advice boundaries.
 - Compliance language: unsafe financial claims are flagged.
 - Required steps: expected agent steps are present.
 

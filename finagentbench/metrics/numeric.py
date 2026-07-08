@@ -5,6 +5,7 @@ import math
 from typing import Any
 
 from ..schema import Finding, MetricResult
+from .common import input_value
 
 
 def numeric_correctness(run: dict[str, Any], case: dict[str, Any]) -> MetricResult:
@@ -41,7 +42,7 @@ def numeric_correctness(run: dict[str, Any], case: dict[str, Any]) -> MetricResu
 def _safe_eval_formula(formula: str, inputs: dict[str, Any]) -> float | None:
     try:
         tree = ast.parse(formula, mode="eval")
-        evaluator = _SafeFormulaEvaluator({key: float(value) for key, value in inputs.items()})
+        evaluator = _SafeFormulaEvaluator({key: float(input_value(value)) for key, value in inputs.items()})
         return round(evaluator.visit(tree), 6)
     except Exception:
         return None

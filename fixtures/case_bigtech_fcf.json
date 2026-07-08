@@ -14,6 +14,9 @@
     "compliance"
   ],
   "numeric_tolerance": 0.001,
+  "require_temporal_consistency": true,
+  "require_unit_currency_consistency": true,
+  "require_risk_disclosure": true,
   "min_score": 85,
   "regression_tolerance": 5
 }

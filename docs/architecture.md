@@ -32,8 +32,10 @@ FinAgentBench also tells where the run became unreliable:
 - missing expected entities
 - missing required intermediate steps
 - wrong deterministic financial formulas
+- mixed reporting periods, units, or currencies
 - unsupported claims without evidence
 - silent market-data failures
+- missing risk and limitation disclosure
 - unsafe investment language
 
 That makes the output actionable for debugging and for CI regression gates.
