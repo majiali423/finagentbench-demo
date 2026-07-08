@@ -30,6 +30,9 @@ jobs:
       - name: Run due diligence benchmark gate
         run: python -m finagentbench gate fixtures/pass_due_diligence_finrun.json --case fixtures/case_due_diligence.json --out outputs/ci-dd-gate
 
+      - name: Run curated due diligence benchmark suite
+        run: python -m finagentbench benchmark benchmarks/due_diligence/suite.json --out outputs/dd-suite-report.json
+
       - name: Assert failing due diligence run is blocked
         run: |
           set +e

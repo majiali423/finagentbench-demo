@@ -48,3 +48,12 @@ examples are fixture-backed so they can be reproduced locally and in CI.
   succeeds on retry.
 - Why it matters: production agent quality depends on runtime behavior such as
   retry, cache, and tool-call observability, not only final-answer text.
+
+## Curated Due Diligence Suite
+
+- Suite: `benchmarks/due_diligence/suite.json`
+- Coverage: 10 traces, 9 failure types.
+- Current result: 9/9 expected failing traces detected, 0 false positives.
+- Failure types: missing entity, missing steps, missing sections, wrong number,
+  evidence-number mismatch, missing evidence, missing risk, compliance
+  violation, and multi-issue regression.

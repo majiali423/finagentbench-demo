@@ -1,0 +1,76 @@
+{
+  "id": "due_diligence_curated_v1",
+  "case": "../../fixtures/case_due_diligence.json",
+  "items": [
+    {
+      "id": "dd_pass_baseline",
+      "run": "../../fixtures/pass_due_diligence_finrun.json",
+      "failure_type": "none",
+      "expected_passed": true,
+      "expected_findings": []
+    },
+    {
+      "id": "dd_multi_issue",
+      "run": "../../fixtures/fail_due_diligence_finrun.json",
+      "failure_type": "multi_issue",
+      "expected_passed": false,
+      "expected_findings": ["step_presence", "section_presence", "numeric_correctness", "evidence_consistency", "risk_disclosure", "compliance_language"]
+    },
+    {
+      "id": "dd_missing_entity",
+      "run": "runs/missing_entity.json",
+      "failure_type": "missing_entity",
+      "expected_passed": false,
+      "expected_findings": ["entity_coverage"]
+    },
+    {
+      "id": "dd_missing_steps",
+      "run": "runs/missing_steps.json",
+      "failure_type": "missing_steps",
+      "expected_passed": false,
+      "expected_findings": ["step_presence"]
+    },
+    {
+      "id": "dd_missing_sections",
+      "run": "runs/missing_sections.json",
+      "failure_type": "missing_sections",
+      "expected_passed": false,
+      "expected_findings": ["section_presence"]
+    },
+    {
+      "id": "dd_wrong_number",
+      "run": "runs/wrong_number.json",
+      "failure_type": "wrong_number",
+      "expected_passed": false,
+      "expected_findings": ["numeric_correctness"]
+    },
+    {
+      "id": "dd_bad_evidence_number",
+      "run": "runs/bad_evidence_number.json",
+      "failure_type": "bad_evidence_number",
+      "expected_passed": false,
+      "expected_findings": ["evidence_consistency"]
+    },
+    {
+      "id": "dd_missing_evidence",
+      "run": "runs/missing_evidence.json",
+      "failure_type": "missing_evidence",
+      "expected_passed": false,
+      "expected_findings": ["evidence_coverage"]
+    },
+    {
+      "id": "dd_missing_risk",
+      "run": "runs/missing_risk.json",
+      "failure_type": "missing_risk",
+      "expected_passed": false,
+      "expected_findings": ["risk_disclosure"]
+    },
+    {
+      "id": "dd_compliance_violation",
+      "run": "runs/compliance_violation.json",
+      "failure_type": "compliance_violation",
+      "expected_passed": false,
+      "expected_findings": ["compliance_language"]
+    }
+  ]
+}

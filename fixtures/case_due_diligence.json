@@ -50,7 +50,7 @@
   },
   "severity_penalties": {
     "high": 10,
-    "medium": 5
+    "medium": 6
   },
   "block_on_severity": [
     "critical"

@@ -74,6 +74,19 @@ python -m finagentbench evaluate fixtures\pass_due_diligence_finrun.json --case 
 python -m finagentbench evaluate fixtures\due_diligence_state_sample.json --adapter due-diligence --case fixtures\case_due_diligence.json --out outputs\dd-state
 ```
 
+## Benchmark Suite
+
+The curated due diligence suite contains 10 traces covering 9 failure scenarios,
+including missing entities, missing workflow steps, missing report sections,
+wrong numbers, evidence-number mismatch, missing evidence, missing risk
+disclosure, compliance violation, and multi-issue regressions.
+
+```powershell
+python -m finagentbench benchmark benchmarks\due_diligence\suite.json --out outputs\dd-suite-report.json
+```
+
+Current expected result: 9/9 failing traces detected, 0 false positives.
+
 ## Repair Suggestions
 
 `suggest` converts findings into structured repair actions that an agent or
