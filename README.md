@@ -21,6 +21,7 @@ FinAgentBench does not import or require any specific agent codebase.
 - Entity coverage: expected companies are present.
 - Numeric correctness: reported financial ratios match formulas and inputs.
 - Evidence coverage: entities and important dimensions have cited evidence.
+- Evidence consistency: cited evidence contains the numbers used in calculations.
 - Market data disclosure: failed market data is disclosed in the final output.
 - Temporal consistency: financial periods and market-data dates are explicit.
 - Unit/currency consistency: calculations do not mix units or currencies.
@@ -49,6 +50,16 @@ wording.
 
 ```powershell
 python -m finagentbench evaluate fixtures\pass_bigtech_finrun.json --case fixtures\case_bigtech_fcf.json --out outputs\bigtech
+```
+
+## Due Diligence Scenario
+
+The due diligence case checks report sections, weighted scoring, evidence-number
+alignment, risk disclosure, and compliance language.
+
+```powershell
+python -m finagentbench evaluate fixtures\pass_due_diligence_finrun.json --case fixtures\case_due_diligence.json --out outputs\dd-pass
+python -m finagentbench evaluate fixtures\due_diligence_state_sample.json --adapter due-diligence --case fixtures\case_due_diligence.json --out outputs\dd-state
 ```
 
 ## Reference Runtime

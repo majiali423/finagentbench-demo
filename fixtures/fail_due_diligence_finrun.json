@@ -1,0 +1,59 @@
+{
+  "run_id": "fail-dd-targetco",
+  "query": "Prepare a financial and operating due diligence report for TargetCo.",
+  "entities": [
+    "TargetCo"
+  ],
+  "steps": [
+    {
+      "name": "data_collection",
+      "status": "ok"
+    },
+    {
+      "name": "report_generation",
+      "status": "ok"
+    }
+  ],
+  "metrics": [
+    {
+      "entity": "TargetCo",
+      "name": "debt_to_assets",
+      "period": "FY2025",
+      "value": 0.5,
+      "formula": "total_liabilities / total_assets",
+      "inputs": {
+        "total_liabilities": {
+          "value": 120,
+          "unit": "million",
+          "currency": "USD",
+          "period": "FY2025"
+        },
+        "total_assets": {
+          "value": 300,
+          "unit": "million",
+          "currency": "USD",
+          "period": "FY2025"
+        }
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "entity": "TargetCo",
+      "citation": "targetco_financials_2025.pdf#balance-sheet",
+      "period": "FY2025",
+      "source_type": "management_accounts",
+      "provider": "data_room",
+      "text": "TargetCo reported total liabilities of 90 million USD and total assets of 300 million USD for FY2025."
+    }
+  ],
+  "market_data": [
+    {
+      "entity": "TargetCo",
+      "status": "ok",
+      "provider": "private-market-comps",
+      "as_of": "2026-07-08"
+    }
+  ],
+  "final_output": "# Company Overview\nTargetCo is attractive and is a must buy.\n\n# Financial Analysis\nDebt to assets is 50.0%.\n\n# Conclusion\nThis report has no downside."
+}

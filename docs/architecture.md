@@ -40,6 +40,7 @@ FinAgentBench also tells where the run became unreliable:
 - wrong deterministic financial formulas
 - mixed reporting periods, units, or currencies
 - unsupported claims without evidence
+- citations whose numbers do not match calculation inputs
 - silent market-data failures
 - missing risk and limitation disclosure
 - unsafe investment language

@@ -22,7 +22,7 @@ DOCS = {
         "FY2025",
         "annual_report",
         "company_filing",
-        "Revenue and free cash flow values from annual filing evidence.",
+        "AAPL free cash flow was 99.6 billion USD and revenue was 382.7 billion USD for FY2025.",
     ),
     "MSFT": RetrievedDoc(
         "MSFT",
@@ -30,7 +30,7 @@ DOCS = {
         "FY2025",
         "annual_report",
         "company_filing",
-        "Revenue and free cash flow values from annual filing evidence.",
+        "MSFT free cash flow was 73.28 billion USD and revenue was 240.0 billion USD for FY2025.",
     ),
     "NVDA": RetrievedDoc(
         "NVDA",
@@ -38,7 +38,7 @@ DOCS = {
         "FY2025",
         "annual_report",
         "company_filing",
-        "Revenue and free cash flow values from annual filing evidence.",
+        "NVDA free cash flow was 67.77 billion USD and revenue was 130.48 billion USD for FY2025.",
     ),
 }
 

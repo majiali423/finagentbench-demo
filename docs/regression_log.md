@@ -33,6 +33,14 @@ examples are fixture-backed so they can be reproduced locally and in CI.
 - Why it matters: real financial analysis often fails through subtle unit,
   currency, and period mismatches rather than obvious syntax errors.
 
+## Citation Number Mismatch
+
+- Test: `tests/test_evidence_consistency.py`
+- Failure: a cited source exists, but the numeric value in evidence text does not
+  match the metric input used for calculation.
+- Why it matters: in due diligence and financial research, a citation is not
+  enough if it supports the wrong number.
+
 ## Runtime Retry Trace
 
 - Test: `tests/test_reference_runtime.py`

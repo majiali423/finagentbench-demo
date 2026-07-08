@@ -55,6 +55,14 @@ def validate_case(case: dict[str, Any]) -> None:
         float(case["numeric_tolerance"])
     if "enabled_metrics" in case:
         _require_list(case, "enabled_metrics")
+    if "required_sections" in case:
+        _require_list(case, "required_sections")
+    if "metric_weights" in case and not isinstance(case["metric_weights"], dict):
+        raise ValidationError("metric_weights must be an object")
+    if "severity_penalties" in case and not isinstance(case["severity_penalties"], dict):
+        raise ValidationError("severity_penalties must be an object")
+    if "block_on_severity" in case:
+        _require_list(case, "block_on_severity")
 
 
 def _require_list(payload: dict[str, Any], field_name: str) -> None:

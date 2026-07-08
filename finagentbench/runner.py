@@ -10,9 +10,10 @@ def evaluate_run(run: dict[str, Any], case: dict[str, Any]) -> EvalReport:
     validate_finrun(run)
     validate_case(case)
     results = [metric(run, case) for metric in resolve_metrics(case)]
-    score = round(sum(result.score for result in results) / len(results), 2)
+    score = _score_results(results, case)
+    blocked = set(case.get("block_on_severity", ["critical"]))
     passed = score >= float(case.get("min_score", 85)) and all(
-        finding.severity != "critical"
+        finding.severity not in blocked
         for result in results
         for finding in result.findings
     )
@@ -47,3 +48,20 @@ def compare_runs(baseline: dict[str, Any], current: dict[str, Any], case: dict[s
         "regressions": regressions,
         "passed": current_report.passed and not regressions,
     }
+
+
+def _score_results(results: list, case: dict[str, Any]) -> float:
+    weights = case.get("metric_weights", {})
+    weighted_total = 0.0
+    weight_total = 0.0
+    for result in results:
+        weight = float(weights.get(result.name, 1.0))
+        weighted_total += result.score * weight
+        weight_total += weight
+    score = 100.0 if weight_total == 0 else weighted_total / weight_total
+
+    penalties = case.get("severity_penalties", {})
+    for result in results:
+        for finding in result.findings:
+            score -= float(penalties.get(finding.severity, 0))
+    return round(max(0.0, score), 2)

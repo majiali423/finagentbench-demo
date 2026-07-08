@@ -1,0 +1,61 @@
+{
+  "id": "due_diligence_001",
+  "query": "Prepare a financial and operating due diligence report for TargetCo.",
+  "expected_entities": [
+    "TargetCo"
+  ],
+  "required_steps": [
+    "data_collection",
+    "financial_analysis",
+    "risk_assessment",
+    "report_generation"
+  ],
+  "required_sections": [
+    "Company Overview",
+    "Financial Analysis",
+    "Operations And Industry",
+    "Risk Disclosure",
+    "Conclusion And Limitations"
+  ],
+  "section_aliases": {
+    "Operations And Industry": [
+      "Operations & Industry"
+    ],
+    "Conclusion And Limitations": [
+      "Conclusion & Limitations"
+    ]
+  },
+  "enabled_metrics": [
+    "entity_coverage",
+    "step_presence",
+    "section_presence",
+    "numeric_correctness",
+    "evidence_coverage",
+    "evidence_consistency",
+    "risk_disclosure",
+    "compliance_language"
+  ],
+  "require_evidence_consistency": true,
+  "evidence_numeric_tolerance": 0.05,
+  "require_risk_disclosure": true,
+  "required_risk_types": [
+    "market",
+    "data"
+  ],
+  "metric_weights": {
+    "evidence_consistency": 2.0,
+    "numeric_correctness": 1.5,
+    "risk_disclosure": 1.5,
+    "compliance_language": 2.0
+  },
+  "severity_penalties": {
+    "high": 10,
+    "medium": 5
+  },
+  "block_on_severity": [
+    "critical"
+  ],
+  "numeric_tolerance": 0.001,
+  "min_score": 85,
+  "regression_tolerance": 5
+}

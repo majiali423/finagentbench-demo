@@ -117,7 +117,7 @@
       "period": "FY2025",
       "source_type": "annual_report",
       "provider": "company_filing",
-      "text": "Revenue and operating cash flow tables used to estimate free cash flow margin."
+      "text": "AAPL free cash flow was 99.6 billion USD and revenue was 382.7 billion USD for FY2025."
     },
     {
       "entity": "MSFT",
@@ -125,7 +125,7 @@
       "period": "FY2025",
       "source_type": "annual_report",
       "provider": "company_filing",
-      "text": "Revenue and free cash flow values used for the calculation."
+      "text": "MSFT free cash flow was 73.28 billion USD and revenue was 240.0 billion USD for FY2025."
     },
     {
       "entity": "NVDA",
@@ -133,7 +133,7 @@
       "period": "FY2025",
       "source_type": "annual_report",
       "provider": "company_filing",
-      "text": "Revenue and free cash flow values used for the calculation."
+      "text": "NVDA free cash flow was 67.77 billion USD and revenue was 130.48 billion USD for FY2025."
     }
   ],
   "market_data": [

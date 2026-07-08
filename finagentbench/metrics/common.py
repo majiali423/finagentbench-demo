@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from typing import Any
 
 
@@ -25,3 +26,14 @@ def input_currency(value: Any) -> str:
     if isinstance(value, dict):
         return str(value.get("currency") or "")
     return ""
+
+
+def extract_numbers(text: str) -> list[float]:
+    values = []
+    for match in re.finditer(r"[-+]?\d+(?:,\d{3})*(?:\.\d+)?", text):
+        raw = match.group(0).replace(",", "")
+        try:
+            values.append(float(raw))
+        except ValueError:
+            continue
+    return values

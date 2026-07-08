@@ -6,10 +6,11 @@ from typing import Any
 
 from .base import TraceAdapter
 from .agent_state import AgentStateAdapter
+from .due_diligence import DueDiligenceAdapter
 from .generic_json import GenericJsonAdapter
 
 
-ADAPTERS: tuple[TraceAdapter, ...] = (GenericJsonAdapter(), AgentStateAdapter())
+ADAPTERS: tuple[TraceAdapter, ...] = (GenericJsonAdapter(), AgentStateAdapter(), DueDiligenceAdapter())
 
 
 def load_run_file(path: str | Path, adapter_name: str = "auto") -> dict[str, Any]:
