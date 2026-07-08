@@ -1,0 +1,19 @@
+{
+  "id": "bigtech_fcf_001",
+  "query": "Compare AAPL, MSFT, and NVDA free cash flow margin and valuation risk.",
+  "expected_entities": [
+    "AAPL",
+    "MSFT",
+    "NVDA"
+  ],
+  "required_steps": [
+    "retrieval",
+    "quant",
+    "risk",
+    "synthesis",
+    "compliance"
+  ],
+  "numeric_tolerance": 0.001,
+  "min_score": 85,
+  "regression_tolerance": 5
+}

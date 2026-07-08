@@ -1,9 +1,16 @@
-# FinAgentBench Demo
+# FinAgentBench
 
 Replay-first reliability checks for financial AI agent runs.
 
-This demo evaluates exported financial-agent run artifacts. It does not run an
-LLM and does not depend on any specific agent framework.
+Financial agents can produce convincing final answers while silently missing an
+entity, using unsupported evidence, computing a ratio incorrectly, hiding market
+data failures, or making unsafe investment claims. FinAgentBench evaluates the
+exported trace of an agent run so those failures are visible before the output
+reaches a user.
+
+FinAgentBench does not run an LLM and does not depend on a specific agent
+framework. Agents export a small `FinRun` JSON artifact, adapters normalize raw
+runtime traces into that shape, and deterministic metrics score the run.
 
 ## What It Checks
 
@@ -27,6 +34,16 @@ python -m finagentbench gate fixtures\pass_finrun.json fixtures\fail_finrun.json
 
 Reports are written as JSON, Markdown, and HTML.
 
+## Realistic Scenario
+
+The fixtures include a larger multi-company case that checks free cash flow
+margin, valuation-risk evidence, market-data failure disclosure, and compliance
+wording.
+
+```powershell
+python -m finagentbench evaluate fixtures\pass_bigtech_finrun.json --case fixtures\case_bigtech_fcf.json --out outputs\bigtech
+```
+
 ## Adapter Demo
 
 The core benchmark expects a normalized `FinRun` shape, but raw agent traces can
@@ -35,6 +52,8 @@ come from different systems. Adapters keep that boundary explicit.
 ```powershell
 python -m finagentbench evaluate fixtures\lumenfin_state_sample.json --adapter lumenfin --case fixtures\case_compare_rd.json --out outputs\lumenfin
 ```
+
+See `docs/adapter_guide.md` for the adapter contract.
 
 ## Metric Subsets
 
@@ -61,3 +80,9 @@ coupled to the agent runtime or prompt implementation.
 - `finagentbench.runner`: validates inputs and aggregates metric results.
 - `finagentbench.report`: writes machine-readable and human-readable reports.
 - `fixtures`: small pass/fail traces and benchmark cases.
+
+## CI Gate
+
+The GitHub Actions workflow runs unit tests and then executes a benchmark gate.
+This lets a team block regressions after changing prompts, tools, retrieval
+pipelines, or agent orchestration code.

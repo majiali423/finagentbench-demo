@@ -1,0 +1,119 @@
+{
+  "run_id": "pass-bigtech-fcf",
+  "query": "Compare AAPL, MSFT, and NVDA free cash flow margin and valuation risk.",
+  "metadata": {
+    "agent_version": "demo-0.1",
+    "trace_format": "finrun"
+  },
+  "entities": [
+    {
+      "name": "AAPL",
+      "symbol": "AAPL"
+    },
+    {
+      "name": "MSFT",
+      "symbol": "MSFT"
+    },
+    {
+      "name": "NVDA",
+      "symbol": "NVDA"
+    }
+  ],
+  "steps": [
+    {
+      "name": "planning",
+      "status": "ok"
+    },
+    {
+      "name": "retrieval",
+      "status": "ok"
+    },
+    {
+      "name": "quant",
+      "status": "ok"
+    },
+    {
+      "name": "risk",
+      "status": "ok"
+    },
+    {
+      "name": "synthesis",
+      "status": "ok"
+    },
+    {
+      "name": "compliance",
+      "status": "ok"
+    }
+  ],
+  "metrics": [
+    {
+      "entity": "AAPL",
+      "name": "free_cash_flow_margin",
+      "value": 0.260188,
+      "formula": "free_cash_flow / revenue",
+      "inputs": {
+        "free_cash_flow": 99.6,
+        "revenue": 382.7
+      }
+    },
+    {
+      "entity": "MSFT",
+      "name": "free_cash_flow_margin",
+      "value": 0.305333,
+      "formula": "free_cash_flow / revenue",
+      "inputs": {
+        "free_cash_flow": 73.28,
+        "revenue": 240.0
+      }
+    },
+    {
+      "entity": "NVDA",
+      "name": "free_cash_flow_margin",
+      "value": 0.519356,
+      "formula": "free_cash_flow / revenue",
+      "inputs": {
+        "free_cash_flow": 67.77,
+        "revenue": 130.48
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "entity": "AAPL",
+      "citation": "aapl_10k_2025.pdf#cashflow",
+      "text": "Revenue and operating cash flow tables used to estimate free cash flow margin."
+    },
+    {
+      "entity": "MSFT",
+      "citation": "msft_10k_2025.pdf#financials",
+      "text": "Revenue and free cash flow values used for the calculation."
+    },
+    {
+      "entity": "NVDA",
+      "citation": "nvda_10k_2025.pdf#liquidity",
+      "text": "Revenue and free cash flow values used for the calculation."
+    }
+  ],
+  "market_data": [
+    {
+      "entity": "AAPL",
+      "status": "ok",
+      "provider": "yahoo",
+      "as_of": "2026-07-08"
+    },
+    {
+      "entity": "MSFT",
+      "status": "ok",
+      "provider": "yahoo",
+      "as_of": "2026-07-08"
+    },
+    {
+      "entity": "NVDA",
+      "status": "failed",
+      "provider": "yahoo",
+      "error": "rate_limit",
+      "as_of": "2026-07-08"
+    }
+  ],
+  "final_output": "AAPL, MSFT, and NVDA were compared using cited annual filing evidence. NVDA has the highest estimated free cash flow margin in this sample, but valuation risk is also higher and the NVDA live market data provider failed due to a rate limit, so valuation context is incomplete. This is research output only and not investment advice."
+}
