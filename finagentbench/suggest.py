@@ -18,7 +18,9 @@ ACTION_BY_METRIC = {
     "evidence_support": "review",
     "market_data_disclosure": "disclose",
     "risk_disclosure": "rewrite",
+    "risk_quality": "review",
     "compliance_language": "rewrite",
+    "compliance_semantic": "review",
 }
 
 
@@ -58,7 +60,7 @@ def _target_for(finding: Finding) -> dict[str, Any]:
         return {"section": _after_last_colon(message)}
     if finding.metric == "market_data_disclosure":
         return {"entity": _between(message, "for ", " but") or "unknown"}
-    if finding.metric in {"risk_disclosure", "compliance_language"}:
+    if finding.metric in {"risk_disclosure", "risk_quality", "compliance_language", "compliance_semantic"}:
         return {"section": "final_output"}
     return asdict(finding)
 

@@ -13,6 +13,11 @@
   "enabled_metrics": [
     "evidence_support"
   ],
+  "audit_metrics": [
+    "evidence_support",
+    "risk_quality",
+    "compliance_semantic"
+  ],
   "semantic_audit": {
     "judge": {
       "provider": "static",
@@ -25,10 +30,30 @@
           "labels": [
             "supported"
           ]
+        },
+        "risk_quality": {
+          "score": 88,
+          "passed": true,
+          "rationale": "Risk disclosure names market risk and data limitation risk tied to private-market peers and data-room materials.",
+          "severity": "low",
+          "labels": [
+            "specific_risk_disclosure"
+          ]
+        },
+        "compliance_semantic": {
+          "score": 90,
+          "passed": true,
+          "rationale": "The output frames the analysis as research only and avoids personalized investment advice.",
+          "severity": "low",
+          "labels": [
+            "research_framing"
+          ]
         }
       }
     },
-    "min_evidence_support_score": 80
+    "min_evidence_support_score": 80,
+    "min_risk_quality_score": 80,
+    "min_compliance_semantic_score": 85
   },
   "min_score": 80
 }

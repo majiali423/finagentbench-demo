@@ -33,6 +33,8 @@ class SchemaAndRegistryTestCase(unittest.TestCase):
         self.assertIn("entity_coverage", names)
         self.assertIn("compliance_language", names)
         self.assertIn("evidence_support", names)
+        self.assertIn("risk_quality", names)
+        self.assertIn("compliance_semantic", names)
 
 
 def _load(name: str) -> dict:

@@ -101,9 +101,11 @@ gaps.
 python -m finagentbench semantic-benchmark benchmarks\semantic_audit\evidence_support_golden.json --out outputs\evidence-support-golden.json
 ```
 
-Current expected result: 20/20 labels matched, 0 false positives, 0 false
-negatives. These cases are intended for judge calibration and regression replay;
-production teams should add real failures observed from their own agent logs.
+Current expected replay result: 20/20 labels matched, 0 false positives, 0
+false negatives. This is static judge replay for metric plumbing and label
+alignment, not a claim of live LLM judge accuracy. Production teams should run
+the same suite with a real judge configuration and add real failures observed
+from their own agent logs.
 
 ## Repair Suggestions
 
@@ -118,11 +120,39 @@ python -m finagentbench suggest fixtures\fail_due_diligence_finrun.json --case f
 
 Most metrics are deterministic and should stay in the default CI gate. Semantic
 audit is optional and intended for release evaluation or golden-label replay.
-Enable `evidence_support` in a case file and configure `semantic_audit.judge`.
-The built-in `static` judge is useful for tests and labeled benchmark replay;
+Enable semantic metrics in a case file and configure `semantic_audit.judge`.
+
+- `evidence_support`: whether final conclusions are supported by cited evidence.
+- `risk_quality`: whether risk disclosure is concrete and tied to the analysis.
+- `compliance_semantic`: whether the answer contains implicit advice or overconfident claims.
+
+The built-in `static` judge is useful for tests and labeled benchmark replay.
+When no semantic judge is configured, semantic metrics fail conservatively with
+`semantic_judge_not_configured`; the fallback is not treated as a real semantic
+auditor.
 `openai-compatible` reads endpoint, key, and model from
 `FINAGENTBENCH_LLM_ENDPOINT`, `FINAGENTBENCH_LLM_API_KEY`, and
-`FINAGENTBENCH_LLM_MODEL`.
+`FINAGENTBENCH_LLM_MODEL`. It also supports cache, retry, timeout, and prompt
+version tracking through judge config:
+
+```json
+{
+  "semantic_audit": {
+    "judge": {
+      "provider": "openai-compatible",
+      "prompt_version": "financial_audit_v1",
+      "cache_path": "outputs/llm_judge_cache.json",
+      "retry_count": 2,
+      "backoff_seconds": 1,
+      "timeout_seconds": 20
+    }
+  }
+}
+```
+
+Semantic findings include judge metadata such as provider, model,
+`prompt_version`, cache key, cache hit status, and latency. This makes release
+audit results easier to reproduce after changing prompts or models.
 
 This keeps the project provider-neutral: the benchmark schema, reports, and
 suggestions do not depend on a specific LLM vendor.
@@ -130,6 +160,20 @@ suggestions do not depend on a specific LLM vendor.
 ```powershell
 python -m finagentbench evaluate fixtures\pass_due_diligence_finrun.json --case fixtures\case_due_diligence_semantic_audit.json --out outputs\dd-semantic-audit
 ```
+
+## Profiles
+
+`--profile ci` removes semantic metrics and keeps the deterministic gate fast
+and reproducible. `--profile audit` adds metrics listed in `audit_metrics`, which
+should be used with a configured semantic judge.
+
+```powershell
+python -m finagentbench evaluate fixtures\pass_due_diligence_finrun.json --case fixtures\case_due_diligence_semantic_audit.json --profile ci
+python -m finagentbench evaluate fixtures\pass_due_diligence_finrun.json --case fixtures\case_due_diligence_semantic_audit.json --profile audit
+```
+
+The included semantic audit case uses `static` judge output for demo replay. It
+is not evidence that a live LLM provider has been audited.
 
 ## Reference Runtime
 

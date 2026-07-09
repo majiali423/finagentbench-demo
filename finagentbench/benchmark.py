@@ -136,14 +136,16 @@ def run_semantic_benchmark_suite(suite_path: str | Path) -> dict[str, Any]:
         )
 
     total = len(items)
-    accuracy = 1.0 if total == 0 else matched / total
+    match_rate = 1.0 if total == 0 else matched / total
     return {
         "suite_id": suite["id"],
         "task": task,
         "metric": metric_name,
+        "benchmark_mode": suite.get("benchmark_mode", "static_judge_replay"),
+        "measures": "pipeline_replay_consistency_not_live_llm_accuracy",
         "total": total,
         "matched": matched,
-        "accuracy": round(accuracy, 4),
+        "replay_match_rate": round(match_rate, 4),
         "false_positives": false_positives,
         "false_negatives": false_negatives,
         "by_failure_type": by_failure_type,

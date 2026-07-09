@@ -2,8 +2,9 @@
   "id": "evidence_support_golden_v1",
   "task": "evidence_support",
   "metric": "evidence_support",
+  "benchmark_mode": "static_judge_replay",
   "min_score": 80,
-  "description": "Synthetic human-labeled golden set for semantic evidence-support calibration.",
+  "description": "Synthetic human-labeled golden set for semantic evidence-support pipeline replay. This validates metric plumbing and label alignment, not live LLM judge accuracy.",
   "items": [
     {
       "id": "supported_balance_sheet_summary_001",

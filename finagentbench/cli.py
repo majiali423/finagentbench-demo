@@ -6,6 +6,7 @@ from pathlib import Path
 
 from .adapters import load_run_file
 from .benchmark import run_benchmark_suite, run_semantic_benchmark_suite
+from .profiles import apply_profile
 from .reference_runtime import run_reference_agent
 from .report import write_compare_report, write_eval_report
 from .runner import compare_runs, evaluate_run
@@ -21,6 +22,7 @@ def main() -> int:
     eval_parser.add_argument("--case", required=True)
     eval_parser.add_argument("--out", default="outputs")
     eval_parser.add_argument("--adapter", default="auto")
+    eval_parser.add_argument("--profile", choices=["default", "ci", "audit"], default="default")
 
     compare_parser = sub.add_parser("compare")
     compare_parser.add_argument("baseline_json")
@@ -28,12 +30,14 @@ def main() -> int:
     compare_parser.add_argument("--case", required=True)
     compare_parser.add_argument("--out", default="outputs")
     compare_parser.add_argument("--adapter", default="auto")
+    compare_parser.add_argument("--profile", choices=["default", "ci", "audit"], default="default")
 
     gate_parser = sub.add_parser("gate")
     gate_parser.add_argument("run_json", nargs="+")
     gate_parser.add_argument("--case", required=True)
     gate_parser.add_argument("--out", default="outputs/gate")
     gate_parser.add_argument("--adapter", default="auto")
+    gate_parser.add_argument("--profile", choices=["default", "ci", "audit"], default="default")
 
     runtime_parser = sub.add_parser("run-reference")
     runtime_parser.add_argument("--out", default="outputs/reference-agent-run.json")
@@ -44,6 +48,7 @@ def main() -> int:
     suggest_parser.add_argument("--case", required=True)
     suggest_parser.add_argument("--out", default="outputs/suggest.json")
     suggest_parser.add_argument("--adapter", default="auto")
+    suggest_parser.add_argument("--profile", choices=["default", "ci", "audit"], default="default")
 
     benchmark_parser = sub.add_parser("benchmark")
     benchmark_parser.add_argument("suite_json")
@@ -56,7 +61,7 @@ def main() -> int:
     args = parser.parse_args()
     if args.command == "evaluate":
         run = load_run_file(args.run_json, args.adapter)
-        case = _load_json(args.case)
+        case = apply_profile(_load_json(args.case), args.profile)
         report = evaluate_run(run, case)
         paths = write_eval_report(report, Path(args.out))
         print(f"{'PASS' if report.passed else 'FAIL'} {report.run_id} score={report.score}")
@@ -64,7 +69,7 @@ def main() -> int:
         return 0 if report.passed else 1
 
     if args.command == "gate":
-        case = _load_json(args.case)
+        case = apply_profile(_load_json(args.case), args.profile)
         failed = False
         for run_json in args.run_json:
             run = load_run_file(run_json, args.adapter)
@@ -86,7 +91,7 @@ def main() -> int:
 
     if args.command == "suggest":
         run = load_run_file(args.run_json, args.adapter)
-        case = _load_json(args.case)
+        case = apply_profile(_load_json(args.case), args.profile)
         report = evaluate_run(run, case)
         payload = build_suggestions(report)
         out_path = Path(args.out)
@@ -113,7 +118,7 @@ def main() -> int:
 
     baseline = load_run_file(args.baseline_json, args.adapter)
     current = load_run_file(args.current_json, args.adapter)
-    case = _load_json(args.case)
+    case = apply_profile(_load_json(args.case), args.profile)
     payload = compare_runs(baseline, current, case)
     paths = write_compare_report(payload, Path(args.out))
     print(f"{'PASS' if payload['passed'] else 'FAIL'} delta={payload['score_delta']}")

@@ -20,7 +20,7 @@ def resolve_metrics(case: dict[str, Any]) -> tuple[MetricFn, ...]:
     if not enabled:
         return tuple(
             metric for name, metric in registry.items()
-            if name not in {"evidence_support"}
+            if name not in {"evidence_support", "risk_quality", "compliance_semantic"}
         )
 
     missing = [name for name in enabled if name not in registry]
