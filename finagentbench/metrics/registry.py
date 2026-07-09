@@ -18,7 +18,10 @@ def resolve_metrics(case: dict[str, Any]) -> tuple[MetricFn, ...]:
     registry = available_metrics()
     enabled = case.get("enabled_metrics")
     if not enabled:
-        return tuple(registry.values())
+        return tuple(
+            metric for name, metric in registry.items()
+            if name not in {"evidence_support"}
+        )
 
     missing = [name for name in enabled if name not in registry]
     if missing:

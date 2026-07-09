@@ -1,0 +1,34 @@
+{
+  "id": "due_diligence_semantic_audit_001",
+  "query": "Prepare a financial and operating due diligence report for TargetCo.",
+  "expected_entities": [
+    "TargetCo"
+  ],
+  "required_steps": [
+    "data_collection",
+    "financial_analysis",
+    "risk_assessment",
+    "report_generation"
+  ],
+  "enabled_metrics": [
+    "evidence_support"
+  ],
+  "semantic_audit": {
+    "judge": {
+      "provider": "static",
+      "results": {
+        "evidence_support": {
+          "score": 92,
+          "passed": true,
+          "rationale": "The conclusion is supported by cited balance-sheet evidence and does not introduce a new investment recommendation.",
+          "severity": "low",
+          "labels": [
+            "supported"
+          ]
+        }
+      }
+    },
+    "min_evidence_support_score": 80
+  },
+  "min_score": 80
+}

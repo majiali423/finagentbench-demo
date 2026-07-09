@@ -7,7 +7,8 @@ from .common import input_currency, input_unit
 
 
 def unit_currency_consistency(run: dict[str, Any], case: dict[str, Any]) -> MetricResult:
-    if not case.get("require_unit_currency_consistency"):
+    explicitly_enabled = "unit_currency_consistency" in case.get("enabled_metrics", [])
+    if not case.get("require_unit_currency_consistency") and not explicitly_enabled:
         return MetricResult("unit_currency_consistency", 100.0, True, [])
 
     findings: list[Finding] = []

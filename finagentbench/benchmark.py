@@ -78,3 +78,100 @@ def run_benchmark_suite(suite_path: str | Path) -> dict[str, Any]:
         "passed": passed,
         "items": items,
     }
+
+
+def run_semantic_benchmark_suite(suite_path: str | Path) -> dict[str, Any]:
+    path = Path(suite_path)
+    suite = json.loads(path.read_text(encoding="utf-8"))
+    root = path.parent
+    task = suite.get("task", "evidence_support")
+    metric_name = suite.get("metric", task)
+    min_score = float(suite.get("min_score", 80.0))
+
+    items = []
+    false_positives = 0
+    false_negatives = 0
+    matched = 0
+    by_failure_type: dict[str, dict[str, Any]] = {}
+
+    for item in suite.get("items", []):
+        run = _load_semantic_run(root, item)
+        human_label = item["human_label"]
+        expected_passed = bool(human_label["passed"])
+        failure_type = str(human_label.get("failure_type", "supported"))
+        case = _semantic_case(item, metric_name, min_score)
+        report = evaluate_run(run, case)
+        metric = next(result for result in report.metrics if result.name == metric_name)
+        actual_passed = metric.passed
+        expectation_matched = actual_passed == expected_passed
+        if expectation_matched:
+            matched += 1
+        if expected_passed and not actual_passed:
+            false_positives += 1
+        if not expected_passed and actual_passed:
+            false_negatives += 1
+
+        bucket = by_failure_type.setdefault(
+            failure_type,
+            {"total": 0, "matched": 0, "detected": 0},
+        )
+        bucket["total"] += 1
+        if expectation_matched:
+            bucket["matched"] += 1
+        if not expected_passed and not actual_passed:
+            bucket["detected"] += 1
+
+        items.append(
+            {
+                "id": item["id"],
+                "task": task,
+                "failure_type": failure_type,
+                "human_passed": expected_passed,
+                "actual_passed": actual_passed,
+                "expectation_matched": expectation_matched,
+                "score": metric.score,
+                "human_severity": human_label.get("severity", ""),
+                "actual_findings": [finding.message for finding in metric.findings],
+            }
+        )
+
+    total = len(items)
+    accuracy = 1.0 if total == 0 else matched / total
+    return {
+        "suite_id": suite["id"],
+        "task": task,
+        "metric": metric_name,
+        "total": total,
+        "matched": matched,
+        "accuracy": round(accuracy, 4),
+        "false_positives": false_positives,
+        "false_negatives": false_negatives,
+        "by_failure_type": by_failure_type,
+        "passed": false_positives == 0 and false_negatives == 0,
+        "items": items,
+    }
+
+
+def _load_semantic_run(root: Path, item: dict[str, Any]) -> dict[str, Any]:
+    run = item.get("run")
+    if isinstance(run, dict):
+        return run
+    if isinstance(run, str):
+        return load_run_file((root / run).resolve(), item.get("adapter", "auto"))
+    raise ValueError(f"Semantic benchmark item {item.get('id')} must provide a run object or run path")
+
+
+def _semantic_case(item: dict[str, Any], metric_name: str, min_score: float) -> dict[str, Any]:
+    return {
+        "expected_entities": item.get("expected_entities", []),
+        "required_steps": [],
+        "enabled_metrics": [metric_name],
+        "semantic_audit": {
+            "judge": {
+                "provider": "static",
+                "results": {metric_name: item["judge_result"]},
+            },
+            f"min_{metric_name}_score": min_score,
+        },
+        "min_score": min_score,
+    }

@@ -4,6 +4,7 @@ from .compliance import compliance_language
 from .entity import entity_coverage
 from .evidence import evidence_coverage
 from .evidence_consistency import evidence_consistency
+from .evidence_support import evidence_support
 from .market import market_data_disclosure
 from .numeric import numeric_correctness
 from .risk import risk_disclosure
@@ -22,6 +23,7 @@ BUILTIN_METRICS = (
     unit_currency_consistency,
     evidence_coverage,
     evidence_consistency,
+    evidence_support,
     market_data_disclosure,
     risk_disclosure,
     compliance_language,

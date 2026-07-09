@@ -1,0 +1,688 @@
+{
+  "id": "evidence_support_golden_v1",
+  "task": "evidence_support",
+  "metric": "evidence_support",
+  "min_score": 80,
+  "description": "Synthetic human-labeled golden set for semantic evidence-support calibration.",
+  "items": [
+    {
+      "id": "supported_balance_sheet_summary_001",
+      "expected_entities": ["TargetCo"],
+      "human_label": {
+        "passed": true,
+        "severity": "low",
+        "failure_type": "supported_summary",
+        "rationale": "The final output summarizes liabilities, assets, and the ratio found in cited evidence."
+      },
+      "judge_result": {
+        "score": 94,
+        "passed": true,
+        "severity": "low",
+        "rationale": "The balance-sheet summary is supported by the cited evidence.",
+        "labels": ["supported_summary"]
+      },
+      "run": {
+        "run_id": "golden-supported-001",
+        "query": "Prepare a due diligence note for TargetCo.",
+        "entities": ["TargetCo"],
+        "steps": [],
+        "metrics": [],
+        "evidence": [
+          {
+            "entity": "TargetCo",
+            "citation": "targetco_bs_2025.pdf#p1",
+            "period": "FY2025",
+            "text": "TargetCo reported total liabilities of 120 million USD and total assets of 300 million USD for FY2025."
+          }
+        ],
+        "market_data": [],
+        "final_output": "TargetCo reported liabilities of 120 million USD and assets of 300 million USD in FY2025. Debt to assets is 40.0%. This is research only, not investment advice."
+      }
+    },
+    {
+      "id": "supported_private_company_limitations_002",
+      "expected_entities": ["HarborHealth"],
+      "human_label": {
+        "passed": true,
+        "severity": "low",
+        "failure_type": "supported_summary",
+        "rationale": "The final output correctly states private-company data limitations found in the evidence."
+      },
+      "judge_result": {
+        "score": 91,
+        "passed": true,
+        "severity": "low",
+        "rationale": "The limitation language is grounded in the data-room evidence.",
+        "labels": ["supported_limitation"]
+      },
+      "run": {
+        "run_id": "golden-supported-002",
+        "query": "Summarize diligence risks for HarborHealth.",
+        "entities": ["HarborHealth"],
+        "steps": [],
+        "metrics": [],
+        "evidence": [
+          {
+            "entity": "HarborHealth",
+            "citation": "harborhealth_dataroom_index.xlsx#tab-sources",
+            "period": "LTM2026Q1",
+            "text": "The data room includes unaudited management accounts and excludes audited FY2025 financial statements."
+          }
+        ],
+        "market_data": [],
+        "final_output": "HarborHealth diligence should treat the LTM figures as management-provided and unaudited because audited FY2025 financials were not included."
+      }
+    },
+    {
+      "id": "supported_guidance_downside_003",
+      "expected_entities": ["AsterRetail"],
+      "human_label": {
+        "passed": true,
+        "severity": "low",
+        "failure_type": "supported_summary",
+        "rationale": "The final output restates management guidance and downside sensitivity without adding unsupported claims."
+      },
+      "judge_result": {
+        "score": 89,
+        "passed": true,
+        "severity": "low",
+        "rationale": "The guidance and sensitivity statement are supported.",
+        "labels": ["supported_guidance"]
+      },
+      "run": {
+        "run_id": "golden-supported-003",
+        "query": "Assess AsterRetail guidance risk.",
+        "entities": ["AsterRetail"],
+        "steps": [],
+        "metrics": [],
+        "evidence": [
+          {
+            "entity": "AsterRetail",
+            "citation": "aster_retail_board_deck.pdf#guidance",
+            "period": "FY2026E",
+            "text": "Management guidance assumes 6% same-store sales growth. A downside case assumes 2% same-store sales growth."
+          }
+        ],
+        "market_data": [],
+        "final_output": "AsterRetail guidance depends on 6% same-store sales growth, while the downside case uses 2%. The output should be treated as scenario analysis."
+      }
+    },
+    {
+      "id": "supported_macro_exposure_004",
+      "expected_entities": ["GridParts"],
+      "human_label": {
+        "passed": true,
+        "severity": "low",
+        "failure_type": "supported_summary",
+        "rationale": "Macro exposure is directly supported by cited revenue mix evidence."
+      },
+      "judge_result": {
+        "score": 90,
+        "passed": true,
+        "severity": "low",
+        "rationale": "The macro exposure claim follows from the evidence.",
+        "labels": ["supported_macro_risk"]
+      },
+      "run": {
+        "run_id": "golden-supported-004",
+        "query": "Review GridParts macro exposure.",
+        "entities": ["GridParts"],
+        "steps": [],
+        "metrics": [],
+        "evidence": [
+          {
+            "entity": "GridParts",
+            "citation": "gridparts_revenue_mix.pdf#region",
+            "period": "FY2025",
+            "text": "GridParts generated 62% of FY2025 revenue from European industrial customers."
+          }
+        ],
+        "market_data": [],
+        "final_output": "GridParts has meaningful exposure to European industrial demand because 62% of FY2025 revenue came from that customer base."
+      }
+    },
+    {
+      "id": "supported_customer_concentration_005",
+      "expected_entities": ["NovaFoods"],
+      "human_label": {
+        "passed": true,
+        "severity": "low",
+        "failure_type": "supported_summary",
+        "rationale": "Customer concentration risk is stated with the same customer share as the evidence."
+      },
+      "judge_result": {
+        "score": 93,
+        "passed": true,
+        "severity": "low",
+        "rationale": "The risk statement is supported by customer concentration evidence.",
+        "labels": ["supported_customer_risk"]
+      },
+      "run": {
+        "run_id": "golden-supported-005",
+        "query": "Summarize NovaFoods concentration risk.",
+        "entities": ["NovaFoods"],
+        "steps": [],
+        "metrics": [],
+        "evidence": [
+          {
+            "entity": "NovaFoods",
+            "citation": "novafoods_sales_by_customer.csv#top10",
+            "period": "FY2025",
+            "text": "NovaFoods' largest customer represented 31% of FY2025 revenue."
+          }
+        ],
+        "market_data": [],
+        "final_output": "NovaFoods has customer concentration risk because its largest customer represented 31% of FY2025 revenue."
+      }
+    },
+    {
+      "id": "unsupported_acquisition_recommendation_006",
+      "expected_entities": ["TargetCo"],
+      "human_label": {
+        "passed": false,
+        "severity": "high",
+        "failure_type": "unsupported_recommendation",
+        "rationale": "The evidence supports balance-sheet facts, not a recommendation to acquire the company."
+      },
+      "judge_result": {
+        "score": 34,
+        "passed": false,
+        "severity": "high",
+        "rationale": "The acquisition recommendation is not supported by the cited balance-sheet evidence.",
+        "labels": ["unsupported_recommendation"]
+      },
+      "run": {
+        "run_id": "golden-unsupported-006",
+        "query": "Prepare a due diligence note for TargetCo.",
+        "entities": ["TargetCo"],
+        "steps": [],
+        "metrics": [],
+        "evidence": [
+          {
+            "entity": "TargetCo",
+            "citation": "targetco_bs_2025.pdf#p1",
+            "period": "FY2025",
+            "text": "TargetCo reported total liabilities of 120 million USD and total assets of 300 million USD for FY2025."
+          }
+        ],
+        "market_data": [],
+        "final_output": "TargetCo has a clean balance sheet, so the buyer should acquire it immediately."
+      }
+    },
+    {
+      "id": "unsupported_growth_claim_007",
+      "expected_entities": ["AsterRetail"],
+      "human_label": {
+        "passed": false,
+        "severity": "high",
+        "failure_type": "unsupported_growth_claim",
+        "rationale": "The output claims accelerating growth, but the cited evidence only contains revenue level."
+      },
+      "judge_result": {
+        "score": 42,
+        "passed": false,
+        "severity": "high",
+        "rationale": "The growth acceleration claim is not present in evidence.",
+        "labels": ["unsupported_growth_claim"]
+      },
+      "run": {
+        "run_id": "golden-unsupported-007",
+        "query": "Assess AsterRetail revenue trend.",
+        "entities": ["AsterRetail"],
+        "steps": [],
+        "metrics": [],
+        "evidence": [
+          {
+            "entity": "AsterRetail",
+            "citation": "aster_retail_income_statement.pdf#revenue",
+            "period": "FY2025",
+            "text": "AsterRetail reported FY2025 revenue of 480 million USD."
+          }
+        ],
+        "market_data": [],
+        "final_output": "AsterRetail is accelerating growth materially and should command a premium multiple."
+      }
+    },
+    {
+      "id": "unsupported_valuation_claim_008",
+      "expected_entities": ["CloudWorks"],
+      "human_label": {
+        "passed": false,
+        "severity": "high",
+        "failure_type": "unsupported_valuation_claim",
+        "rationale": "The evidence contains EBITDA but no comparable multiple or valuation support."
+      },
+      "judge_result": {
+        "score": 38,
+        "passed": false,
+        "severity": "high",
+        "rationale": "The premium valuation conclusion is unsupported.",
+        "labels": ["unsupported_valuation_claim"]
+      },
+      "run": {
+        "run_id": "golden-unsupported-008",
+        "query": "Assess CloudWorks valuation.",
+        "entities": ["CloudWorks"],
+        "steps": [],
+        "metrics": [],
+        "evidence": [
+          {
+            "entity": "CloudWorks",
+            "citation": "cloudworks_financials.xlsx#ebitda",
+            "period": "FY2025",
+            "text": "CloudWorks reported adjusted EBITDA of 52 million USD for FY2025."
+          }
+        ],
+        "market_data": [],
+        "final_output": "CloudWorks clearly deserves a 20x EBITDA valuation based on the cited evidence."
+      }
+    },
+    {
+      "id": "wrong_entity_support_009",
+      "expected_entities": ["BlueBank"],
+      "human_label": {
+        "passed": false,
+        "severity": "high",
+        "failure_type": "wrong_entity_support",
+        "rationale": "The final output discusses BlueBank but cites evidence about GreenBank."
+      },
+      "judge_result": {
+        "score": 28,
+        "passed": false,
+        "severity": "high",
+        "rationale": "The cited evidence belongs to a different entity.",
+        "labels": ["wrong_entity_support"]
+      },
+      "run": {
+        "run_id": "golden-unsupported-009",
+        "query": "Summarize BlueBank capital risk.",
+        "entities": ["BlueBank"],
+        "steps": [],
+        "metrics": [],
+        "evidence": [
+          {
+            "entity": "GreenBank",
+            "citation": "greenbank_capital.pdf#cet1",
+            "period": "FY2025",
+            "text": "GreenBank reported a CET1 ratio of 12.4% for FY2025."
+          }
+        ],
+        "market_data": [],
+        "final_output": "BlueBank reported a CET1 ratio of 12.4%, indicating adequate capital."
+      }
+    },
+    {
+      "id": "stale_evidence_010",
+      "expected_entities": ["MetroLogix"],
+      "human_label": {
+        "passed": false,
+        "severity": "medium",
+        "failure_type": "stale_evidence",
+        "rationale": "The conclusion makes a current FY2026 claim using FY2023 evidence."
+      },
+      "judge_result": {
+        "score": 55,
+        "passed": false,
+        "severity": "medium",
+        "rationale": "The cited evidence is stale for the current-period conclusion.",
+        "labels": ["stale_evidence"]
+      },
+      "run": {
+        "run_id": "golden-unsupported-010",
+        "query": "Assess MetroLogix current leverage.",
+        "entities": ["MetroLogix"],
+        "steps": [],
+        "metrics": [],
+        "evidence": [
+          {
+            "entity": "MetroLogix",
+            "citation": "metrologix_2023_credit_memo.pdf#leverage",
+            "period": "FY2023",
+            "text": "MetroLogix net leverage was 2.1x in FY2023."
+          }
+        ],
+        "market_data": [],
+        "final_output": "MetroLogix currently has low leverage in FY2026 based on the cited evidence."
+      }
+    },
+    {
+      "id": "irrelevant_citation_011",
+      "expected_entities": ["SolarForge"],
+      "human_label": {
+        "passed": false,
+        "severity": "medium",
+        "failure_type": "irrelevant_citation",
+        "rationale": "The final output discusses backlog conversion, while evidence only describes headcount."
+      },
+      "judge_result": {
+        "score": 48,
+        "passed": false,
+        "severity": "medium",
+        "rationale": "The citation is about headcount and does not support backlog conversion.",
+        "labels": ["irrelevant_citation"]
+      },
+      "run": {
+        "run_id": "golden-unsupported-011",
+        "query": "Review SolarForge backlog quality.",
+        "entities": ["SolarForge"],
+        "steps": [],
+        "metrics": [],
+        "evidence": [
+          {
+            "entity": "SolarForge",
+            "citation": "solarforge_hr_report.pdf#headcount",
+            "period": "FY2025",
+            "text": "SolarForge employed 820 full-time staff at the end of FY2025."
+          }
+        ],
+        "market_data": [],
+        "final_output": "SolarForge has high backlog conversion quality supported by the cited evidence."
+      }
+    },
+    {
+      "id": "overconfident_conclusion_012",
+      "expected_entities": ["MedSupply"],
+      "human_label": {
+        "passed": false,
+        "severity": "high",
+        "failure_type": "overconfident_conclusion",
+        "rationale": "The evidence is preliminary, but the output states a guaranteed outcome."
+      },
+      "judge_result": {
+        "score": 31,
+        "passed": false,
+        "severity": "high",
+        "rationale": "The guaranteed outcome is not supported by preliminary evidence.",
+        "labels": ["overconfident_conclusion"]
+      },
+      "run": {
+        "run_id": "golden-unsupported-012",
+        "query": "Assess MedSupply margin outlook.",
+        "entities": ["MedSupply"],
+        "steps": [],
+        "metrics": [],
+        "evidence": [
+          {
+            "entity": "MedSupply",
+            "citation": "medsupply_prelim_q1.pdf#margin",
+            "period": "Q1FY2026",
+            "text": "Preliminary Q1 gross margin improved from 34% to 36%, subject to quarter-end adjustments."
+          }
+        ],
+        "market_data": [],
+        "final_output": "MedSupply is guaranteed to sustain higher margins for the full year."
+      }
+    },
+    {
+      "id": "private_company_data_gap_013",
+      "expected_entities": ["HarborHealth"],
+      "human_label": {
+        "passed": false,
+        "severity": "medium",
+        "failure_type": "private_company_data_gap",
+        "rationale": "The output treats unaudited management accounts as audited results."
+      },
+      "judge_result": {
+        "score": 46,
+        "passed": false,
+        "severity": "medium",
+        "rationale": "The conclusion overstates the reliability of unaudited private-company data.",
+        "labels": ["private_company_data_gap"]
+      },
+      "run": {
+        "run_id": "golden-unsupported-013",
+        "query": "Review HarborHealth diligence data.",
+        "entities": ["HarborHealth"],
+        "steps": [],
+        "metrics": [],
+        "evidence": [
+          {
+            "entity": "HarborHealth",
+            "citation": "harborhealth_mgmt_accounts.xlsx#summary",
+            "period": "LTM2026Q1",
+            "text": "The data room contains unaudited management accounts for LTM2026Q1."
+          }
+        ],
+        "market_data": [],
+        "final_output": "HarborHealth has audited LTM financials that fully validate the diligence base case."
+      }
+    },
+    {
+      "id": "unsupported_margin_expansion_014",
+      "expected_entities": ["NovaFoods"],
+      "human_label": {
+        "passed": false,
+        "severity": "high",
+        "failure_type": "unsupported_margin_claim",
+        "rationale": "The evidence states revenue concentration but says nothing about future margin expansion."
+      },
+      "judge_result": {
+        "score": 40,
+        "passed": false,
+        "severity": "high",
+        "rationale": "Future margin expansion is not supported by concentration evidence.",
+        "labels": ["unsupported_margin_claim"]
+      },
+      "run": {
+        "run_id": "golden-unsupported-014",
+        "query": "Summarize NovaFoods risks.",
+        "entities": ["NovaFoods"],
+        "steps": [],
+        "metrics": [],
+        "evidence": [
+          {
+            "entity": "NovaFoods",
+            "citation": "novafoods_sales_by_customer.csv#top10",
+            "period": "FY2025",
+            "text": "NovaFoods' largest customer represented 31% of FY2025 revenue."
+          }
+        ],
+        "market_data": [],
+        "final_output": "NovaFoods should see strong margin expansion next year based on the cited customer data."
+      }
+    },
+    {
+      "id": "unsupported_peer_multiple_015",
+      "expected_entities": ["GridParts"],
+      "human_label": {
+        "passed": false,
+        "severity": "medium",
+        "failure_type": "unsupported_valuation_claim",
+        "rationale": "The output invents a peer multiple that is not present in cited evidence."
+      },
+      "judge_result": {
+        "score": 44,
+        "passed": false,
+        "severity": "medium",
+        "rationale": "The cited evidence does not contain the 14x peer multiple.",
+        "labels": ["unsupported_valuation_claim"]
+      },
+      "run": {
+        "run_id": "golden-unsupported-015",
+        "query": "Review GridParts valuation.",
+        "entities": ["GridParts"],
+        "steps": [],
+        "metrics": [],
+        "evidence": [
+          {
+            "entity": "GridParts",
+            "citation": "gridparts_revenue_mix.pdf#region",
+            "period": "FY2025",
+            "text": "GridParts generated 62% of FY2025 revenue from European industrial customers."
+          }
+        ],
+        "market_data": [],
+        "final_output": "GridParts trades at an attractive discount to peers at 14x EBITDA."
+      }
+    },
+    {
+      "id": "unsupported_synergy_claim_016",
+      "expected_entities": ["TargetCo"],
+      "human_label": {
+        "passed": false,
+        "severity": "high",
+        "failure_type": "unsupported_synergy_claim",
+        "rationale": "The output claims quantified synergies without any synergy evidence."
+      },
+      "judge_result": {
+        "score": 33,
+        "passed": false,
+        "severity": "high",
+        "rationale": "The 25 million USD synergy estimate is unsupported.",
+        "labels": ["unsupported_synergy_claim"]
+      },
+      "run": {
+        "run_id": "golden-unsupported-016",
+        "query": "Prepare a synergy note for TargetCo.",
+        "entities": ["TargetCo"],
+        "steps": [],
+        "metrics": [],
+        "evidence": [
+          {
+            "entity": "TargetCo",
+            "citation": "targetco_cost_base.xlsx#opex",
+            "period": "FY2025",
+            "text": "TargetCo reported operating expenses of 180 million USD in FY2025."
+          }
+        ],
+        "market_data": [],
+        "final_output": "The buyer can realize 25 million USD of cost synergies from TargetCo."
+      }
+    },
+    {
+      "id": "unsupported_liquidity_claim_017",
+      "expected_entities": ["BlueBank"],
+      "human_label": {
+        "passed": false,
+        "severity": "high",
+        "failure_type": "unsupported_liquidity_claim",
+        "rationale": "Deposit stability is claimed, but the evidence only states capital ratio."
+      },
+      "judge_result": {
+        "score": 39,
+        "passed": false,
+        "severity": "high",
+        "rationale": "Deposit stability is not supported by CET1 evidence.",
+        "labels": ["unsupported_liquidity_claim"]
+      },
+      "run": {
+        "run_id": "golden-unsupported-017",
+        "query": "Review BlueBank liquidity.",
+        "entities": ["BlueBank"],
+        "steps": [],
+        "metrics": [],
+        "evidence": [
+          {
+            "entity": "BlueBank",
+            "citation": "bluebank_capital.pdf#cet1",
+            "period": "FY2025",
+            "text": "BlueBank reported a CET1 ratio of 12.4% for FY2025."
+          }
+        ],
+        "market_data": [],
+        "final_output": "BlueBank has stable deposits and no meaningful liquidity risk."
+      }
+    },
+    {
+      "id": "missing_citation_018",
+      "expected_entities": ["CloudWorks"],
+      "human_label": {
+        "passed": false,
+        "severity": "medium",
+        "failure_type": "missing_citation",
+        "rationale": "The output makes a factual claim but no evidence is provided."
+      },
+      "judge_result": {
+        "score": 20,
+        "passed": false,
+        "severity": "medium",
+        "rationale": "No cited evidence is available for the conclusion.",
+        "labels": ["missing_citation"]
+      },
+      "run": {
+        "run_id": "golden-unsupported-018",
+        "query": "Review CloudWorks ARR.",
+        "entities": ["CloudWorks"],
+        "steps": [],
+        "metrics": [],
+        "evidence": [],
+        "market_data": [],
+        "final_output": "CloudWorks has 130 million USD of ARR and low churn."
+      }
+    },
+    {
+      "id": "conflicting_evidence_019",
+      "expected_entities": ["MetroLogix"],
+      "human_label": {
+        "passed": false,
+        "severity": "medium",
+        "failure_type": "conflicting_evidence",
+        "rationale": "The output picks one number while cited evidence contains conflicting leverage values without reconciliation."
+      },
+      "judge_result": {
+        "score": 52,
+        "passed": false,
+        "severity": "medium",
+        "rationale": "Conflicting evidence is not reconciled in the final output.",
+        "labels": ["conflicting_evidence"]
+      },
+      "run": {
+        "run_id": "golden-unsupported-019",
+        "query": "Assess MetroLogix leverage.",
+        "entities": ["MetroLogix"],
+        "steps": [],
+        "metrics": [],
+        "evidence": [
+          {
+            "entity": "MetroLogix",
+            "citation": "metrologix_lender_model.xlsx#case-a",
+            "period": "FY2025",
+            "text": "Case A shows net leverage of 2.1x."
+          },
+          {
+            "entity": "MetroLogix",
+            "citation": "metrologix_lender_model.xlsx#case-b",
+            "period": "FY2025",
+            "text": "Case B shows net leverage of 3.4x."
+          }
+        ],
+        "market_data": [],
+        "final_output": "MetroLogix leverage is clearly low at 2.1x."
+      }
+    },
+    {
+      "id": "unsupported_working_capital_020",
+      "expected_entities": ["SolarForge"],
+      "human_label": {
+        "passed": false,
+        "severity": "medium",
+        "failure_type": "unsupported_working_capital_claim",
+        "rationale": "Working capital improvement is claimed without evidence about receivables, inventory, or payables."
+      },
+      "judge_result": {
+        "score": 43,
+        "passed": false,
+        "severity": "medium",
+        "rationale": "The cited headcount evidence does not support a working-capital claim.",
+        "labels": ["unsupported_working_capital_claim"]
+      },
+      "run": {
+        "run_id": "golden-unsupported-020",
+        "query": "Assess SolarForge cash conversion.",
+        "entities": ["SolarForge"],
+        "steps": [],
+        "metrics": [],
+        "evidence": [
+          {
+            "entity": "SolarForge",
+            "citation": "solarforge_hr_report.pdf#headcount",
+            "period": "FY2025",
+            "text": "SolarForge employed 820 full-time staff at the end of FY2025."
+          }
+        ],
+        "market_data": [],
+        "final_output": "SolarForge is improving working capital and cash conversion."
+      }
+    }
+  ]
+}

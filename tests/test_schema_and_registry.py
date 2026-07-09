@@ -32,6 +32,7 @@ class SchemaAndRegistryTestCase(unittest.TestCase):
         names = available_metrics()
         self.assertIn("entity_coverage", names)
         self.assertIn("compliance_language", names)
+        self.assertIn("evidence_support", names)
 
 
 def _load(name: str) -> dict:

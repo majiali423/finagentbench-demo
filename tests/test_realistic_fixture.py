@@ -38,6 +38,19 @@ class RealisticFixtureTestCase(unittest.TestCase):
         self.assertFalse(report.passed)
         self.assertTrue(any("mixed or missing currencies" in finding for finding in findings))
 
+    def test_explicit_unit_currency_metric_runs_without_legacy_flag(self) -> None:
+        run = _load("pass_bigtech_finrun.json")
+        case = _load("case_bigtech_fcf.json")
+        case.pop("require_unit_currency_consistency")
+        case["enabled_metrics"] = ["unit_currency_consistency"]
+        run["metrics"][1]["inputs"]["revenue"]["currency"] = "EUR"
+
+        report = evaluate_run(run, case)
+
+        findings = _finding_messages(report)
+        self.assertFalse(report.passed)
+        self.assertTrue(any("mixed or missing currencies" in finding for finding in findings))
+
     def test_missing_risk_disclosure_is_detected(self) -> None:
         run = _load("pass_bigtech_finrun.json")
         case = _load("case_bigtech_fcf.json")

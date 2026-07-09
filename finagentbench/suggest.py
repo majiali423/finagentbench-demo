@@ -15,6 +15,7 @@ ACTION_BY_METRIC = {
     "unit_currency_consistency": "normalize",
     "evidence_coverage": "retrieve",
     "evidence_consistency": "retrieve",
+    "evidence_support": "review",
     "market_data_disclosure": "disclose",
     "risk_disclosure": "rewrite",
     "compliance_language": "rewrite",
@@ -36,8 +37,8 @@ def build_suggestions(report: EvalReport) -> dict[str, Any]:
 
 def _finding_to_action(finding: Finding) -> dict[str, Any]:
     return {
-        "action": ACTION_BY_METRIC.get(finding.metric, "review"),
-        "target": _target_for(finding),
+        "action": finding.action or ACTION_BY_METRIC.get(finding.metric, "review"),
+        "target": finding.target or _target_for(finding),
         "reason": finding.message,
         "metric": finding.metric,
         "severity": finding.severity,

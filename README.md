@@ -8,9 +8,12 @@ data failures, or making unsafe investment claims. FinAgentBench evaluates the
 exported trace of an agent run so those failures are visible before the output
 reaches a user.
 
-FinAgentBench does not run an LLM and does not depend on a specific agent
+FinAgentBench does not require an LLM and does not depend on a specific agent
 framework. Agents export a small `FinRun` JSON artifact, adapters normalize raw
-runtime traces into that shape, and deterministic metrics score the run.
+runtime traces into that shape, and deterministic metrics score the run. For
+release audits, an optional semantic judge can be enabled for checks that are
+hard to express with rules, such as whether the final conclusion is actually
+supported by cited evidence.
 
 This repository is intended to stand alone as a benchmark and reliability
 harness. A financial agent project can use it as a downstream quality gate, but
@@ -34,6 +37,7 @@ That keeps the benchmark reusable for other financial agents as well.
 - Numeric correctness: reported financial ratios match formulas and inputs.
 - Evidence coverage: entities and important dimensions have cited evidence.
 - Evidence consistency: cited evidence contains the numbers used in calculations.
+- Evidence support: optional semantic audit for whether cited evidence supports the final answer.
 - Market data disclosure: failed market data is disclosed in the final output.
 - Temporal consistency: financial periods and market-data dates are explicit.
 - Unit/currency consistency: calculations do not mix units or currencies.
@@ -87,6 +91,20 @@ python -m finagentbench benchmark benchmarks\due_diligence\suite.json --out outp
 
 Current expected result: 9/9 failing traces detected, 0 false positives.
 
+The semantic audit suite contains 20 human-labeled synthetic golden cases for
+`evidence_support`, covering supported summaries and unsupported
+recommendations, growth claims, valuation claims, stale evidence, wrong-entity
+evidence, irrelevant citations, missing citations, and private-company data
+gaps.
+
+```powershell
+python -m finagentbench semantic-benchmark benchmarks\semantic_audit\evidence_support_golden.json --out outputs\evidence-support-golden.json
+```
+
+Current expected result: 20/20 labels matched, 0 false positives, 0 false
+negatives. These cases are intended for judge calibration and regression replay;
+production teams should add real failures observed from their own agent logs.
+
 ## Repair Suggestions
 
 `suggest` converts findings into structured repair actions that an agent or
@@ -94,6 +112,23 @@ human review queue can consume.
 
 ```powershell
 python -m finagentbench suggest fixtures\fail_due_diligence_finrun.json --case fixtures\case_due_diligence.json --out outputs\dd-suggest.json
+```
+
+## Optional Semantic Audit
+
+Most metrics are deterministic and should stay in the default CI gate. Semantic
+audit is optional and intended for release evaluation or golden-label replay.
+Enable `evidence_support` in a case file and configure `semantic_audit.judge`.
+The built-in `static` judge is useful for tests and labeled benchmark replay;
+`openai-compatible` reads endpoint, key, and model from
+`FINAGENTBENCH_LLM_ENDPOINT`, `FINAGENTBENCH_LLM_API_KEY`, and
+`FINAGENTBENCH_LLM_MODEL`.
+
+This keeps the project provider-neutral: the benchmark schema, reports, and
+suggestions do not depend on a specific LLM vendor.
+
+```powershell
+python -m finagentbench evaluate fixtures\pass_due_diligence_finrun.json --case fixtures\case_due_diligence_semantic_audit.json --out outputs\dd-semantic-audit
 ```
 
 ## Reference Runtime

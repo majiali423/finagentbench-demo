@@ -10,6 +10,8 @@ class Finding:
     severity: str
     message: str
     recommendation: str = ""
+    action: str = ""
+    target: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)

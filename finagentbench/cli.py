@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 
 from .adapters import load_run_file
-from .benchmark import run_benchmark_suite
+from .benchmark import run_benchmark_suite, run_semantic_benchmark_suite
 from .reference_runtime import run_reference_agent
 from .report import write_compare_report, write_eval_report
 from .runner import compare_runs, evaluate_run
@@ -48,6 +48,10 @@ def main() -> int:
     benchmark_parser = sub.add_parser("benchmark")
     benchmark_parser.add_argument("suite_json")
     benchmark_parser.add_argument("--out", default="outputs/benchmark_report.json")
+
+    semantic_benchmark_parser = sub.add_parser("semantic-benchmark")
+    semantic_benchmark_parser.add_argument("suite_json")
+    semantic_benchmark_parser.add_argument("--out", default="outputs/semantic_benchmark_report.json")
 
     args = parser.parse_args()
     if args.command == "evaluate":
@@ -93,6 +97,14 @@ def main() -> int:
 
     if args.command == "benchmark":
         payload = run_benchmark_suite(args.suite_json)
+        out_path = Path(args.out)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
+        return 0 if payload["passed"] else 1
+
+    if args.command == "semantic-benchmark":
+        payload = run_semantic_benchmark_suite(args.suite_json)
         out_path = Path(args.out)
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
