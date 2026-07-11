@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 import json
+import sys
 import threading
 import unittest
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from tempfile import TemporaryDirectory
+
+if __package__ in {None, ""}:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from finagentbench.benchmark import (
     run_benchmark_suite,
@@ -73,6 +77,7 @@ class BenchmarkSuiteTestCase(unittest.TestCase):
         self.assertTrue(items["lumenfin_baseline"]["actual_passed"])
         self.assertIn("numeric_correctness", items["lumenfin_wrong_quant"]["actual_findings"])
         self.assertIn("risk_disclosure", items["lumenfin_missing_risk_section"]["actual_findings"])
+        self.assertIn("section_presence", items["lumenfin_missing_risk_section"]["actual_findings"])
 
     def test_live_semantic_benchmark_runner_shape(self) -> None:
         """Static judge replay checks live-benchmark output fields, not live inference."""

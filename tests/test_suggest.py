@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+import sys
 import unittest
+from pathlib import Path
+
+if __package__ in {None, ""}:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from finagentbench.runner import evaluate_run
 from finagentbench.suggest import build_suggestions
-from helpers import load_fixture
+from tests.helpers import load_fixture
 
 
 class SuggestTestCase(unittest.TestCase):

@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+import sys
 import unittest
+from pathlib import Path
+
+if __package__ in {None, ""}:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from finagentbench.runner import evaluate_run
-from helpers import load_fixture, metric_by_name
+from tests.helpers import load_fixture, metric_by_name
 
 
 class EvidenceConsistencyTestCase(unittest.TestCase):

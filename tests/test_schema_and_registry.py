@@ -1,11 +1,16 @@
 from __future__ import annotations
 
+import sys
 import unittest
+from pathlib import Path
+
+if __package__ in {None, ""}:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from finagentbench.metrics.registry import available_metrics, resolve_metrics
 from finagentbench.runner import evaluate_run
 from finagentbench.schema import ValidationError, validate_finrun
-from helpers import load_fixture
+from tests.helpers import load_fixture
 
 
 class SchemaAndRegistryTestCase(unittest.TestCase):
