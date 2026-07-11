@@ -85,6 +85,8 @@ class OpenAICompatibleJudge:
         backoff_seconds: float = 1.0,
         prompt_version: str = "financial_audit_v1",
         cache_path: str | None = None,
+        temperature: float = 0.0,
+        max_tokens: int = 500,
     ) -> None:
         self.endpoint = endpoint
         self.api_key = api_key
@@ -94,6 +96,8 @@ class OpenAICompatibleJudge:
         self.backoff_seconds = backoff_seconds
         self.prompt_version = prompt_version
         self.cache_path = Path(cache_path) if cache_path else None
+        self.temperature = temperature
+        self.max_tokens = max_tokens
 
     def judge(self, task: str, payload: dict[str, Any]) -> JudgeResult:
         started = time.monotonic()
@@ -115,6 +119,8 @@ class OpenAICompatibleJudge:
         request_payload = {
             "model": self.model,
             "response_format": {"type": "json_object"},
+            "temperature": self.temperature,
+            "max_tokens": self.max_tokens,
             "messages": [
                 {
                     "role": "system",
@@ -174,7 +180,7 @@ class OpenAICompatibleJudge:
 
         content = raw.get("choices", [{}])[0].get("message", {}).get("content", "{}")
         try:
-            parsed = json.loads(content)
+            parsed = _loads_json_object(content)
         except json.JSONDecodeError:
             return JudgeResult(
                 score=0.0,
@@ -213,7 +219,8 @@ def build_judge(config: dict[str, Any] | None = None) -> SemanticJudge:
         return StaticJudge(config.get("results", {}), prompt_version)
     if provider in {"openai-compatible", "openai_compatible"}:
         endpoint = str(config.get("endpoint") or os.getenv("FINAGENTBENCH_LLM_ENDPOINT", ""))
-        api_key = str(config.get("api_key") or os.getenv("FINAGENTBENCH_LLM_API_KEY", ""))
+        api_key_env = str(config.get("api_key_env") or "FINAGENTBENCH_LLM_API_KEY")
+        api_key = str(config.get("api_key") or os.getenv(api_key_env, ""))
         model = str(config.get("model") or os.getenv("FINAGENTBENCH_LLM_MODEL", ""))
         if not endpoint or not api_key or not model:
             return StaticJudge(
@@ -237,6 +244,8 @@ def build_judge(config: dict[str, Any] | None = None) -> SemanticJudge:
             backoff_seconds=float(config.get("backoff_seconds", 1)),
             prompt_version=prompt_version,
             cache_path=config.get("cache_path") or os.getenv("FINAGENTBENCH_LLM_CACHE"),
+            temperature=float(config.get("temperature", 0)),
+            max_tokens=int(config.get("max_tokens", 500)),
         )
     return RuleJudge(prompt_version)
 
@@ -272,10 +281,36 @@ def _prompt_for(task: str, prompt_version: str) -> str:
         ),
     }
     return (
-        "You are a financial-agent audit judge. Return only JSON with score, passed, rationale, "
-        f"severity, and labels. Prompt version: {prompt_version}. "
+        "You are a financial-agent audit judge. Return only a JSON object with this schema: "
+        '{"score": number, "passed": boolean, "rationale": string, "severity": '
+        'string, "labels": string[]}. The score must use a 0-100 scale where 100 '
+        "means fully supported and 0 means completely unsupported. Set passed=true "
+        "only when score is at least 80. Use severity one of none, low, medium, high. "
+        f"Prompt version: {prompt_version}. "
         f"{task_guidance.get(task, 'Judge the requested financial-agent audit task.')}"
     )
+
+
+def _loads_json_object(content: str) -> dict[str, Any]:
+    text = content.strip()
+    if text.startswith("```"):
+        lines = text.splitlines()
+        if lines and lines[0].startswith("```"):
+            lines = lines[1:]
+        if lines and lines[-1].startswith("```"):
+            lines = lines[:-1]
+        text = "\n".join(lines).strip()
+    try:
+        parsed = json.loads(text)
+    except json.JSONDecodeError:
+        start = text.find("{")
+        end = text.rfind("}")
+        if start < 0 or end <= start:
+            raise
+        parsed = json.loads(text[start : end + 1])
+    if not isinstance(parsed, dict):
+        raise json.JSONDecodeError("Expected a JSON object", text, 0)
+    return parsed
 
 
 def _metadata(

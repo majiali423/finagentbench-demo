@@ -197,14 +197,18 @@ def _flaky_handler():
                 "choices": [
                     {
                         "message": {
-                            "content": json.dumps(
-                                {
-                                    "score": 88,
-                                    "passed": True,
-                                    "rationale": "Supported by evidence.",
-                                    "severity": "low",
-                                    "labels": ["supported"],
-                                }
+                            "content": (
+                                "```json\n"
+                                + json.dumps(
+                                    {
+                                        "score": 88,
+                                        "passed": True,
+                                        "rationale": "Supported by evidence.",
+                                        "severity": "low",
+                                        "labels": ["supported"],
+                                    }
+                                )
+                                + "\n```"
                             )
                         }
                     }

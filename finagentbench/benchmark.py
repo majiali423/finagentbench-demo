@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from .adapters import load_run_file, normalize_run
+from .llm import build_judge
 from .runner import evaluate_run
 
 
@@ -186,6 +187,82 @@ def run_semantic_benchmark_suite(suite_path: str | Path) -> dict[str, Any]:
     }
 
 
+def run_live_semantic_benchmark_suite(
+    suite_path: str | Path,
+    judge_config: dict[str, Any],
+    limit: int | None = None,
+) -> dict[str, Any]:
+    path = Path(suite_path)
+    suite = json.loads(path.read_text(encoding="utf-8"))
+    root = path.parent
+    task = suite.get("task", "evidence_support")
+    metric_name = suite.get("metric", task)
+    min_score = float(suite.get("min_score", 80.0))
+    judge = build_judge(judge_config)
+
+    items = []
+    false_positives = 0
+    false_negatives = 0
+    matched = 0
+    judged_items = suite.get("items", [])
+    if limit is not None:
+        judged_items = judged_items[: max(0, limit)]
+
+    for item in judged_items:
+        run = _load_semantic_run(root, item)
+        human_label = item["human_label"]
+        human_passed = bool(human_label["passed"])
+        result = judge.judge(metric_name, _semantic_payload(run))
+        actual_passed = result.passed and result.score >= min_score
+        expectation_matched = actual_passed == human_passed
+        if expectation_matched:
+            matched += 1
+        if human_passed and not actual_passed:
+            false_positives += 1
+        if not human_passed and actual_passed:
+            false_negatives += 1
+
+        items.append(
+            {
+                "id": item["id"],
+                "task": task,
+                "failure_type": str(human_label.get("failure_type", "supported")),
+                "human_passed": human_passed,
+                "actual_passed": actual_passed,
+                "expectation_matched": expectation_matched,
+                "score": round(result.score, 2),
+                "human_severity": human_label.get("severity", ""),
+                "judge_severity": result.severity,
+                "judge_labels": result.labels,
+                "judge_rationale": result.rationale,
+                "judge": result.metadata,
+            }
+        )
+
+    total = len(items)
+    match_rate = 1.0 if total == 0 else matched / total
+    provider = items[0]["judge"].get("provider", "") if items else ""
+    model = items[0]["judge"].get("model", "") if items else ""
+    prompt_version = items[0]["judge"].get("prompt_version", "") if items else ""
+    return {
+        "suite_id": suite["id"],
+        "task": task,
+        "metric": metric_name,
+        "benchmark_mode": "live_llm_judge_small_sample",
+        "measures": "live_judge_alignment_with_human_labels_not_production_accuracy",
+        "provider": provider,
+        "model": model,
+        "prompt_version": prompt_version,
+        "total": total,
+        "matched": matched,
+        "match_rate": round(match_rate, 4),
+        "false_positives": false_positives,
+        "false_negatives": false_negatives,
+        "passed": false_positives == 0 and false_negatives == 0,
+        "items": items,
+    }
+
+
 def _load_semantic_run(root: Path, item: dict[str, Any]) -> dict[str, Any]:
     run = item.get("run")
     if isinstance(run, dict):
@@ -193,6 +270,18 @@ def _load_semantic_run(root: Path, item: dict[str, Any]) -> dict[str, Any]:
     if isinstance(run, str):
         return load_run_file((root / run).resolve(), item.get("adapter", "auto"))
     raise ValueError(f"Semantic benchmark item {item.get('id')} must provide a run object or run path")
+
+
+def _semantic_payload(run: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "query": run.get("query", ""),
+        "entities": run.get("entities", []),
+        "steps": run.get("steps", []),
+        "metrics": run.get("metrics", []),
+        "evidence": run.get("evidence", []),
+        "market_data": run.get("market_data", []),
+        "final_output": run.get("final_output", ""),
+    }
 
 
 def _semantic_case(item: dict[str, Any], metric_name: str, min_score: float) -> dict[str, Any]:

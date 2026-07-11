@@ -3,7 +3,11 @@ from __future__ import annotations
 import unittest
 from pathlib import Path
 
-from finagentbench.benchmark import run_benchmark_suite, run_semantic_benchmark_suite
+from finagentbench.benchmark import (
+    run_benchmark_suite,
+    run_live_semantic_benchmark_suite,
+    run_semantic_benchmark_suite,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -43,6 +47,34 @@ class BenchmarkSuiteTestCase(unittest.TestCase):
         self.assertTrue(items["lumenfin_baseline"]["actual_passed"])
         self.assertIn("numeric_correctness", items["lumenfin_wrong_quant"]["actual_findings"])
         self.assertIn("risk_disclosure", items["lumenfin_missing_risk_section"]["actual_findings"])
+
+    def test_live_semantic_benchmark_reports_judge_alignment(self) -> None:
+        payload = run_live_semantic_benchmark_suite(
+            ROOT / "benchmarks" / "semantic_audit" / "evidence_support_golden.json",
+            {
+                "provider": "static",
+                "results": {
+                    "evidence_support": {
+                        "score": 91,
+                        "passed": True,
+                        "rationale": "The claim is supported.",
+                        "severity": "low",
+                        "labels": ["supported"],
+                    }
+                },
+            },
+            limit=1,
+        )
+
+        self.assertTrue(payload["passed"])
+        self.assertEqual(payload["benchmark_mode"], "live_llm_judge_small_sample")
+        self.assertEqual(
+            payload["measures"],
+            "live_judge_alignment_with_human_labels_not_production_accuracy",
+        )
+        self.assertEqual(payload["total"], 1)
+        self.assertEqual(payload["matched"], 1)
+        self.assertEqual(payload["items"][0]["judge"]["provider"], "static")
 
 
 if __name__ == "__main__":

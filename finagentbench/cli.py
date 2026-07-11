@@ -5,7 +5,11 @@ import json
 from pathlib import Path
 
 from .adapters import load_run_file
-from .benchmark import run_benchmark_suite, run_semantic_benchmark_suite
+from .benchmark import (
+    run_benchmark_suite,
+    run_live_semantic_benchmark_suite,
+    run_semantic_benchmark_suite,
+)
 from .profiles import apply_profile
 from .reference_runtime import run_reference_agent
 from .report import write_compare_report, write_eval_report
@@ -57,6 +61,19 @@ def main() -> int:
     semantic_benchmark_parser = sub.add_parser("semantic-benchmark")
     semantic_benchmark_parser.add_argument("suite_json")
     semantic_benchmark_parser.add_argument("--out", default="outputs/semantic_benchmark_report.json")
+
+    live_semantic_parser = sub.add_parser("live-semantic-benchmark")
+    live_semantic_parser.add_argument("suite_json")
+    live_semantic_parser.add_argument("--out", default="outputs/live_semantic_benchmark_report.json")
+    live_semantic_parser.add_argument("--limit", type=int, default=10)
+    live_semantic_parser.add_argument("--endpoint", default=None)
+    live_semantic_parser.add_argument("--model", default=None)
+    live_semantic_parser.add_argument("--api-key-env", default="FINAGENTBENCH_LLM_API_KEY")
+    live_semantic_parser.add_argument("--cache-path", default="outputs/live_semantic_judge_cache.json")
+    live_semantic_parser.add_argument("--prompt-version", default="financial_audit_v1")
+    live_semantic_parser.add_argument("--retry-count", type=int, default=2)
+    live_semantic_parser.add_argument("--backoff-seconds", type=float, default=1.0)
+    live_semantic_parser.add_argument("--timeout-seconds", type=float, default=20.0)
 
     args = parser.parse_args()
     if args.command == "evaluate":
@@ -110,6 +127,29 @@ def main() -> int:
 
     if args.command == "semantic-benchmark":
         payload = run_semantic_benchmark_suite(args.suite_json)
+        out_path = Path(args.out)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
+        return 0 if payload["passed"] else 1
+
+    if args.command == "live-semantic-benchmark":
+        judge_config = {
+            "provider": "openai-compatible",
+            "endpoint": args.endpoint,
+            "model": args.model,
+            "api_key_env": args.api_key_env,
+            "cache_path": args.cache_path,
+            "prompt_version": args.prompt_version,
+            "retry_count": args.retry_count,
+            "backoff_seconds": args.backoff_seconds,
+            "timeout_seconds": args.timeout_seconds,
+        }
+        payload = run_live_semantic_benchmark_suite(
+            args.suite_json,
+            judge_config,
+            limit=args.limit,
+        )
         out_path = Path(args.out)
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")

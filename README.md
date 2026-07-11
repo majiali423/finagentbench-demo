@@ -107,6 +107,19 @@ alignment, not a claim of live LLM judge accuracy. Production teams should run
 the same suite with a real judge configuration and add real failures observed
 from their own agent logs.
 
+For a live release-audit smoke test, run a small golden subset against an
+OpenAI-compatible judge:
+
+```powershell
+$env:FINAGENTBENCH_LLM_API_KEY = "<provider key>"
+python -m finagentbench live-semantic-benchmark benchmarks\semantic_audit\evidence_support_golden.json --limit 10 --endpoint https://api.deepseek.com/chat/completions --model deepseek-chat --cache-path outputs\live-semantic-judge-cache-v2.json --prompt-version evidence_support_live_v2 --out outputs\live-semantic-judge-report-v2.json
+Remove-Item Env:FINAGENTBENCH_LLM_API_KEY
+```
+
+One DeepSeek-backed run on 2026-07-11 matched 10/10 human labels with 0 false
+positives and 0 false negatives. Treat this as small-sample judge alignment, not
+production accuracy. See `docs/live_semantic_judge_validation.md`.
+
 ## Repair Suggestions
 
 `suggest` converts findings into structured repair actions that an agent or
