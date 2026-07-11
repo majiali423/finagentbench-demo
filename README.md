@@ -19,17 +19,18 @@ This repository is intended to stand alone as a benchmark and reliability
 harness. A financial agent project can use it as a downstream quality gate, but
 FinAgentBench does not import or require any specific agent codebase.
 
-## Relationship To The Financial Agent Project
+## Agent Integration Model
 
-This is my second project, not an extension module inside the first one. The
-financial agent project is responsible for generation: LLM calls, RAG, tools, and
-report writing. FinAgentBench is responsible for calibration: checking exported
-`FinRun` traces with deterministic metrics, regression gates, and repair
-suggestions.
+FinAgentBench is a standalone calibration layer, not an embedded module inside
+a specific agent runtime. A financial agent handles generation—LLM reasoning,
+retrieval, tool use, and report synthesis. FinAgentBench handles evaluation—
+validating exported `FinRun` traces with deterministic metrics, regression
+gates, and repair suggestions.
 
-The two projects connect only through files or adapters. The agent can export a
-JSON trace, and FinAgentBench can evaluate it without importing the agent runtime.
-That keeps the benchmark reusable for other financial agents as well.
+Integration is file-based: the agent exports a JSON trace, and FinAgentBench
+evaluates it through adapters without importing the agent runtime. This
+decoupled interface keeps the benchmark reusable across different financial
+agent implementations.
 
 ## What It Checks
 
