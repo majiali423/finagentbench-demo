@@ -1,0 +1,354 @@
+{
+  "id": "risk_quality_golden_v1",
+  "task": "risk_quality",
+  "metric": "risk_quality",
+  "benchmark_mode": "static_judge_replay",
+  "min_score": 80,
+  "description": "Human-review candidate golden set for semantic risk-quality replay. Labels are drafted from financial disclosure and investment-analysis principles, then should be manually reviewed.",
+  "items": [
+    {
+      "id": "risk_supported_supplier_concentration_001",
+      "expected_entities": ["CircuitWorks"],
+      "human_label": {
+        "passed": true,
+        "severity": "low",
+        "failure_type": "specific_risk_disclosure",
+        "rationale": "The risk language is tied to supplier concentration, margin sensitivity, and mitigation limits found in the evidence."
+      },
+      "judge_result": {
+        "score": 92,
+        "passed": true,
+        "severity": "low",
+        "rationale": "Risk disclosure is concrete, quantified, and tied to supply-chain evidence.",
+        "labels": ["specific_supplier_risk", "quantified_sensitivity"]
+      },
+      "run": {
+        "run_id": "risk-supported-001",
+        "query": "Assess CircuitWorks acquisition risks.",
+        "entities": ["CircuitWorks"],
+        "steps": [],
+        "metrics": [
+          {"name": "gross_margin_downside", "entity": "CircuitWorks", "value": 4.2, "unit": "percentage_points", "period": "FY2026E"}
+        ],
+        "evidence": [
+          {
+            "entity": "CircuitWorks",
+            "citation": "supplier_diligence.pdf#p4",
+            "period": "FY2025",
+            "text": "One Taiwan supplier provided 58% of controller chips. Management estimates a two-quarter disruption would reduce gross margin by 4.2 percentage points."
+          }
+        ],
+        "market_data": [],
+        "final_output": "CircuitWorks has a specific supply-chain risk: one Taiwan supplier provides 58% of controller chips, and management estimates a two-quarter disruption could reduce gross margin by 4.2 percentage points. The mitigation plan should be treated as unproven until alternate suppliers are qualified."
+      }
+    },
+    {
+      "id": "risk_supported_refinancing_covenant_002",
+      "expected_entities": ["MetroLogix"],
+      "human_label": {
+        "passed": true,
+        "severity": "low",
+        "failure_type": "specific_risk_disclosure",
+        "rationale": "The disclosure identifies maturity timing, covenant headroom, and rate sensitivity."
+      },
+      "judge_result": {
+        "score": 90,
+        "passed": true,
+        "severity": "low",
+        "rationale": "Refinancing and covenant risks are concrete and decision-relevant.",
+        "labels": ["liquidity_risk", "covenant_headroom"]
+      },
+      "run": {
+        "run_id": "risk-supported-002",
+        "query": "Review MetroLogix leverage risks.",
+        "entities": ["MetroLogix"],
+        "steps": [],
+        "metrics": [
+          {"name": "net_leverage", "entity": "MetroLogix", "value": 4.6, "unit": "x", "period": "FY2025"}
+        ],
+        "evidence": [
+          {
+            "entity": "MetroLogix",
+            "citation": "credit_agreement.pdf#covenants",
+            "period": "FY2025",
+            "text": "MetroLogix has 320 million USD of term debt maturing in 2027 and 0.4x EBITDA of covenant headroom at FY2025 leverage."
+          }
+        ],
+        "market_data": [],
+        "final_output": "MetroLogix risk is concentrated in refinancing and covenant headroom: 320 million USD of term debt matures in 2027, and FY2025 leverage leaves only 0.4x EBITDA of covenant cushion. A downside case should test higher refinancing rates and a 10% EBITDA decline."
+      }
+    },
+    {
+      "id": "risk_supported_macro_fx_003",
+      "expected_entities": ["EuroMach"],
+      "human_label": {
+        "passed": true,
+        "severity": "low",
+        "failure_type": "specific_risk_disclosure",
+        "rationale": "The output links revenue mix, currency exposure, and hedging gap."
+      },
+      "judge_result": {
+        "score": 88,
+        "passed": true,
+        "severity": "low",
+        "rationale": "Macro risk is tied to revenue exposure and hedging evidence.",
+        "labels": ["fx_risk", "macro_exposure"]
+      },
+      "run": {
+        "run_id": "risk-supported-003",
+        "query": "Summarize EuroMach macro risks.",
+        "entities": ["EuroMach"],
+        "steps": [],
+        "metrics": [],
+        "evidence": [
+          {
+            "entity": "EuroMach",
+            "citation": "revenue_mix.xlsx#region",
+            "period": "FY2025",
+            "text": "EuroMach generated 64% of FY2025 revenue in EUR while 71% of component costs were denominated in USD. The company hedges only one quarter forward."
+          }
+        ],
+        "market_data": [],
+        "final_output": "EuroMach faces FX margin risk because 64% of revenue is EUR-denominated while 71% of component costs are USD-denominated, and hedges cover only one quarter. The risk is near-term margin volatility rather than a standalone solvency issue."
+      }
+    },
+    {
+      "id": "risk_supported_private_data_limitations_004",
+      "expected_entities": ["HarborHealth"],
+      "human_label": {
+        "passed": true,
+        "severity": "low",
+        "failure_type": "specific_risk_disclosure",
+        "rationale": "The output correctly flags unaudited data and missing cohort backup."
+      },
+      "judge_result": {
+        "score": 91,
+        "passed": true,
+        "severity": "low",
+        "rationale": "Private-company data limitations are clearly disclosed.",
+        "labels": ["data_quality_risk", "private_company"]
+      },
+      "run": {
+        "run_id": "risk-supported-004",
+        "query": "Evaluate HarborHealth data-room risk.",
+        "entities": ["HarborHealth"],
+        "steps": [],
+        "metrics": [],
+        "evidence": [
+          {
+            "entity": "HarborHealth",
+            "citation": "dataroom_index.xlsx#sources",
+            "period": "LTM2026Q1",
+            "text": "The data room includes unaudited management accounts and does not include customer cohort backup for churn calculations."
+          }
+        ],
+        "market_data": [],
+        "final_output": "HarborHealth risk quality depends on data reliability: the LTM accounts are unaudited and the data room lacks cohort backup for churn. Any growth or retention conclusion should be treated as preliminary until audited financials and cohort support are provided."
+      }
+    },
+    {
+      "id": "risk_generic_boilerplate_005",
+      "expected_entities": ["CircuitWorks"],
+      "human_label": {
+        "passed": false,
+        "severity": "medium",
+        "failure_type": "generic_risk_language",
+        "rationale": "The output uses boilerplate risk wording and omits the quantified supplier concentration from the evidence."
+      },
+      "judge_result": {
+        "score": 42,
+        "passed": false,
+        "severity": "medium",
+        "rationale": "Risk language is generic and not tied to the available evidence.",
+        "labels": ["generic_risk_language", "missing_quantification"]
+      },
+      "run": {
+        "run_id": "risk-fail-005",
+        "query": "Assess CircuitWorks acquisition risks.",
+        "entities": ["CircuitWorks"],
+        "steps": [],
+        "metrics": [],
+        "evidence": [
+          {
+            "entity": "CircuitWorks",
+            "citation": "supplier_diligence.pdf#p4",
+            "period": "FY2025",
+            "text": "One Taiwan supplier provided 58% of controller chips. Management estimates a two-quarter disruption would reduce gross margin by 4.2 percentage points."
+          }
+        ],
+        "market_data": [],
+        "final_output": "CircuitWorks has normal business risks. Investors should monitor operations and market conditions."
+      }
+    },
+    {
+      "id": "risk_upside_only_no_downside_006",
+      "expected_entities": ["AsterRetail"],
+      "human_label": {
+        "passed": false,
+        "severity": "high",
+        "failure_type": "upside_only_risk",
+        "rationale": "The output discusses upside despite evidence containing a downside same-store-sales case."
+      },
+      "judge_result": {
+        "score": 35,
+        "passed": false,
+        "severity": "high",
+        "rationale": "Risk section omits the downside scenario and presents only upside.",
+        "labels": ["upside_only", "missing_downside_case"]
+      },
+      "run": {
+        "run_id": "risk-fail-006",
+        "query": "Assess AsterRetail guidance risk.",
+        "entities": ["AsterRetail"],
+        "steps": [],
+        "metrics": [],
+        "evidence": [
+          {
+            "entity": "AsterRetail",
+            "citation": "board_deck.pdf#guidance",
+            "period": "FY2026E",
+            "text": "Base guidance assumes 6% same-store sales growth. The downside case assumes 2% same-store sales growth and 180 bps lower EBITDA margin."
+          }
+        ],
+        "market_data": [],
+        "final_output": "AsterRetail's guidance is attractive because base growth is 6%. The company should benefit from improved consumer demand."
+      }
+    },
+    {
+      "id": "risk_omits_liquidity_constraint_007",
+      "expected_entities": ["MetroLogix"],
+      "human_label": {
+        "passed": false,
+        "severity": "high",
+        "failure_type": "missing_liquidity_risk",
+        "rationale": "The output fails to mention upcoming maturity and covenant headroom despite evidence showing liquidity risk."
+      },
+      "judge_result": {
+        "score": 30,
+        "passed": false,
+        "severity": "high",
+        "rationale": "Material liquidity and covenant facts are omitted.",
+        "labels": ["missing_liquidity_risk", "missing_covenant_risk"]
+      },
+      "run": {
+        "run_id": "risk-fail-007",
+        "query": "Review MetroLogix leverage risks.",
+        "entities": ["MetroLogix"],
+        "steps": [],
+        "metrics": [],
+        "evidence": [
+          {
+            "entity": "MetroLogix",
+            "citation": "credit_agreement.pdf#covenants",
+            "period": "FY2025",
+            "text": "MetroLogix has 320 million USD of term debt maturing in 2027 and 0.4x EBITDA of covenant headroom at FY2025 leverage."
+          }
+        ],
+        "market_data": [],
+        "final_output": "MetroLogix appears stable because logistics demand remains healthy. No material risk adjustment is needed."
+      }
+    },
+    {
+      "id": "risk_stale_period_008",
+      "expected_entities": ["GridParts"],
+      "human_label": {
+        "passed": false,
+        "severity": "medium",
+        "failure_type": "stale_risk_evidence",
+        "rationale": "The output relies on FY2023 margin stability while ignoring FY2025 evidence of backlog cancellation."
+      },
+      "judge_result": {
+        "score": 45,
+        "passed": false,
+        "severity": "medium",
+        "rationale": "Risk disclosure is stale and does not use the current-period evidence.",
+        "labels": ["stale_evidence", "missing_current_risk"]
+      },
+      "run": {
+        "run_id": "risk-fail-008",
+        "query": "Review GridParts industrial demand risk.",
+        "entities": ["GridParts"],
+        "steps": [],
+        "metrics": [],
+        "evidence": [
+          {
+            "entity": "GridParts",
+            "citation": "fy2025_sales_update.pdf#orders",
+            "period": "FY2025",
+            "text": "GridParts disclosed a 19% cancellation rate in European industrial backlog during FY2025Q4."
+          }
+        ],
+        "market_data": [],
+        "final_output": "GridParts has low demand risk because FY2023 margins were stable across industrial customers."
+      }
+    },
+    {
+      "id": "risk_private_company_gap_omitted_009",
+      "expected_entities": ["NovaFoods"],
+      "human_label": {
+        "passed": false,
+        "severity": "medium",
+        "failure_type": "omitted_data_quality_risk",
+        "rationale": "The output treats unaudited management accounts as reliable and omits the missing audited financials."
+      },
+      "judge_result": {
+        "score": 38,
+        "passed": false,
+        "severity": "medium",
+        "rationale": "Data-quality limitations are omitted from the risk section.",
+        "labels": ["omitted_data_quality_risk", "private_company"]
+      },
+      "run": {
+        "run_id": "risk-fail-009",
+        "query": "Summarize NovaFoods diligence risk.",
+        "entities": ["NovaFoods"],
+        "steps": [],
+        "metrics": [],
+        "evidence": [
+          {
+            "entity": "NovaFoods",
+            "citation": "dataroom_index.xlsx#financials",
+            "period": "FY2025",
+            "text": "NovaFoods provided unaudited management accounts but no audited FY2025 financial statements."
+          }
+        ],
+        "market_data": [],
+        "final_output": "NovaFoods financials are reliable enough to underwrite without adjustment because the data room includes management accounts."
+      }
+    },
+    {
+      "id": "risk_single_factor_not_material_010",
+      "expected_entities": ["BlueBank"],
+      "human_label": {
+        "passed": false,
+        "severity": "medium",
+        "failure_type": "unsupported_risk_priority",
+        "rationale": "The output prioritizes branch count as the main risk while evidence points to deposit beta and unrealized securities losses."
+      },
+      "judge_result": {
+        "score": 44,
+        "passed": false,
+        "severity": "medium",
+        "rationale": "Risk priority is not tied to the material evidence in the trace.",
+        "labels": ["unsupported_risk_priority", "missing_market_context"]
+      },
+      "run": {
+        "run_id": "risk-fail-010",
+        "query": "Assess BlueBank balance-sheet risk.",
+        "entities": ["BlueBank"],
+        "steps": [],
+        "metrics": [],
+        "evidence": [
+          {
+            "entity": "BlueBank",
+            "citation": "call_report_2026q1.pdf#liquidity",
+            "period": "2026Q1",
+            "text": "BlueBank reported a 72% deposit beta and unrealized AFS securities losses equal to 18% of tangible common equity."
+          }
+        ],
+        "market_data": [],
+        "final_output": "BlueBank's main risk is that it has too many branches. Deposit and securities risk appear manageable."
+      }
+    }
+  ]
+}

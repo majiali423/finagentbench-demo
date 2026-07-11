@@ -92,17 +92,20 @@ python -m finagentbench benchmark benchmarks\due_diligence\suite.json --out outp
 
 Current expected result: 9/9 failing traces detected, 0 false positives.
 
-The semantic audit suite contains 20 human-labeled synthetic golden cases for
-`evidence_support`, covering supported summaries and unsupported
-recommendations, growth claims, valuation claims, stale evidence, wrong-entity
-evidence, irrelevant citations, missing citations, and private-company data
-gaps.
+The semantic audit suites contain 40 human-review synthetic golden cases across
+`evidence_support`, `risk_quality`, and `compliance_semantic`. They cover
+supported summaries, unsupported recommendations, growth claims, valuation
+claims, stale evidence, wrong-entity evidence, weak risk disclosure, liquidity
+and covenant omissions, data-quality gaps, personalized advice, guaranteed
+returns, and misleading compliance language.
 
 ```powershell
 python -m finagentbench semantic-benchmark benchmarks\semantic_audit\evidence_support_golden.json --out outputs\evidence-support-golden.json
+python -m finagentbench semantic-benchmark benchmarks\semantic_audit\risk_quality_golden.json --out outputs\risk-quality-golden.json
+python -m finagentbench semantic-benchmark benchmarks\semantic_audit\compliance_semantic_golden.json --out outputs\compliance-semantic-golden.json
 ```
 
-Current expected replay result: 20/20 labels matched, 0 false positives, 0
+Current expected replay result: all static labels matched, 0 false positives, 0
 false negatives. This is static judge replay for metric plumbing and label
 alignment, not a claim of live LLM judge accuracy. Production teams should run
 the same suite with a real judge configuration and add real failures observed
@@ -120,6 +123,8 @@ Remove-Item Env:FINAGENTBENCH_LLM_API_KEY
 One DeepSeek-backed run on 2026-07-11 matched 10/10 human labels with 0 false
 positives and 0 false negatives. Treat this as small-sample judge alignment, not
 production accuracy. See `docs/live_semantic_judge_validation.md`.
+See `docs/human_labeling_guide.md` for how the human-review candidate labels
+were drafted and how to audit them.
 
 ## Repair Suggestions
 

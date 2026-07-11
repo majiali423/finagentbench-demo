@@ -5,6 +5,7 @@ from pathlib import Path
 
 from finagentbench.adapters import load_run_file
 from finagentbench.runner import evaluate_run
+from helpers import metric_by_name
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -19,7 +20,11 @@ class LumenFinIntegrationTestCase(unittest.TestCase):
 
         self.assertTrue(report.passed)
         self.assertGreaterEqual(report.score, 85)
-        self.assertEqual({metric.name for metric in report.metrics} & {"numeric_correctness", "evidence_consistency"}, {"numeric_correctness", "evidence_consistency"})
+        self.assertTrue(metric_by_name(report, "numeric_correctness").passed)
+        self.assertTrue(metric_by_name(report, "evidence_consistency").passed)
+        self.assertEqual(metric_by_name(report, "entity_coverage").findings, [])
+        self.assertEqual(metric_by_name(report, "step_presence").findings, [])
+        self.assertEqual(metric_by_name(report, "section_presence").findings, [])
 
     def test_lumenfin_case_accepts_live_report_risk_language(self) -> None:
         run = load_run_file(ROOT / "fixtures" / "lumenfin_state_sample.json", "lumenfin")

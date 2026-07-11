@@ -170,6 +170,10 @@ and regression gates.
 `--profile audit` adds metrics listed in `audit_metrics`. It should be used only
 when a semantic judge is configured through `semantic_audit.judge`.
 
+If a case omits `enabled_metrics`, `--profile audit` evaluates only the metrics
+listed in `audit_metrics`; include deterministic metrics explicitly when you
+want audit mode to be additive.
+
 If no semantic judge is configured, semantic metrics fail conservatively with
 `semantic_judge_not_configured`; the fallback is not treated as a real semantic
 auditor.

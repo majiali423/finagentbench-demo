@@ -9,9 +9,7 @@ from tempfile import TemporaryDirectory
 
 from finagentbench.llm import build_judge
 from finagentbench.runner import evaluate_run
-
-
-ROOT = Path(__file__).resolve().parents[1]
+from helpers import load_fixture, metric_by_name
 
 
 class SemanticAuditTestCase(unittest.TestCase):
@@ -25,9 +23,9 @@ class SemanticAuditTestCase(unittest.TestCase):
                 "labels": ["supported"],
             }
         )
-        report = evaluate_run(_load("pass_due_diligence_finrun.json"), case)
+        report = evaluate_run(load_fixture("pass_due_diligence_finrun.json"), case)
 
-        metric = _metric(report, "evidence_support")
+        metric = metric_by_name(report, "evidence_support")
         self.assertTrue(metric.passed)
         self.assertEqual(metric.score, 92)
 
@@ -41,47 +39,47 @@ class SemanticAuditTestCase(unittest.TestCase):
                 "labels": ["unsupported_recommendation"],
             }
         )
-        report = evaluate_run(_load("pass_due_diligence_finrun.json"), case)
+        report = evaluate_run(load_fixture("pass_due_diligence_finrun.json"), case)
 
-        metric = _metric(report, "evidence_support")
+        metric = metric_by_name(report, "evidence_support")
         self.assertFalse(metric.passed)
         self.assertEqual(metric.findings[0].target["section"], "final_output")
         self.assertIn("unsupported_recommendation", metric.findings[0].target["labels"])
         self.assertEqual(metric.findings[0].target["judge"]["provider"], "static")
 
     def test_unconfigured_external_judge_degrades_to_finding(self) -> None:
-        case = _load("case_due_diligence.json")
+        case = load_fixture("case_due_diligence.json")
         case["enabled_metrics"] = ["evidence_support"]
         case["semantic_audit"] = {
             "judge": {"provider": "openai-compatible"},
             "min_evidence_support_score": 80,
         }
-        report = evaluate_run(_load("pass_due_diligence_finrun.json"), case)
+        report = evaluate_run(load_fixture("pass_due_diligence_finrun.json"), case)
 
-        metric = _metric(report, "evidence_support")
+        metric = metric_by_name(report, "evidence_support")
         self.assertFalse(metric.passed)
         self.assertIn("missing endpoint", metric.findings[0].message.lower())
 
     def test_rule_fallback_does_not_pass_unsupported_semantic_claim(self) -> None:
-        run = _load("pass_due_diligence_finrun.json")
+        run = load_fixture("pass_due_diligence_finrun.json")
         run["final_output"] += "\nThe buyer should acquire TargetCo immediately with guaranteed upside."
-        case = _load("case_due_diligence.json")
+        case = load_fixture("case_due_diligence.json")
         case["enabled_metrics"] = ["evidence_support"]
         case["semantic_audit"] = {"min_evidence_support_score": 80}
 
         report = evaluate_run(run, case)
 
-        metric = _metric(report, "evidence_support")
+        metric = metric_by_name(report, "evidence_support")
         self.assertFalse(metric.passed)
         self.assertEqual(metric.score, 0)
         self.assertIn("semantic_judge_not_configured", metric.findings[0].target["labels"])
 
     def test_rule_fallback_does_not_pass_risk_or_compliance_semantic(self) -> None:
-        case = _load("case_due_diligence.json")
+        case = load_fixture("case_due_diligence.json")
         case["enabled_metrics"] = ["risk_quality", "compliance_semantic"]
         case["semantic_audit"] = {}
 
-        report = evaluate_run(_load("pass_due_diligence_finrun.json"), case)
+        report = evaluate_run(load_fixture("pass_due_diligence_finrun.json"), case)
 
         metrics = {metric.name: metric for metric in report.metrics}
         self.assertFalse(metrics["risk_quality"].passed)
@@ -98,9 +96,9 @@ class SemanticAuditTestCase(unittest.TestCase):
             },
             metric="risk_quality",
         )
-        report = evaluate_run(_load("pass_due_diligence_finrun.json"), case)
+        report = evaluate_run(load_fixture("pass_due_diligence_finrun.json"), case)
 
-        metric = _metric(report, "risk_quality")
+        metric = metric_by_name(report, "risk_quality")
         self.assertFalse(metric.passed)
         self.assertIn("generic_risk_language", metric.findings[0].target["labels"])
 
@@ -116,15 +114,16 @@ class SemanticAuditTestCase(unittest.TestCase):
             metric="compliance_semantic",
             min_score=85,
         )
-        report = evaluate_run(_load("pass_due_diligence_finrun.json"), case)
+        report = evaluate_run(load_fixture("pass_due_diligence_finrun.json"), case)
 
-        metric = _metric(report, "compliance_semantic")
+        metric = metric_by_name(report, "compliance_semantic")
         self.assertFalse(metric.passed)
         self.assertIn("implicit_investment_advice", metric.findings[0].target["labels"])
 
     def test_openai_compatible_judge_records_cache_and_retries(self) -> None:
         handler = _flaky_handler()
         server = HTTPServer(("127.0.0.1", 0), handler)
+        server.request_count = 0
         thread = threading.Thread(target=server.serve_forever, daemon=True)
         thread.start()
         try:
@@ -152,7 +151,7 @@ class SemanticAuditTestCase(unittest.TestCase):
                 self.assertEqual(first.metadata["model"], "test-model")
                 self.assertTrue(second.passed)
                 self.assertTrue(second.metadata["cached"])
-                self.assertEqual(handler.call_count, 2)
+                self.assertEqual(server.request_count, 2)
         finally:
             server.shutdown()
             thread.join(timeout=2)
@@ -160,7 +159,7 @@ class SemanticAuditTestCase(unittest.TestCase):
 
 
 def _semantic_case(result: dict, metric: str = "evidence_support", min_score: int = 80) -> dict:
-    case = _load("case_due_diligence.json")
+    case = load_fixture("case_due_diligence.json")
     case["enabled_metrics"] = [metric]
     case["semantic_audit"] = {
         "judge": {
@@ -172,22 +171,11 @@ def _semantic_case(result: dict, metric: str = "evidence_support", min_score: in
     }
     return case
 
-
-def _metric(report, name: str):
-    return next(metric for metric in report.metrics if metric.name == name)
-
-
-def _load(name: str) -> dict:
-    return json.loads((ROOT / "fixtures" / name).read_text(encoding="utf-8"))
-
-
 def _flaky_handler():
     class FlakyHandler(BaseHTTPRequestHandler):
-        call_count = 0
-
         def do_POST(self) -> None:
-            type(self).call_count += 1
-            if type(self).call_count == 1:
+            self.server.request_count += 1
+            if self.server.request_count == 1:
                 self.send_response(500)
                 self.end_headers()
                 return

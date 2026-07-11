@@ -38,7 +38,7 @@ class ScoringTestCase(unittest.TestCase):
 def _minimal_run() -> dict:
     return {
         "run_id": "scoring-demo",
-        "entities": ["A"],
+        "entities": [{"name": "A"}],
         "steps": [],
         "metrics": [],
         "evidence": [],

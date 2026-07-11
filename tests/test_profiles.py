@@ -35,6 +35,18 @@ class ProfileTestCase(unittest.TestCase):
         )
         self.assertEqual(profiled["semantic_profile"], "audit")
 
+    def test_audit_profile_without_enabled_metrics_evaluates_only_audit_metrics(self) -> None:
+        case = {
+            "audit_metrics": ["evidence_support", "risk_quality"],
+            "expected_entities": [],
+            "required_steps": [],
+        }
+
+        profiled = apply_profile(case, "audit")
+
+        self.assertEqual(profiled["enabled_metrics"], ["evidence_support", "risk_quality"])
+        self.assertEqual(profiled["semantic_profile"], "audit")
+
 
 if __name__ == "__main__":
     unittest.main()

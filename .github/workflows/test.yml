@@ -39,6 +39,12 @@ jobs:
       - name: Run semantic static replay suite
         run: python -m finagentbench semantic-benchmark benchmarks/semantic_audit/evidence_support_golden.json --out outputs/evidence-support-golden.json
 
+      - name: Run risk quality semantic replay suite
+        run: python -m finagentbench semantic-benchmark benchmarks/semantic_audit/risk_quality_golden.json --out outputs/risk-quality-golden.json
+
+      - name: Run compliance semantic replay suite
+        run: python -m finagentbench semantic-benchmark benchmarks/semantic_audit/compliance_semantic_golden.json --out outputs/compliance-semantic-golden.json
+
       - name: Assert failing due diligence run is blocked
         run: |
           set +e
