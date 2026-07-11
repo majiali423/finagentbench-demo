@@ -198,6 +198,8 @@ python -m finagentbench evaluate fixtures\agent_state_sample.json --adapter agen
 ```
 
 See `docs/adapter_guide.md` for the adapter contract.
+See `docs/agent_integration_guide.md` for a full guide to connecting another
+financial agent through direct `FinRun` export or a custom adapter.
 
 ## LumenFin End-To-End Trace
 

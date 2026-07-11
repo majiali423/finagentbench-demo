@@ -33,6 +33,9 @@ jobs:
       - name: Run curated due diligence benchmark suite
         run: python -m finagentbench benchmark benchmarks/due_diligence/suite.json --out outputs/dd-suite-report.json
 
+      - name: Run LumenFin regression suite
+        run: python -m finagentbench benchmark benchmarks/lumenfin_regression/suite.json --out outputs/lumenfin-regression-report.json
+
       - name: Run semantic static replay suite
         run: python -m finagentbench semantic-benchmark benchmarks/semantic_audit/evidence_support_golden.json --out outputs/evidence-support-golden.json
 
