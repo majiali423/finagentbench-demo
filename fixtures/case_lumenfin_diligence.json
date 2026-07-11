@@ -1,0 +1,62 @@
+{
+  "id": "lumenfin_diligence_001",
+  "query": "Compare Apple and Microsoft FY2025 financial performance, supply chain risk, and market data quality.",
+  "expected_entities": [
+    "Apple",
+    "Microsoft"
+  ],
+  "required_steps": [
+    "query_planner",
+    "supervisor",
+    "retrieval",
+    "quant",
+    "psychologist",
+    "critic",
+    "synthesizer"
+  ],
+  "required_sections": [
+    "Executive Summary",
+    "Financial Performance Analysis",
+    "Risk",
+    "Compliance",
+    "Methodology",
+    "Disclaimer"
+  ],
+  "enabled_metrics": [
+    "entity_coverage",
+    "step_presence",
+    "section_presence",
+    "numeric_correctness",
+    "unit_currency_consistency",
+    "evidence_coverage",
+    "evidence_consistency",
+    "market_data_disclosure",
+    "risk_disclosure",
+    "compliance_language"
+  ],
+  "require_unit_currency_consistency": true,
+  "require_evidence_consistency": true,
+  "evidence_numeric_tolerance": 0.05,
+  "require_risk_disclosure": true,
+  "required_risk_types": [
+    "market",
+    "data"
+  ],
+  "numeric_tolerance": 0.0001,
+  "min_score": 85,
+  "regression_tolerance": 5,
+  "metric_weights": {
+    "numeric_correctness": 1.5,
+    "evidence_consistency": 1.5,
+    "risk_disclosure": 1.2,
+    "compliance_language": 1.5
+  },
+  "severity_penalties": {
+    "high": 10,
+    "medium": 6,
+    "critical": 20
+  },
+  "block_on_severity": [
+    "critical"
+  ]
+}

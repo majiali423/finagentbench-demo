@@ -23,6 +23,19 @@ class AdapterTestCase(unittest.TestCase):
         self.assertTrue(any(step["name"] == "retrieval" for step in run["steps"]))
         self.assertTrue(any(metric["name"] == "r_and_d_intensity" for metric in run["metrics"]))
 
+    def test_lumenfin_adapter_maps_state_to_finrun(self) -> None:
+        run = load_run_file(ROOT / "fixtures" / "lumenfin_state_sample.json", "lumenfin")
+        self.assertEqual(run["run_id"], "lumenfin-e2e-apple-microsoft")
+        self.assertEqual({entity["name"] for entity in run["entities"]}, {"Apple", "Microsoft"})
+        self.assertTrue(any(step["name"] == "quant" for step in run["steps"]))
+        self.assertTrue(any(metric["name"] == "ebitda_margin" and metric["formula"] for metric in run["metrics"]))
+        self.assertTrue(any(item["source_type"] == "sample_db" for item in run["evidence"]))
+
+    def test_lumenfin_adapter_is_auto_detected_before_generic_agent_state(self) -> None:
+        run = load_run_file(ROOT / "fixtures" / "lumenfin_state_sample.json")
+        self.assertEqual(run["metadata"]["adapter"], "lumenfin")
+        self.assertTrue(run["metrics"])
+
     def test_unknown_adapter_is_rejected(self) -> None:
         payload = json.loads((ROOT / "fixtures" / "pass_finrun.json").read_text(encoding="utf-8"))
         with self.assertRaises(ValueError):
