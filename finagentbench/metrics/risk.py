@@ -20,7 +20,7 @@ RISK_TYPES = {
     "market": ("market risk", "valuation risk", "volatility", "drawdown"),
     "liquidity": ("liquidity risk", "cash flow risk"),
     "regulatory": ("regulatory risk", "compliance risk"),
-    "data": ("data limitation", "data limitations", "incomplete", "unavailable", "failed"),
+    "data": ("data limitation", "data limitations", "incomplete", "unavailable", "failed", "unverified"),
 }
 
 
@@ -36,7 +36,12 @@ def risk_disclosure(run: dict[str, Any], case: dict[str, Any]) -> MetricResult:
         for risk_type in required_types
         if not any(term in output for term in RISK_TYPES.get(risk_type, (risk_type,)))
     ]
-    has_research_boundary = "not investment advice" in output or "research output" in output
+    has_research_boundary = (
+        "not investment advice" in output
+        or "does not constitute investment advice" in output
+        or "research output" in output
+        or "for research" in output
+    )
     findings = []
     if not has_risk_language:
         findings.append(

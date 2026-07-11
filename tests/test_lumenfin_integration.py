@@ -21,6 +21,22 @@ class LumenFinIntegrationTestCase(unittest.TestCase):
         self.assertGreaterEqual(report.score, 85)
         self.assertEqual({metric.name for metric in report.metrics} & {"numeric_correctness", "evidence_consistency"}, {"numeric_correctness", "evidence_consistency"})
 
+    def test_lumenfin_case_accepts_live_report_risk_language(self) -> None:
+        run = load_run_file(ROOT / "fixtures" / "lumenfin_state_sample.json", "lumenfin")
+        run["final_output"] = run["final_output"].replace("## Risk", "Risk Exposure Matrix")
+        run["final_output"] = run["final_output"].replace(
+            "not investment advice",
+            "does not constitute investment advice",
+        )
+        run["final_output"] += "\n_Source: LLM knowledge (unverified in this run)._"
+        case = load_run_case("case_lumenfin_diligence.json")
+
+        report = evaluate_run(run, case)
+
+        findings = [finding.metric for metric in report.metrics for finding in metric.findings]
+        self.assertNotIn("section_presence", findings)
+        self.assertNotIn("risk_disclosure", findings)
+
 
 def load_run_case(name: str) -> dict:
     import json

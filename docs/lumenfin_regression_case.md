@@ -20,6 +20,31 @@ The baseline includes the expected LumenFin workflow steps, report sections,
 formula-backed metrics, numeric evidence, market-data status, risk disclosure,
 and compliance language.
 
+## Live Trace Check
+
+On 2026-07-11, a live LumenFin run was executed with DeepSeek and market data
+providers, then exported through `scripts\export_finrun.py` and evaluated by
+FinAgentBench.
+
+```powershell
+# In C:\a_project\Projects\lumenfin-agent
+python run_demo.py --query "Compare Apple and Microsoft FY2025 financial performance, supply chain risk, and market data quality." --thread-id lumenfin-live-20260711 --output-dir outputs
+python scripts\export_finrun.py outputs\lumenfin-live-20260711_20260711_204223_state.json --out outputs\lumenfin-live-20260711-finrun.json
+
+# In C:\a_project\Projects\finagentbench-demo
+python -m finagentbench evaluate C:\a_project\Projects\lumenfin-agent\outputs\lumenfin-live-20260711-finrun.json --case fixtures\case_lumenfin_diligence.json --profile ci --out outputs\lumenfin-live-20260711-eval
+```
+
+Result:
+
+```text
+PASS lumenfin-live-20260711 score=100.0
+```
+
+This live run is separate from the deterministic fixture used by CI. The fixture
+keeps tests reproducible; the live trace proves the integration path works with
+a freshly generated LumenFin artifact.
+
 ## Mutated Regression Suite
 
 ```powershell

@@ -22,6 +22,13 @@
     "Methodology",
     "Disclaimer"
   ],
+  "section_aliases": {
+    "## Risk": [
+      "Risk Exposure Matrix",
+      "Risk Considerations",
+      "Risk Architecture"
+    ]
+  },
   "enabled_metrics": [
     "entity_coverage",
     "step_presence",
