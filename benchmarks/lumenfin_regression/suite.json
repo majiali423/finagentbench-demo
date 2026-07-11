@@ -1,0 +1,50 @@
+{
+  "id": "lumenfin_regression_v1",
+  "case": "../../fixtures/case_lumenfin_diligence.json",
+  "items": [
+    {
+      "id": "lumenfin_baseline",
+      "run": "../../fixtures/lumenfin_state_sample.json",
+      "adapter": "lumenfin",
+      "failure_type": "none",
+      "expected_passed": true,
+      "expected_findings": []
+    },
+    {
+      "id": "lumenfin_wrong_quant",
+      "run": "../../fixtures/lumenfin_state_sample.json",
+      "adapter": "lumenfin",
+      "failure_type": "wrong_quant",
+      "expected_passed": false,
+      "expected_findings": [
+        "numeric_correctness"
+      ],
+      "mutations": [
+        {
+          "op": "set",
+          "path": ["financial_metrics", "Microsoft", "ebitda_margin"],
+          "value": 0.5
+        }
+      ]
+    },
+    {
+      "id": "lumenfin_missing_risk_section",
+      "run": "../../fixtures/lumenfin_state_sample.json",
+      "adapter": "lumenfin",
+      "failure_type": "missing_risk_section",
+      "expected_passed": false,
+      "expected_findings": [
+        "risk_disclosure",
+        "section_presence"
+      ],
+      "mutations": [
+        {
+          "op": "replace_text",
+          "path": ["final_report"],
+          "old": "## Risk\nMarket risk remains relevant because valuation and price snapshots can change. Data limitation risk remains because the run uses sample financial data and retrieved snippets rather than audited filings.\n\n",
+          "new": ""
+        }
+      ]
+    }
+  ]
+}

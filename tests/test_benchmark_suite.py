@@ -33,6 +33,17 @@ class BenchmarkSuiteTestCase(unittest.TestCase):
         self.assertEqual(payload["false_negatives"], 0)
         self.assertGreaterEqual(len(payload["by_failure_type"]), 10)
 
+    def test_lumenfin_regression_suite_catches_before_after_failures(self) -> None:
+        payload = run_benchmark_suite(ROOT / "benchmarks" / "lumenfin_regression" / "suite.json")
+        self.assertTrue(payload["passed"])
+        self.assertEqual(payload["total_traces"], 3)
+        self.assertEqual(payload["expected_failures"], 2)
+        self.assertEqual(payload["detected_failures"], 2)
+        items = {item["id"]: item for item in payload["items"]}
+        self.assertTrue(items["lumenfin_baseline"]["actual_passed"])
+        self.assertIn("numeric_correctness", items["lumenfin_wrong_quant"]["actual_findings"])
+        self.assertIn("risk_disclosure", items["lumenfin_missing_risk_section"]["actual_findings"])
+
 
 if __name__ == "__main__":
     unittest.main()

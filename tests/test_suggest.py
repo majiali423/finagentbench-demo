@@ -22,6 +22,15 @@ class SuggestTestCase(unittest.TestCase):
         self.assertIn("rewrite", actions)
         self.assertTrue(any(item["target"].get("section") == "final_output" for item in payload["actions"]))
 
+    def test_lumenfin_regression_suggests_recompute_and_rewrite(self) -> None:
+        report = evaluate_run(_load("lumenfin_regression_bad_finrun.json"), _load("case_lumenfin_diligence.json"))
+        payload = build_suggestions(report)
+
+        self.assertFalse(report.passed)
+        actions = {item["action"] for item in payload["actions"]}
+        self.assertIn("recompute", actions)
+        self.assertIn("rewrite", actions)
+
 
 def _load(name: str) -> dict:
     return json.loads((ROOT / "fixtures" / name).read_text(encoding="utf-8"))

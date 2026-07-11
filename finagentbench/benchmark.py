@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import json
+import copy
 from pathlib import Path
 from typing import Any
 
-from .adapters import load_run_file
+from .adapters import load_run_file, normalize_run
 from .runner import evaluate_run
 
 
@@ -22,7 +23,10 @@ def run_benchmark_suite(suite_path: str | Path) -> dict[str, Any]:
 
     for item in suite.get("items", []):
         run_path = (root / item["run"]).resolve()
-        run = load_run_file(run_path, item.get("adapter", "auto"))
+        raw_run = json.loads(run_path.read_text(encoding="utf-8"))
+        for mutation in item.get("mutations", []):
+            _apply_mutation(raw_run, mutation)
+        run = normalize_run(raw_run, item.get("adapter", "auto"))
         report = evaluate_run(run, case)
         finding_metrics = {
             finding.metric
@@ -78,6 +82,34 @@ def run_benchmark_suite(suite_path: str | Path) -> dict[str, Any]:
         "passed": passed,
         "items": items,
     }
+
+
+def _apply_mutation(payload: dict[str, Any], mutation: dict[str, Any]) -> None:
+    operation = mutation.get("op")
+    path = mutation.get("path")
+    if not isinstance(path, list):
+        raise ValueError(f"Mutation path must be a list: {mutation}")
+    parent, key = _resolve_parent(payload, path)
+    if operation == "set":
+        parent[key] = copy.deepcopy(mutation.get("value"))
+        return
+    if operation == "replace_text":
+        old = str(mutation.get("old", ""))
+        new = str(mutation.get("new", ""))
+        if not isinstance(parent.get(key), str):
+            raise ValueError(f"replace_text target must be a string: {mutation}")
+        parent[key] = parent[key].replace(old, new)
+        return
+    raise ValueError(f"Unsupported mutation op: {operation}")
+
+
+def _resolve_parent(payload: dict[str, Any], path: list[Any]) -> tuple[Any, Any]:
+    if not path:
+        raise ValueError("Mutation path cannot be empty")
+    current: Any = payload
+    for part in path[:-1]:
+        current = current[part]
+    return current, path[-1]
 
 
 def run_semantic_benchmark_suite(suite_path: str | Path) -> dict[str, Any]:

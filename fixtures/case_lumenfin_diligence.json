@@ -17,7 +17,7 @@
   "required_sections": [
     "Executive Summary",
     "Financial Performance Analysis",
-    "Risk",
+    "## Risk",
     "Compliance",
     "Methodology",
     "Disclaimer"
@@ -57,6 +57,7 @@
     "critical": 20
   },
   "block_on_severity": [
+    "high",
     "critical"
   ]
 }
