@@ -3,7 +3,7 @@
 FinAgentBench is a replay-first reliability harness for financial AI agents.
 It evaluates exported traces instead of calling an LLM directly.
 
-It is designed as a standalone second project: the benchmark defines its own
+It is designed as a standalone calibration layer: the benchmark defines its own
 schema, fixtures, metrics, reports, and CI gate. Agent projects integrate by
 exporting traces or writing adapters; the benchmark does not depend on their
 runtime code.
