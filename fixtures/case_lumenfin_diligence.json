@@ -43,6 +43,7 @@
   ],
   "require_unit_currency_consistency": true,
   "require_evidence_consistency": true,
+  "require_checkable_metrics": true,
   "evidence_numeric_tolerance": 0.05,
   "require_risk_disclosure": true,
   "required_risk_types": [

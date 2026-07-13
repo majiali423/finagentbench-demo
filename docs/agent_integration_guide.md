@@ -203,6 +203,17 @@ python scripts\export_finrun.py outputs\lumenfin-e2e_state.json --out outputs\lu
 python -m finagentbench evaluate fixtures\lumenfin_state_sample.json --adapter lumenfin --case fixtures\case_lumenfin_diligence.json --profile ci --out outputs\lumenfin-e2e
 ```
 
+CI also gates this LumenFin-shaped native trace (not only synthetic FinRun fixtures):
+
+```powershell
+python -m finagentbench gate fixtures\lumenfin_state_sample.json --adapter lumenfin --case fixtures\case_lumenfin_diligence.json --profile ci --out outputs\ci-lumenfin-gate
+```
+
+Diligence cases set `require_checkable_metrics: true`. If `numeric_correctness`
+or `evidence_consistency` is enabled but the export has nothing checkable
+(empty metrics / missing formula+inputs), the gate fails closed instead of
+scoring 100. Keep that flag off for intentionally non-quantitative L0–L2 scaffolds.
+
 The LumenFin regression suite mutates the same baseline trace to prove that the
 gate catches real failures:
 

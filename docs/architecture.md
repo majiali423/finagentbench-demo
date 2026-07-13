@@ -57,7 +57,12 @@ Metrics are resolved through a registry. A benchmark case can set
 retrieval, only numeric correctness, or only compliance language.
 
 Reports are emitted as JSON for automation, Markdown for code review, and HTML
-for quick human inspection.
+for quick human inspection. CLI evaluate/gate reports also stamp provenance:
+tool version, case id/hash, profile, adapter, and enabled metrics.
+
+Cases may set `require_checkable_metrics: true` so numeric/evidence metrics
+fail closed when the export has nothing to check (empty check sets no longer
+score 100).
 
 ## Production Extensions
 
@@ -65,3 +70,6 @@ for quick human inspection.
 - Historical baselines by dataset and agent version.
 - Severity-weighted scoring instead of a simple average.
 - Sensitive-data scrubber before reports are persisted.
+- Optional citation authenticity checks against original documents when sources
+  are available (out of default CI scope).
+- Multi-tenant SaaS control plane (out of scope; this project remains a CLI/library gate).

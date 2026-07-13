@@ -11,6 +11,7 @@ from .benchmark import (
     run_semantic_benchmark_suite,
 )
 from .profiles import apply_profile
+from .provenance import attach_provenance
 from .reference_runtime import run_reference_agent
 from .report import write_compare_report, write_eval_report
 from .runner import compare_runs, evaluate_run
@@ -79,7 +80,12 @@ def main() -> int:
     if args.command == "evaluate":
         run = load_run_file(args.run_json, args.adapter)
         case = apply_profile(_load_json(args.case), args.profile)
-        report = evaluate_run(run, case)
+        report = attach_provenance(
+            evaluate_run(run, case),
+            case,
+            profile=args.profile,
+            adapter=str(run.get("metadata", {}).get("adapter") or args.adapter),
+        )
         paths = write_eval_report(report, Path(args.out))
         print(f"{'PASS' if report.passed else 'FAIL'} {report.run_id} score={report.score}")
         print(json.dumps(paths, ensure_ascii=False, indent=2))
@@ -90,7 +96,12 @@ def main() -> int:
         failed = False
         for run_json in args.run_json:
             run = load_run_file(run_json, args.adapter)
-            report = evaluate_run(run, case)
+            report = attach_provenance(
+                evaluate_run(run, case),
+                case,
+                profile=args.profile,
+                adapter=str(run.get("metadata", {}).get("adapter") or args.adapter),
+            )
             run_out = Path(args.out) / report.run_id
             paths = write_eval_report(report, run_out)
             failed = failed or not report.passed

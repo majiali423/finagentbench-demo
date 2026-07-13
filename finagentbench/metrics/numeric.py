@@ -5,7 +5,7 @@ import math
 from typing import Any
 
 from ..schema import Finding, MetricResult
-from .common import input_value
+from .common import empty_check_result, input_value
 
 
 def numeric_correctness(run: dict[str, Any], case: dict[str, Any]) -> MetricResult:
@@ -35,7 +35,16 @@ def numeric_correctness(run: dict[str, Any], case: dict[str, Any]) -> MetricResu
                 recommendation="Recompute financial ratios with deterministic tools instead of relying on model text.",
             )
         )
-    score = 100.0 if checked == 0 else round(passed / checked * 100, 2)
+    if checked == 0:
+        empty = empty_check_result(
+            "numeric_correctness",
+            case,
+            detail="no metrics with both formula and inputs were exported",
+        )
+        if empty is not None:
+            return empty
+        return MetricResult("numeric_correctness", 100.0, True, [])
+    score = round(passed / checked * 100, 2)
     return MetricResult("numeric_correctness", score, not findings, findings)
 
 

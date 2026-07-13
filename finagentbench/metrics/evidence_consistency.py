@@ -4,7 +4,7 @@ import math
 from typing import Any
 
 from ..schema import Finding, MetricResult
-from .common import extract_numbers, input_value
+from .common import empty_check_result, extract_numbers, input_value
 
 
 def evidence_consistency(run: dict[str, Any], case: dict[str, Any]) -> MetricResult:
@@ -40,7 +40,16 @@ def evidence_consistency(run: dict[str, Any], case: dict[str, Any]) -> MetricRes
                 )
             )
 
-    score = 100.0 if checked == 0 else round(passed / checked * 100, 2)
+    if checked == 0:
+        empty = empty_check_result(
+            "evidence_consistency",
+            case,
+            detail="no metric inputs were available to compare against evidence text",
+        )
+        if empty is not None:
+            return empty
+        return MetricResult("evidence_consistency", 100.0, True, [])
+    score = round(passed / checked * 100, 2)
     return MetricResult("evidence_consistency", score, not findings, findings)
 
 

@@ -55,6 +55,14 @@ def _render_markdown(report: EvalReport) -> str:
         f"Score: **{report.score}**",
         f"Status: **{'PASS' if report.passed else 'FAIL'}**",
         "",
+        "## Provenance",
+        f"- Tool version: `{report.tool_version or 'n/a'}`",
+        f"- Case id: `{report.case_id or 'n/a'}`",
+        f"- Case hash: `{report.case_hash or 'n/a'}`",
+        f"- Profile: `{report.profile or 'n/a'}`",
+        f"- Adapter: `{report.adapter or 'n/a'}`",
+        f"- Enabled metrics: `{', '.join(report.enabled_metrics) if report.enabled_metrics else 'n/a'}`",
+        "",
         "## Metrics",
     ]
     for metric in report.metrics:

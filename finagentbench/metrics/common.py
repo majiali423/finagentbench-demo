@@ -3,6 +3,31 @@ from __future__ import annotations
 import re
 from typing import Any
 
+from ..schema import Finding, MetricResult
+
+
+def empty_check_result(metric_name: str, case: dict[str, Any], *, detail: str) -> MetricResult | None:
+    """Return a fail-closed result when a case requires checkable work but none was found."""
+    if not case.get("require_checkable_metrics"):
+        return None
+    return MetricResult(
+        metric_name,
+        0.0,
+        False,
+        [
+            Finding(
+                metric=metric_name,
+                severity="high",
+                message=f"No checkable items for {metric_name}: {detail}",
+                recommendation=(
+                    "Export formula/inputs (or evidence numbers) so the metric can verify the run, "
+                    "or disable require_checkable_metrics for intentionally non-quantitative cases."
+                ),
+                action="recompute" if metric_name == "numeric_correctness" else "retrieve",
+            )
+        ],
+    )
+
 
 def input_value(value: Any) -> Any:
     if isinstance(value, dict):

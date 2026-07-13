@@ -36,6 +36,9 @@ jobs:
       - name: Run LumenFin regression suite
         run: python -m finagentbench benchmark benchmarks/lumenfin_regression/suite.json --out outputs/lumenfin-regression-report.json
 
+      - name: Run LumenFin real-trace gate
+        run: python -m finagentbench gate fixtures/lumenfin_state_sample.json --adapter lumenfin --case fixtures/case_lumenfin_diligence.json --profile ci --out outputs/ci-lumenfin-gate
+
       - name: Run semantic static replay suite
         run: python -m finagentbench semantic-benchmark benchmarks/semantic_audit/evidence_support_golden.json --out outputs/evidence-support-golden.json
 

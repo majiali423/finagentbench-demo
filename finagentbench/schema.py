@@ -28,6 +28,12 @@ class EvalReport:
     score: float
     passed: bool
     metrics: list[MetricResult]
+    tool_version: str = ""
+    case_id: str = ""
+    case_hash: str = ""
+    profile: str = ""
+    adapter: str = ""
+    enabled_metrics: list[str] = field(default_factory=list)
 
 
 class ValidationError(ValueError):
