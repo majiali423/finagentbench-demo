@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from .case_binding import resolve_case_for_run
 from .metrics.registry import resolve_metrics
 from .schema import EvalReport, validate_case, validate_finrun
 
@@ -9,6 +10,7 @@ from .schema import EvalReport, validate_case, validate_finrun
 def evaluate_run(run: dict[str, Any], case: dict[str, Any]) -> EvalReport:
     validate_finrun(run)
     validate_case(case)
+    case = resolve_case_for_run(run, case)
     results = [metric(run, case) for metric in resolve_metrics(case)]
     score = _score_results(results, case)
     blocked = set(case.get("block_on_severity", ["critical"]))

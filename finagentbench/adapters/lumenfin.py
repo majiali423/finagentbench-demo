@@ -31,6 +31,11 @@ class LumenFinAdapter:
                 "thread_id": payload.get("thread_id"),
                 "workflow_status": payload.get("workflow_status"),
                 "llm_backend": payload.get("llm_backend"),
+                "data_mode": payload.get("data_mode"),
+                "input_guardrail_summary": payload.get("input_guardrail_summary") or {},
+                "input_guardrail_findings": payload.get("input_guardrail_findings") or [],
+                "compliance_violations": payload.get("compliance_violations") or [],
+                "retrieval_provenance": _retrieval_provenance(payload),
             },
             "entities": [{"name": company} for company in _companies(payload)],
             "steps": _steps(payload),
@@ -43,6 +48,22 @@ class LumenFinAdapter:
 
 def _companies(payload: dict[str, Any]) -> list[str]:
     return [str(company) for company in payload.get("companies") or []]
+
+
+def _retrieval_provenance(payload: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    explicit = payload.get("retrieval_provenance") or {}
+    if explicit:
+        return {str(company): dict(value) for company, value in explicit.items()}
+
+    derived: dict[str, dict[str, Any]] = {}
+    for company, bundle in (payload.get("retrieved_docs") or {}).items():
+        provenance = bundle.get("provenance")
+        if isinstance(provenance, dict):
+            derived[str(company)] = dict(provenance)
+            continue
+        structured_source = str(bundle.get("structured_source") or "none")
+        derived[str(company)] = {"structured_source": structured_source}
+    return derived
 
 
 def _steps(payload: dict[str, Any]) -> list[dict[str, str]]:
@@ -71,7 +92,11 @@ def _metrics(payload: dict[str, Any]) -> list[dict[str, Any]]:
                     "value": value,
                     "formula": formula,
                     "inputs": _metric_inputs(input_map, source_values),
-                    "confidence": (metric_confidence.get(company) or {}).get(name, {}),
+                    "confidence": _metric_confidence(
+                        metric_confidence.get(company) or {},
+                        name,
+                        retrieved_docs.get(company) or {},
+                    ),
                 }
             )
     return output
@@ -88,6 +113,23 @@ def _metric_inputs(input_map: dict[str, str], source_values: dict[str, Any]) -> 
                 "period": "FY2025",
             }
     return inputs
+
+
+def _metric_confidence(
+    company_confidence: dict[str, Any],
+    metric_name: str,
+    bundle: dict[str, Any],
+) -> dict[str, Any]:
+    confidence = dict(company_confidence.get(metric_name) or {})
+    provenance = bundle.get("provenance") or {}
+    if provenance:
+        confidence.setdefault("structured_source", provenance.get("structured_source"))
+        confidence.setdefault("data_mode", provenance.get("data_mode"))
+        confidence.setdefault("market_status", provenance.get("market_status"))
+    retrieval_confidence = bundle.get("confidence") or {}
+    if retrieval_confidence:
+        confidence.setdefault("retrieval_overall", retrieval_confidence.get("overall"))
+    return confidence
 
 
 def _evidence(payload: dict[str, Any]) -> list[dict[str, str]]:

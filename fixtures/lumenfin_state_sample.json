@@ -3,6 +3,15 @@
   "query": "Compare Apple and Microsoft FY2025 financial performance, supply chain risk, and market data quality.",
   "workflow_status": "completed",
   "llm_backend": "local-fallback",
+  "data_mode": "demo",
+  "input_guardrail_summary": {
+    "allowed": true,
+    "mode": "sanitize",
+    "finding_count": 0,
+    "critical_count": 0
+  },
+  "input_guardrail_findings": [],
+  "compliance_violations": [],
   "companies": [
     "Apple",
     "Microsoft"
@@ -37,7 +46,23 @@
           "source_type": "markdown",
           "excerpt": "Apple FY2025 source package shows revenue of 412.0 billion USD, EBITDA of 141.2 billion USD, R&D of 33.4 billion USD, and operating income of 123.6 billion USD. Supply chain risk remains medium."
         }
-      ]
+      ],
+      "structured_source": "sample_db",
+      "provenance": {
+        "structured_source": "sample_db",
+        "market_provider": "fake",
+        "market_status": "ok",
+        "rag_enabled": true,
+        "rag_hit_count": 1,
+        "document_count": 1,
+        "data_mode": "demo"
+      },
+      "confidence": {
+        "overall": 0.83,
+        "market_data": 1.0,
+        "live_market": 1.0,
+        "rag_coverage": 0.33
+      }
     },
     "Microsoft": {
       "market_data": {
@@ -58,7 +83,23 @@
           "source_type": "markdown",
           "excerpt": "Microsoft FY2025 source package shows revenue of 288.7 billion USD, EBITDA of 122.5 billion USD, R&D of 36.8 billion USD, and operating income of 118.3 billion USD. Supply chain risk is low."
         }
-      ]
+      ],
+      "structured_source": "sample_db",
+      "provenance": {
+        "structured_source": "sample_db",
+        "market_provider": "fake",
+        "market_status": "ok",
+        "rag_enabled": true,
+        "rag_hit_count": 1,
+        "document_count": 1,
+        "data_mode": "demo"
+      },
+      "confidence": {
+        "overall": 0.83,
+        "market_data": 1.0,
+        "live_market": 1.0,
+        "rag_coverage": 0.33
+      }
     }
   },
   "financial_metrics": {
@@ -96,6 +137,26 @@
         "snippet": "Microsoft sourcing is diversified across multiple geographies."
       }
     ]
+  },
+  "retrieval_provenance": {
+    "Apple": {
+      "structured_source": "sample_db",
+      "market_provider": "fake",
+      "market_status": "ok",
+      "rag_enabled": true,
+      "rag_hit_count": 1,
+      "document_count": 1,
+      "data_mode": "demo"
+    },
+    "Microsoft": {
+      "structured_source": "sample_db",
+      "market_provider": "fake",
+      "market_status": "ok",
+      "rag_enabled": true,
+      "rag_hit_count": 1,
+      "document_count": 1,
+      "data_mode": "demo"
+    }
   },
   "market_snapshots": {
     "Apple": {

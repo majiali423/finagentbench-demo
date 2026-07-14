@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+from .input_safety import input_safety
 from .compliance import compliance_language
+from .retrieval_provenance import retrieval_provenance
+from .runtime_compliance import runtime_compliance
 from .compliance_semantic import compliance_semantic
 from .entity import entity_coverage
 from .evidence import evidence_coverage
@@ -31,4 +34,7 @@ BUILTIN_METRICS = (
     risk_quality,
     compliance_language,
     compliance_semantic,
+    input_safety,
+    runtime_compliance,
+    retrieval_provenance,
 )

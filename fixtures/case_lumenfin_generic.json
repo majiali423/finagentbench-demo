@@ -1,10 +1,8 @@
 {
-  "id": "lumenfin_diligence_001",
-  "query": "Compare Apple and Microsoft FY2025 financial performance, supply chain risk, and market data quality.",
-  "expected_entities": [
-    "Apple",
-    "Microsoft"
-  ],
+  "id": "lumenfin_generic_001",
+  "query": "Generic LumenFin release gate for arbitrary company sets exported from a real run.",
+  "derive_entities_from_run": true,
+  "expected_entities": [],
   "required_steps": [
     "query_planner",
     "supervisor",

@@ -8,7 +8,7 @@ if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from finagentbench.runner import evaluate_run
-from tests.helpers import load_fixture
+from tests.helpers import load_fixture, metric_by_name
 
 
 class RealisticFixtureTestCase(unittest.TestCase):
@@ -60,7 +60,7 @@ class RealisticFixtureTestCase(unittest.TestCase):
         report = evaluate_run(run, case)
 
         findings = _finding_messages(report)
-        self.assertFalse(report.passed)
+        self.assertFalse(metric_by_name(report, "risk_disclosure").passed)
         self.assertTrue(any("does not disclose material risks" in finding for finding in findings))
 
 
