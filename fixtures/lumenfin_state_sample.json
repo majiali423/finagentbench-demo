@@ -24,6 +24,7 @@
     {"step": "quant", "status": "ok"},
     {"step": "psychologist", "status": "ok"},
     {"step": "critic", "status": "ok"},
+    {"step": "claim_binder", "status": "ok"},
     {"step": "synthesizer", "status": "ok"}
   ],
   "retrieved_docs": {
