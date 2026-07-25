@@ -1,0 +1,94 @@
+{
+  "id": "lumenfin_issuer_apple_001",
+  "query": "Issuer-only gate for Apple live diligence.",
+  "derive_entities_from_run": false,
+  "expected_entities": [
+    "Apple"
+  ],
+  "forbidden_entities": [
+    "Microsoft",
+    "Alphabet",
+    "Amazon",
+    "NVIDIA",
+    "Tesla",
+    "Meta"
+  ],
+  "required_steps": [
+    "query_planner",
+    "supervisor",
+    "retrieval",
+    "quant",
+    "psychologist",
+    "critic",
+    "claim_binder",
+    "synthesizer"
+  ],
+  "required_sections": [
+    "Executive Summary",
+    "Financial Performance Analysis",
+    "## Risk",
+    "Compliance",
+    "Methodology",
+    "Disclaimer"
+  ],
+  "section_aliases": {
+    "## Risk": [
+      "Risk Exposure Matrix",
+      "Risk Considerations",
+      "Risk Architecture"
+    ]
+  },
+  "enabled_metrics": [
+    "entity_coverage",
+    "entity_leakage",
+    "step_presence",
+    "section_presence",
+    "numeric_correctness",
+    "unit_currency_consistency",
+    "evidence_coverage",
+    "evidence_consistency",
+    "market_data_disclosure",
+    "risk_disclosure",
+    "compliance_language",
+    "input_safety",
+    "runtime_compliance",
+    "retrieval_provenance"
+  ],
+  "require_input_guardrail": true,
+  "expected_violation_codes": [],
+  "require_retrieval_provenance": true,
+  "forbidden_structured_sources": [
+    "none"
+  ],
+  "require_unit_currency_consistency": true,
+  "require_evidence_consistency": true,
+  "require_checkable_metrics": true,
+  "evidence_numeric_tolerance": 0.05,
+  "require_risk_disclosure": true,
+  "required_risk_types": [
+    "market",
+    "data"
+  ],
+  "numeric_tolerance": 0.0001,
+  "min_score": 85,
+  "regression_tolerance": 5,
+  "metric_weights": {
+    "entity_leakage": 1.5,
+    "numeric_correctness": 1.5,
+    "evidence_consistency": 1.5,
+    "risk_disclosure": 1.2,
+    "compliance_language": 1.5,
+    "input_safety": 1.0,
+    "runtime_compliance": 1.0,
+    "retrieval_provenance": 1.0
+  },
+  "severity_penalties": {
+    "high": 10,
+    "medium": 6,
+    "critical": 20
+  },
+  "block_on_severity": [
+    "high",
+    "critical"
+  ]
+}

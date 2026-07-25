@@ -1,0 +1,19 @@
+{
+  "run_id": "pass-dd-targetco",
+  "score": 100.0,
+  "passed": true,
+  "metrics": [
+    {"name": "entity_coverage", "score": 100.0, "passed": true, "findings": []},
+    {"name": "step_presence", "score": 100.0, "passed": true, "findings": []},
+    {"name": "section_presence", "score": 100.0, "passed": true, "findings": []},
+    {"name": "numeric_correctness", "score": 100.0, "passed": true, "findings": []},
+    {"name": "evidence_coverage", "score": 100.0, "passed": true, "findings": []},
+    {"name": "evidence_consistency", "score": 100.0, "passed": true, "findings": []},
+    {"name": "risk_disclosure", "score": 100.0, "passed": true, "findings": []},
+    {"name": "compliance_language", "score": 100.0, "passed": true, "findings": []}
+  ],
+  "tool_version": "0.1.0rc1",
+  "case_id": "due_diligence_001",
+  "profile": "ci",
+  "adapter": "generic"
+}

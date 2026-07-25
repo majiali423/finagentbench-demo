@@ -1,0 +1,56 @@
+{
+  "id": "finrun_reliability_mutations_v1",
+  "case": "../../fixtures/case_due_diligence.json",
+  "items": [
+    {
+      "id": "baseline",
+      "run": "../../fixtures/pass_due_diligence_finrun.json",
+      "failure_type": "none",
+      "expected_passed": true
+    },
+    {
+      "id": "wrong_number",
+      "run": "../../fixtures/pass_due_diligence_finrun.json",
+      "failure_type": "wrong_number",
+      "expected_passed": false,
+      "expected_findings": ["numeric_correctness"],
+      "mutations": [
+        {"op": "set", "path": ["metrics", 0, "value"], "value": 0.9}
+      ]
+    },
+    {
+      "id": "wrong_entity",
+      "run": "../../fixtures/pass_due_diligence_finrun.json",
+      "failure_type": "wrong_entity",
+      "expected_passed": false,
+      "expected_findings": ["entity_coverage"],
+      "mutations": [
+        {"op": "set", "path": ["entities"], "value": ["OpenAI"]}
+      ]
+    },
+    {
+      "id": "missing_citation",
+      "run": "../../fixtures/pass_due_diligence_finrun.json",
+      "failure_type": "missing_citation",
+      "expected_passed": false,
+      "expected_findings": ["evidence_coverage", "evidence_consistency"],
+      "mutations": [
+        {"op": "set", "path": ["evidence"], "value": []}
+      ]
+    },
+    {
+      "id": "missing_risk",
+      "run": "../../fixtures/pass_due_diligence_finrun.json",
+      "failure_type": "missing_risk",
+      "expected_passed": false,
+      "expected_findings": ["risk_disclosure", "section_presence"],
+      "mutations": [
+        {
+          "op": "set",
+          "path": ["final_output"],
+          "value": "# Company Overview\nTargetCo is the subject of this review.\n\n# Financial Analysis\nDebt to assets is 40.0%.\n\n# Operations & Industry\nTargetCo operates in a competitive market.\n\n# Conclusion & Limitations\nThis is research output only and not investment advice."
+        }
+      ]
+    }
+  ]
+}
