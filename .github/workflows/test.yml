@@ -36,6 +36,9 @@ jobs:
       - name: Run LumenFin regression suite
         run: python -m finagentbench benchmark benchmarks/lumenfin_regression/suite.json --out outputs/lumenfin-regression-report.json
 
+      - name: Run four-mutation reliability gate
+        run: python scripts/run_mutation_suite.py --out outputs/mutation_detection_report.json
+
       - name: Run LumenFin real-trace gate
         run: python -m finagentbench gate fixtures/lumenfin_state_sample.json --adapter lumenfin --case fixtures/case_lumenfin_diligence.json --profile ci --out outputs/ci-lumenfin-gate
 
@@ -63,3 +66,11 @@ jobs:
         run: |
           python -m finagentbench run-reference --out outputs/reference-agent-run.json
           python -m finagentbench evaluate outputs/reference-agent-run.json --case fixtures/case_bigtech_fcf.json --out outputs/reference-agent-eval
+
+      - name: Upload benchmark reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: finagentbench-reports
+          path: outputs/
+          if-no-files-found: error
