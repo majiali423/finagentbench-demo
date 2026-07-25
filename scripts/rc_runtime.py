@@ -26,6 +26,46 @@ def dump_json(path: Path, payload: Any) -> None:
     )
 
 
+class LocalFallbackAbort(RuntimeError):
+    """Live RC must not continue after local-fallback is observed."""
+
+
+def provider_fingerprint(cfg: Any) -> dict[str, Any]:
+    llm = getattr(cfg, "llm", None)
+    return {
+        "provider": "deepseek" if (getattr(llm, "api_key", None) or "").strip() else "local-fallback",
+        "model": getattr(llm, "model", None),
+        "base_url": getattr(llm, "base_url", None),
+        "data_mode": getattr(cfg, "data_mode", None),
+        "allow_local_fallback": bool(getattr(cfg, "allows_local_fallback", lambda: None)()),
+        "app_env": getattr(cfg, "app_env", None),
+    }
+
+
+def live_preflight(*, lumen_root: Path) -> dict[str, Any]:
+    """Shared config path with formal live_analyze (no override=True)."""
+    from lumenfin.config import AppConfig
+    from lumenfin.env_bootstrap import announce_credential_sources, bootstrap_dotenv
+
+    bootstrap_dotenv(root=lumen_root, announce=False, strict_conflicts=True)
+    announce_credential_sources(root=lumen_root)
+    cfg = AppConfig.from_env()
+    fp = provider_fingerprint(cfg)
+    print(
+        "RC preflight fingerprint: "
+        f"provider={fp['provider']} model={fp['model']} "
+        f"base_url={fp['base_url']} data_mode={fp['data_mode']} "
+        f"allow_local_fallback={fp['allow_local_fallback']}",
+        flush=True,
+    )
+    if fp["provider"] != "deepseek":
+        raise RuntimeError(
+            "Live RC preflight refused: DEEPSEEK_API_KEY missing after shared config load. "
+            "Unset conflicting process env vars if they shadow project .env."
+        )
+    return {"config": cfg, "fingerprint": fp}
+
+
 def live_analyze(
     *,
     lumen_root: Path,
@@ -33,6 +73,7 @@ def live_analyze(
     query: str,
     docs: list[Path],
     prefix: str,
+    expected_fingerprint: dict[str, Any] | None = None,
 ) -> tuple[dict[str, Any], float, str | None]:
     """Run one live LumenFin analyze call. Heavy imports are deferred."""
     from dataclasses import replace
@@ -43,9 +84,18 @@ def live_analyze(
     cfg = AppConfig.from_env()
     if not (cfg.llm.api_key or "").strip():
         raise RuntimeError("DEEPSEEK_API_KEY required")
+    runtime_fp = provider_fingerprint(cfg)
+    if expected_fingerprint is not None:
+        for key in ("provider", "model", "base_url"):
+            if runtime_fp.get(key) != expected_fingerprint.get(key):
+                raise RuntimeError(
+                    "Live RC config drift after preflight: "
+                    f"preflight={expected_fingerprint} runtime={runtime_fp}"
+                )
     cfg = replace(
         cfg,
         data_mode="live",
+        allow_local_fallback=False,
         fetch_live_fundamentals=True,
         fetch_sec_fundamentals=True,
         rag_index_mode="sync_on_run",
@@ -59,7 +109,11 @@ def live_analyze(
     err = None
     state: dict[str, Any] = {}
     try:
-        print(f"LIVE {thread_id} docs={[d.name for d in docs] or None}", flush=True)
+        print(
+            f"LIVE {thread_id} provider={runtime_fp['provider']} "
+            f"model={runtime_fp['model']} docs={[d.name for d in docs] or None}",
+            flush=True,
+        )
         pkg = service.analyze(
             query=query,
             document_paths=[str(d) for d in docs] or None,
@@ -91,6 +145,14 @@ def live_analyze(
         }
     elapsed_ms = (time.perf_counter() - t0) * 1000.0
     state.setdefault("thread_id", thread_id)
+    state.setdefault("llm_backend", runtime_fp["provider"])
+    state.setdefault("llm_model", runtime_fp["model"])
+    backend = str(state.get("llm_backend") or "")
+    if backend == "local-fallback":
+        raise LocalFallbackAbort(
+            f"Live RC aborted: local-fallback observed for {thread_id}. "
+            "Do not record local-fallback as a live PASS."
+        )
     return state, elapsed_ms, err
 
 

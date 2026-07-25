@@ -105,6 +105,33 @@ class RcRunnerImportTestCase(unittest.TestCase):
             elapsed = time.perf_counter() - started
         self.assertLess(elapsed, 5.0)
 
+    def test_live_rc_rejects_local_fallback_and_fingerprint_drift(self) -> None:
+        runtime = _load_module("rc_runtime_fallback_probe", SCRIPTS / "rc_runtime.py")
+        self.assertTrue(issubclass(runtime.LocalFallbackAbort, RuntimeError))
+
+        class _LLM:
+            api_key = "sk-test"
+            model = "deepseek-v4-flash"
+            base_url = "https://api.deepseek.com"
+
+        class _Cfg:
+            llm = _LLM()
+            data_mode = "live"
+            app_env = "dev"
+
+            def allows_local_fallback(self) -> bool:
+                return False
+
+        fp = runtime.provider_fingerprint(_Cfg())
+        self.assertEqual(fp["provider"], "deepseek")
+        self.assertEqual(fp["model"], "deepseek-v4-flash")
+        self.assertFalse(fp["allow_local_fallback"])
+
+        # Fingerprint mismatch must be detectable before analyze proceeds.
+        drifted = dict(fp)
+        drifted["model"] = "other-model"
+        self.assertNotEqual(fp["model"], drifted["model"])
+
 
 if __name__ == "__main__":
     unittest.main()

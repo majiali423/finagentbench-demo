@@ -267,6 +267,7 @@ def _run_live_case(
     lumen: Path,
     out: Path,
     spec: dict[str, Any],
+    expected_fingerprint: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     # Deferred import: keeps module import free of Agent/provider side effects.
     import rc_runtime as runtime
@@ -288,6 +289,8 @@ def _run_live_case(
             "elapsed_ms": 0.0,
             "claim_coverage": {},
             "fab": None,
+            "llm_backend": None,
+            "llm_model": None,
         }
         row["judgment"] = runtime.judge_row(row)
         return row
@@ -298,6 +301,7 @@ def _run_live_case(
         query=spec["query"],
         docs=docs,
         prefix=f"rc-{spec['id']}",
+        expected_fingerprint=expected_fingerprint,
     )
     runtime.dump_json(out / "states" / f"{spec['id']}_state.json", state)
     run = (
@@ -353,10 +357,13 @@ def _run_live_case(
         "elapsed_ms": elapsed_ms,
         "claim_coverage": cov,
         "fab": fab,
+        "llm_backend": state.get("llm_backend"),
+        "llm_model": state.get("llm_model"),
     }
     row["judgment"] = runtime.judge_row(row)
     print(
         f"[{spec['id']}] status={row['workflow_status']} ok={row['judgment']['ok']} "
+        f"backend={row['llm_backend']} model={row['llm_model']} "
         f"verified={cov.get('verified_total')} fab={((fab or {}).get('score'))} "
         f"elapsed_ms={row['elapsed_ms']}",
         flush=True,
@@ -565,20 +572,11 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
-    # Optional env loading happens only when the CLI is explicitly invoked.
-    try:
-        from dotenv import load_dotenv
-    except ImportError:
-        load_dotenv = None  # type: ignore[assignment]
-
     lumen = lumenfin_root()
     fab = finagentbench_root()
     out = fab / "outputs" / "lumenfin_rc_validation"
     report = lumen / "reports" / "current" / "LumenFin_RC_Final_Reliability_Report.md"
     readiness = lumen / "reports" / "current" / "LumenFin_RC_Production_Readiness_Assessment.md"
-
-    if load_dotenv is not None:
-        load_dotenv(lumen / ".env")
 
     if args.dry_run:
         return _dry_run(lumen, fab)
@@ -603,11 +601,61 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 0 if offline_ok else 2
 
+    print("=== LIVE RC PREFLIGHT (shared AppConfig path) ===", flush=True)
+    # Formal live path imports LumenFin via the same src tree as AppConfig.
+    lumen_src = str(lumen / "src")
+    if lumen_src not in sys.path:
+        sys.path.insert(0, lumen_src)
+    scripts_dir = str(Path(__file__).resolve().parent)
+    if scripts_dir not in sys.path:
+        sys.path.insert(0, scripts_dir)
+    import rc_runtime as runtime
+
+    try:
+        preflight = runtime.live_preflight(lumen_root=lumen)
+    except Exception as exc:  # noqa: BLE001
+        print(f"LIVE RC PREFLIGHT FAILED: {exc}", flush=True)
+        return 2
+    expected_fingerprint = preflight["fingerprint"]
+    _dump(out / "preflight.json", {"generated_at": _now(), "fingerprint": expected_fingerprint})
+
     print("=== LIVE RC PACK ===", flush=True)
-    rows = [
-        _run_live_case(lumen=lumen, out=out, spec=spec)
-        for spec in _rc_cases(lumen, fab)
-    ]
+    rows: list[dict[str, Any]] = []
+    for spec in _rc_cases(lumen, fab):
+        try:
+            row = _run_live_case(
+                lumen=lumen,
+                out=out,
+                spec=spec,
+                expected_fingerprint=expected_fingerprint,
+            )
+        except runtime.LocalFallbackAbort as exc:
+            print(f"ABORT: {exc}", flush=True)
+            rows.append(
+                {
+                    "id": spec["id"],
+                    "label": spec["label"],
+                    "scenario": spec["scenario"],
+                    "raw_scenario": spec["scenario"],
+                    "expect": spec["expect"],
+                    "workflow_status": "crashed",
+                    "error": str(exc),
+                    "entities": [],
+                    "checkable": 0,
+                    "elapsed_ms": 0.0,
+                    "claim_coverage": {},
+                    "fab": None,
+                    "llm_backend": "local-fallback",
+                    "llm_model": "local-fallback",
+                    "judgment": {"ok": False, "checks": [{"name": "no_local_fallback", "ok": False}]},
+                    "aborted": True,
+                }
+            )
+            break
+        rows.append(row)
+        if row.get("llm_backend") == "local-fallback":
+            print(f"ABORT: local-fallback on {spec['id']}", flush=True)
+            break
     priors = _load_prior_summaries(lumen, fab)
     slim_priors = {
         k: priors[k]
