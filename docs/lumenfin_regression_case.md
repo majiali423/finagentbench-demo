@@ -27,12 +27,12 @@ providers, then exported through `scripts\export_finrun.py` and evaluated by
 FinAgentBench.
 
 ```powershell
-# In C:\a_project\Projects\lumenfin-agent
+# In sibling lumenfin-agent/
 python run_demo.py --query "Compare Apple and Microsoft FY2025 financial performance, supply chain risk, and market data quality." --thread-id lumenfin-live-20260711 --output-dir outputs
 python scripts\export_finrun.py outputs\lumenfin-live-20260711_20260711_204223_state.json --out outputs\lumenfin-live-20260711-finrun.json
 
-# In C:\a_project\Projects\finagentbench-demo
-python -m finagentbench evaluate C:\a_project\Projects\lumenfin-agent\outputs\lumenfin-live-20260711-finrun.json --case fixtures\case_lumenfin_diligence.json --profile ci --out outputs\lumenfin-live-20260711-eval
+# In sibling finagentbench-demo/
+python -m finagentbench evaluate ..\lumenfin-agent\outputs\lumenfin-live-20260711-finrun.json --case fixtures\case_lumenfin_diligence.json --profile ci --out outputs\lumenfin-live-20260711-eval
 ```
 
 Result:

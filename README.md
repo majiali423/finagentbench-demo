@@ -1,6 +1,8 @@
 # FinAgentBench
 
-Replay-first reliability checks for financial AI agent runs.
+**Replay-first Financial Agent Reliability Evaluation Framework**
+
+Release candidate: `0.1.0rc1` · FinRun schema: `1.0`
 
 Financial agents can produce convincing final answers while silently missing an
 entity, using unsupported evidence, computing a ratio incorrectly, hiding market
@@ -18,6 +20,16 @@ supported by cited evidence.
 This repository is intended to stand alone as a benchmark and reliability
 harness. A financial agent project can use it as a downstream quality gate, but
 FinAgentBench does not import or require any specific agent codebase.
+
+## Release compatibility
+
+LumenFin `0.1.0rc1` exports FinRun `1.0` and is supported by FinAgentBench
+`0.1.0rc1`. LumenFin CI pins the benchmark release tag
+`v0.1.0-rc.1`; it does not track a floating branch.
+
+See [FinRun compatibility](docs/FINRUN_COMPATIBILITY.md),
+[metrics](docs/METRICS.md), [mutation testing](docs/MUTATION_TESTING.md), and
+[CI gate](docs/CI_GATE.md).
 
 ## Agent Integration Model
 
@@ -58,6 +70,28 @@ python -m finagentbench gate fixtures\pass_finrun.json fixtures\fail_finrun.json
 ```
 
 Reports are written as JSON, Markdown, and HTML.
+
+Key-free release demo:
+
+```powershell
+python scripts\run_offline_demo.py
+```
+
+It shows one passing synthetic FinRun and detection of all four release
+mutations without modifying fixtures.
+
+### Post-RC reproducibility gate
+
+Clone `lumenfin-agent` next to this repository, or set `LUMENFIN_ROOT`, then run:
+
+```powershell
+python scripts\validate_cross_repo.py
+```
+
+The command checks repository discovery, exports the deterministic sample
+through LumenFin's canonical FinRun exporter, runs the CI profile gate, and
+requires the four-mutation suite (wrong number/entity, missing citation/risk)
+to pass. It is offline and portable.
 
 ## Realistic Scenario
 
@@ -227,16 +261,16 @@ LumenFin runtime. LumenFin writes a `*_state.json` artifact; the `lumenfin`
 adapter maps that state into the neutral `FinRun` schema.
 
 ```powershell
-# In C:\a_project\Projects\lumenfin-agent
+# In sibling lumenfin-agent/
 python run_demo.py --query "Compare Apple and Microsoft FY2025 financial performance, supply chain risk, and market data quality." --thread-id lumenfin-e2e --output-dir outputs
 $state = Get-ChildItem outputs\lumenfin-e2e_*_state.json | Sort-Object LastWriteTime -Descending | Select-Object -First 1
 python scripts\export_finrun.py $state.FullName --out outputs\lumenfin-e2e-finrun.json
 
-# In C:\a_project\Projects\finagentbench-demo
+# In sibling finagentbench-demo/
 # Regression / Apple-Microsoft sample fixture (fixed expected_entities):
 python -m finagentbench evaluate fixtures\lumenfin_state_sample.json --adapter lumenfin --case fixtures\case_lumenfin_diligence.json --profile ci --out outputs\lumenfin-e2e
 # Real LumenFin export for ANY companies (entities derived from the run):
-python -m finagentbench evaluate C:\a_project\Projects\lumenfin-agent\outputs\lumenfin-e2e-finrun.json --case fixtures\case_lumenfin_generic.json --profile ci --out outputs\lumenfin-exported-finrun-eval
+python -m finagentbench evaluate ..\lumenfin-agent\outputs\lumenfin-e2e-finrun.json --case fixtures\case_lumenfin_generic.json --profile ci --out outputs\lumenfin-exported-finrun-eval
 ```
 
 The included fixture is a deterministic LumenFin-shaped trace for CI and demo
