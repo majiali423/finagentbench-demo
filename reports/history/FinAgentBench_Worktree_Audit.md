@@ -1,5 +1,9 @@
 # FinAgentBench Worktree Audit
 
+Status: Historical
+Superseded by: `../current/FinAgentBench_Final_Release_Report.md`
+Purpose: Engineering evolution and release-boundary evidence
+
 Date: 2026-07-25
 Branch: `master`
 HEAD before release commits: `a2042e6a493af1d5e464590eeb082bec7c20fa70`

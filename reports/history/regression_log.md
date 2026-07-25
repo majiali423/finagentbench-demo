@@ -1,5 +1,9 @@
 # Regression Log
 
+Status: Historical
+Superseded by: `../current/FinAgentBench_Final_Release_Report.md`
+Purpose: Engineering evolution and regression evidence
+
 This file records the kinds of failures FinAgentBench is designed to catch. The
 examples are fixture-backed so they can be reproduced locally and in CI.
 

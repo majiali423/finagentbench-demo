@@ -1,5 +1,9 @@
 # Sample Evaluation Report
 
+Status: Historical
+Superseded by: `../../examples/offline_demo/sample_eval_report.json`
+Purpose: Engineering evolution and regression evidence
+
 Run: `fail-nvidia-amd`
 
 Score: **34.45**

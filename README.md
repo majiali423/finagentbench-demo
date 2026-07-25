@@ -1,320 +1,200 @@
 # FinAgentBench
 
-**Replay-first Financial Agent Reliability Evaluation Framework**
+**Replay-first reliability evaluation for financial Agents.**
 
-Release candidate: `0.1.0rc1` · FinRun schema: `1.0`
+FinAgentBench evaluates an exported Agent trace instead of judging only the
+final answer. It turns financial calculations, entities, evidence, citations,
+risks and execution steps into deterministic findings that can block CI.
 
-Financial agents can produce convincing final answers while silently missing an
-entity, using unsupported evidence, computing a ratio incorrectly, hiding market
-data failures, or making unsafe investment claims. FinAgentBench evaluates the
-exported trace of an agent run so those failures are visible before the output
-reaches a user.
+Project status: **Release Candidate / Internal Portfolio Release**
+Package: `0.1.0rc1` | FinRun schema: `1.0`
 
-FinAgentBench does not require an LLM and does not depend on a specific agent
-framework. Agents export a small `FinRun` JSON artifact, adapters normalize raw
-runtime traces into that shape, and deterministic metrics score the run. For
-release audits, an optional semantic judge can be enabled for checks that are
-hard to express with rules, such as whether the final conclusion is actually
-supported by cited evidence.
+## Why replay the trace?
 
-This repository is intended to stand alone as a benchmark and reliability
-harness. A financial agent project can use it as a downstream quality gate, but
-FinAgentBench does not import or require any specific agent codebase.
+A fluent report can still:
 
-## Release compatibility
+- omit one company in a comparison;
+- calculate a ratio from the wrong inputs;
+- cite evidence from another issuer;
+- hide missing market data;
+- pass an evaluator that had nothing checkable.
 
-LumenFin `0.1.0rc1` exports FinRun `1.0` and is supported by FinAgentBench
-`0.1.0rc1`. LumenFin CI pins the benchmark release tag
-`v0.1.0-rc.1`; it does not track a floating branch.
+FinAgentBench addresses those failure modes with a framework-independent
+artifact and fail-closed metrics.
 
-See [FinRun compatibility](docs/FINRUN_COMPATIBILITY.md),
-[metrics](docs/METRICS.md), [mutation testing](docs/MUTATION_TESTING.md), and
-[CI gate](docs/CI_GATE.md).
+## How it works
 
-## Agent Integration Model
-
-FinAgentBench is a standalone calibration layer, not an embedded module inside
-a specific agent runtime. A financial agent handles generation—LLM reasoning,
-retrieval, tool use, and report synthesis. FinAgentBench handles evaluation—
-validating exported `FinRun` traces with deterministic metrics, regression
-gates, and repair suggestions.
-
-Integration is file-based: the agent exports a JSON trace, and FinAgentBench
-evaluates it through adapters without importing the agent runtime. This
-decoupled interface keeps the benchmark reusable across different financial
-agent implementations.
-
-## What It Checks
-
-- Entity coverage: expected companies are present.
-- Numeric correctness: reported financial ratios match formulas and inputs.
-- Evidence coverage: entities and important dimensions have cited evidence.
-- Evidence consistency: cited evidence contains the numbers used in calculations.
-- Evidence support: optional semantic audit for whether cited evidence supports the final answer.
-- Market data disclosure: failed market data is disclosed in the final output.
-- Temporal consistency: financial periods and market-data dates are explicit.
-- Unit/currency consistency: calculations do not mix units or currencies.
-- Risk disclosure: outputs include limitations and research/advice boundaries.
-- Compliance language: unsafe financial claims are flagged.
-- Required steps: expected agent steps are present.
-
-## Quick Start
-
-```powershell
-python -m pip install -e .
-
-python -m finagentbench evaluate fixtures\pass_finrun.json --case fixtures\case_compare_rd.json --out outputs\pass
-python -m finagentbench evaluate fixtures\fail_finrun.json --case fixtures\case_compare_rd.json --out outputs\fail
-python -m finagentbench compare fixtures\pass_finrun.json fixtures\fail_finrun.json --case fixtures\case_compare_rd.json --out outputs\compare
-python -m finagentbench gate fixtures\pass_finrun.json fixtures\fail_finrun.json --case fixtures\case_compare_rd.json --out outputs\gate
+```text
+Agent state or FinRun
+        ?
+        ?
+ Adapter / schema validation
+        ?
+        ?
+ Deterministic metrics ?? optional semantic judge
+        ?
+        ?
+ Findings + EvalReport
+        ?
+        ?
+ CI pass / fail
 ```
 
-Reports are written as JSON, Markdown, and HTML.
+## Core features
 
-Key-free release demo:
+- Framework-independent `FinRun` contract
+- Deterministic-first entity, numeric, temporal and unit checks
+- Evidence coverage and numeric evidence consistency
+- Entity leakage detection for issuer and comparison cases
+- Fail-closed behavior when required checks have zero inputs
+- Four-mutation evaluator regression suite
+- JSON, Markdown and HTML EvalReports
+- Optional semantic audit profile
+- Portable LumenFin compatibility gate
 
-```powershell
-python scripts\run_offline_demo.py
-```
-
-It shows one passing synthetic FinRun and detection of all four release
-mutations without modifying fixtures.
-
-### Post-RC reproducibility gate
-
-Clone `lumenfin-agent` next to this repository, or set `LUMENFIN_ROOT`, then run:
-
-```powershell
-python scripts\validate_cross_repo.py
-```
-
-The command checks repository discovery, exports the deterministic sample
-through LumenFin's canonical FinRun exporter, runs the CI profile gate, and
-requires the four-mutation suite (wrong number/entity, missing citation/risk)
-to pass. It is offline and portable.
-
-## Realistic Scenario
-
-The fixtures include a larger multi-company case that checks free cash flow
-margin, valuation-risk evidence, market-data failure disclosure, and compliance
-wording.
-
-```powershell
-python -m finagentbench evaluate fixtures\pass_bigtech_finrun.json --case fixtures\case_bigtech_fcf.json --out outputs\bigtech
-```
-
-## Due Diligence Scenario
-
-The due diligence case checks report sections, weighted scoring, evidence-number
-alignment, risk disclosure, and compliance language.
-
-```powershell
-python -m finagentbench evaluate fixtures\pass_due_diligence_finrun.json --case fixtures\case_due_diligence.json --out outputs\dd-pass
-python -m finagentbench evaluate fixtures\due_diligence_state_sample.json --adapter due-diligence --case fixtures\case_due_diligence.json --out outputs\dd-state
-```
-
-## Benchmark Suite
-
-The curated due diligence suite contains 10 traces covering 9 failure scenarios,
-including missing entities, missing workflow steps, missing report sections,
-wrong numbers, evidence-number mismatch, missing evidence, missing risk
-disclosure, compliance violation, and multi-issue regressions.
-
-```powershell
-python -m finagentbench benchmark benchmarks\due_diligence\suite.json --out outputs\dd-suite-report.json
-```
-
-Current expected result: 9/9 failing traces detected, 0 false positives.
-
-The semantic audit suites contain 40 human-review synthetic golden cases across
-`evidence_support`, `risk_quality`, and `compliance_semantic`. They cover
-supported summaries, unsupported recommendations, growth claims, valuation
-claims, stale evidence, wrong-entity evidence, weak risk disclosure, liquidity
-and covenant omissions, data-quality gaps, personalized advice, guaranteed
-returns, and misleading compliance language.
-
-```powershell
-python -m finagentbench semantic-benchmark benchmarks\semantic_audit\evidence_support_golden.json --out outputs\evidence-support-golden.json
-python -m finagentbench semantic-benchmark benchmarks\semantic_audit\risk_quality_golden.json --out outputs\risk-quality-golden.json
-python -m finagentbench semantic-benchmark benchmarks\semantic_audit\compliance_semantic_golden.json --out outputs\compliance-semantic-golden.json
-```
-
-Current expected replay result: all static labels matched, 0 false positives, 0
-false negatives. This is static judge replay for metric plumbing and label
-alignment, not a claim of live LLM judge accuracy. Production teams should run
-the same suite with a real judge configuration and add real failures observed
-from their own agent logs.
-
-For a live release-audit smoke test, run a small golden subset against an
-OpenAI-compatible judge:
-
-```powershell
-$env:FINAGENTBENCH_LLM_API_KEY = "<provider key>"
-python -m finagentbench live-semantic-benchmark benchmarks\semantic_audit\evidence_support_golden.json --limit 10 --endpoint https://api.deepseek.com/chat/completions --model deepseek-chat --cache-path outputs\live-semantic-judge-cache-v2.json --prompt-version evidence_support_live_v2 --out outputs\live-semantic-judge-report-v2.json
-Remove-Item Env:FINAGENTBENCH_LLM_API_KEY
-```
-
-One DeepSeek-backed run on 2026-07-11 matched 10/10 human labels with 0 false
-positives and 0 false negatives. Treat this as small-sample judge alignment, not
-production accuracy. See `docs/live_semantic_judge_validation.md`.
-See `docs/human_labeling_guide.md` for how the human-review candidate labels
-were drafted and how to audit them.
-
-## Repair Suggestions
-
-`suggest` converts findings into structured repair actions that an agent or
-human review queue can consume.
-
-```powershell
-python -m finagentbench suggest fixtures\fail_due_diligence_finrun.json --case fixtures\case_due_diligence.json --out outputs\dd-suggest.json
-```
-
-## Optional Semantic Audit
-
-Most metrics are deterministic and should stay in the default CI gate. Semantic
-audit is optional and intended for release evaluation or golden-label replay.
-Enable semantic metrics in a case file and configure `semantic_audit.judge`.
-
-- `evidence_support`: whether final conclusions are supported by cited evidence.
-- `risk_quality`: whether risk disclosure is concrete and tied to the analysis.
-- `compliance_semantic`: whether the answer contains implicit advice or overconfident claims.
-
-The built-in `static` judge is useful for tests and labeled benchmark replay.
-When no semantic judge is configured, semantic metrics fail conservatively with
-`semantic_judge_not_configured`; the fallback is not treated as a real semantic
-auditor.
-`openai-compatible` reads endpoint, key, and model from
-`FINAGENTBENCH_LLM_ENDPOINT`, `FINAGENTBENCH_LLM_API_KEY`, and
-`FINAGENTBENCH_LLM_MODEL`. It also supports cache, retry, timeout, and prompt
-version tracking through judge config:
+## Minimal FinRun
 
 ```json
 {
-  "semantic_audit": {
-    "judge": {
-      "provider": "openai-compatible",
-      "prompt_version": "financial_audit_v1",
-      "cache_path": "outputs/llm_judge_cache.json",
-      "retry_count": 2,
-      "backoff_seconds": 1,
-      "timeout_seconds": 20
-    }
-  }
+  "schema_version": "1.0",
+  "run_id": "demo-001",
+  "query": "Compare Company A and Company B",
+  "entities": [{"name": "Company A"}, {"name": "Company B"}],
+  "steps": [{"name": "retrieval", "status": "ok"}],
+  "metrics": [],
+  "evidence": [],
+  "market_data": [],
+  "final_output": "Research output with disclosed limitations."
 }
 ```
 
-Semantic findings include judge metadata such as provider, model,
-`prompt_version`, cache key, cache hit status, and latency. This makes release
-audit results easier to reproduce after changing prompts or models.
+Cases decide which fields must be checkable. An empty list does not receive a
+free pass when `require_checkable_metrics` is enabled.
 
-This keeps the project provider-neutral: the benchmark schema, reports, and
-suggestions do not depend on a specific LLM vendor.
+## Quick start
 
-```powershell
-python -m finagentbench evaluate fixtures\pass_due_diligence_finrun.json --case fixtures\case_due_diligence_semantic_audit.json --out outputs\dd-semantic-audit
+Requires Python 3.11+.
+
+```bash
+python -m venv .venv
+python -m pip install -e .
+python -m unittest discover -s tests -v
 ```
 
-## Profiles
+Evaluate the included synthetic due-diligence run:
 
-`--profile ci` removes semantic metrics and keeps the deterministic gate fast
-and reproducible. `--profile audit` adds metrics listed in `audit_metrics`, which
-should be used with a configured semantic judge.
-
-```powershell
-python -m finagentbench evaluate fixtures\pass_due_diligence_finrun.json --case fixtures\case_due_diligence_semantic_audit.json --profile ci
-python -m finagentbench evaluate fixtures\pass_due_diligence_finrun.json --case fixtures\case_due_diligence_semantic_audit.json --profile audit
+```bash
+python -m finagentbench evaluate \
+  fixtures/pass_due_diligence_finrun.json \
+  --case fixtures/case_due_diligence.json \
+  --profile ci \
+  --out outputs/example
 ```
 
-The included semantic audit case uses `static` judge output for demo replay. It
-is not evidence that a live LLM provider has been audited.
+Exit codes for `evaluate` / `gate` / `benchmark`:
 
-## Reference Runtime
+| Code | Meaning |
+|------|---------|
+| `0` | evaluation / gate passed |
+| `1` | evaluation / gate failed (expected for known-fail fixtures) |
+| non-`0` other | CLI / IO / argument error |
 
-The repository also includes a small reference financial-agent runtime. It is not
-the main product, but it demonstrates orchestration, tool calling, retrieval,
-caching, retry, and trace export.
+When a Quick Start example intentionally evaluates a failing fixture, exit code
+`1` is success for the demo narrative, not a broken install.
 
-```powershell
-python -m finagentbench run-reference --out outputs\reference-agent-run.json
-python -m finagentbench evaluate outputs\reference-agent-run.json --case fixtures\case_bigtech_fcf.json --out outputs\reference-agent-eval
+Key-free release demo:
+
+```bash
+python scripts/run_offline_demo.py
 ```
 
-See `docs/reference_runtime.md` and `docs/regression_log.md`.
+Mutation and correctness gates:
 
-## Adapter Demo
-
-The core benchmark expects a normalized `FinRun` shape, but raw agent traces can
-come from different systems. Adapters keep that boundary explicit.
-
-```powershell
-python -m finagentbench evaluate fixtures\agent_state_sample.json --adapter agent-state --case fixtures\case_compare_rd.json --out outputs\agent-state
+```bash
+python scripts/run_mutation_suite.py
+python scripts/run_correctness_validation.py
 ```
 
-See `docs/adapter_guide.md` for the adapter contract.
-See `docs/agent_integration_guide.md` for a full guide to connecting another
-financial agent through direct `FinRun` export or a custom adapter.
+Supported validation commands: [docs/VALIDATION_COMMANDS.md](docs/VALIDATION_COMMANDS.md).
 
-## LumenFin End-To-End Trace
+## LumenFin integration
 
-FinAgentBench can evaluate a LumenFin exported state without importing the
-LumenFin runtime. LumenFin writes a `*_state.json` artifact; the `lumenfin`
-adapter maps that state into the neutral `FinRun` schema.
+Clone `lumenfin-agent` and `finagentbench-demo` as sibling directories, or set
+`LUMENFIN_ROOT` / `FINAGENTBENCH_DIR`.
 
-```powershell
-# In sibling lumenfin-agent/
-python run_demo.py --query "Compare Apple and Microsoft FY2025 financial performance, supply chain risk, and market data quality." --thread-id lumenfin-e2e --output-dir outputs
-$state = Get-ChildItem outputs\lumenfin-e2e_*_state.json | Sort-Object LastWriteTime -Descending | Select-Object -First 1
-python scripts\export_finrun.py $state.FullName --out outputs\lumenfin-e2e-finrun.json
-
-# In sibling finagentbench-demo/
-# Regression / Apple-Microsoft sample fixture (fixed expected_entities):
-python -m finagentbench evaluate fixtures\lumenfin_state_sample.json --adapter lumenfin --case fixtures\case_lumenfin_diligence.json --profile ci --out outputs\lumenfin-e2e
-# Real LumenFin export for ANY companies (entities derived from the run):
-python -m finagentbench evaluate ..\lumenfin-agent\outputs\lumenfin-e2e-finrun.json --case fixtures\case_lumenfin_generic.json --profile ci --out outputs\lumenfin-exported-finrun-eval
+```bash
+python scripts/validate_cross_repo.py --profile ci
 ```
 
-The included fixture is a deterministic LumenFin-shaped trace for CI and demo
-purposes. For a live portfolio run, point `evaluate` at the actual exported
-`*_state.json` or FinRun and use `case_lumenfin_generic.json` so you do not
-hand-edit `expected_entities` per query.
+The summary records both repository commits, worktree state, FinRun schema,
+benchmark profile and mutation results.
 
-See `docs/lumenfin_case_selection.md` for:
-- when to use `case_lumenfin_generic.json` vs `case_lumenfin_diligence.json`
-- why runs without sample/PDF fundamentals fail-loud (`incomplete_data`)
+Full live RC orchestration:
 
-See `docs/lumenfin_regression_case.md` for a before/after regression story:
-wrong quant and missing risk disclosure are blocked by the gate, and `suggest`
-returns concrete `recompute` / `rewrite` actions.
-
-## Metric Subsets
-
-Cases can enable a subset of metrics when a team wants to gate only one layer.
-
-```powershell
-python -m finagentbench evaluate fixtures\pass_finrun.json --case fixtures\case_numeric_only.json --out outputs\numeric-only
+```bash
+python scripts/run_rc_validation.py --help
+python scripts/run_rc_validation.py --dry-run
+python scripts/run_rc_validation.py
 ```
 
-## Positioning
+This command requires the configured LumenFin live providers. Infrastructure
+failures are non-pass and must not be reported as Agent-quality success.
 
-FinAgentBench is not a financial report generator. It is a small reliability
-harness for checking whether a financial agent run is auditable, grounded, and
-safe enough to trust.
+## Metrics
 
-The important design choice is replay-first evaluation: production agents export
-their intermediate artifacts, and FinAgentBench checks each layer without being
-coupled to the agent runtime or prompt implementation.
+The deterministic CI profile covers:
 
-## Project Shape
+- entity coverage and leakage;
+- numeric correctness;
+- unit/currency and temporal consistency;
+- evidence coverage and consistency;
+- required execution steps and report sections;
+- risk disclosure and compliance language.
 
-- `finagentbench.adapters`: converts external traces into the neutral `FinRun` shape.
-- `finagentbench.metrics`: independent checks that can be enabled per case.
-- `finagentbench.runner`: validates inputs and aggregates metric results.
-- `finagentbench.report`: writes machine-readable and human-readable reports.
-- `finagentbench.reference_runtime`: minimal agent runtime that exports `FinRun`.
-- `fixtures`: small pass/fail traces and benchmark cases.
+See [Metrics](docs/METRICS.md) and
+[FinRun compatibility](docs/FINRUN_COMPATIBILITY.md).
 
-## CI Gate
+## Benchmark integrity
 
-The GitHub Actions workflow runs unit tests and then executes a benchmark gate.
-This lets a team block regressions after changing prompts, tools, retrieval
-pipelines, or agent orchestration code.
+- No metric threshold is changed to match a tested Agent.
+- Required empty checks fail with diagnostic findings.
+- The mutation gate must detect wrong number, wrong entity, missing citation
+  and missing risk.
+- The CI profile removes optional semantic metrics; it does not lower case
+  thresholds.
+- Case hashes and enabled metrics are recorded in EvalReports.
+
+## Repository structure
+
+```text
+finagentbench/       evaluator, adapters, metrics and report model
+benchmarks/          deterministic suites, mutations and semantic gold data
+fixtures/            small synthetic FinRuns and case contracts
+tests/               unit and cross-project regression tests
+scripts/             supported release and validation entrypoints
+docs/                schema, metrics, integration and CI guides
+reports/current/     current release evidence
+reports/history/     superseded engineering evidence
+tools/archived_audits/ unsupported historical audit scripts
+examples/            sanitized demo artifacts
+```
+
+## Limitations
+
+- This is a reliability framework, not an academic leaderboard.
+- Scores depend on the case contract and exported trace quality.
+- Optional semantic judges introduce provider and prompt variability.
+- Passing a benchmark does not prove investment performance or universal
+  factual correctness.
+- Human financial review remains required.
+
+## Documentation
+
+Start with [docs/README.md](docs/README.md). The current release evidence is in
+[reports/current/FinAgentBench_Final_Release_Report.md](reports/current/FinAgentBench_Final_Release_Report.md).
+
+## License status
+
+No public license grant has been selected. The current repository is intended
+for private/internal portfolio review unless the owner explicitly adds a
+license.
