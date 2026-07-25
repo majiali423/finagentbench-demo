@@ -1,6 +1,21 @@
 __pycache__/
 *.pyc
 .venv/
+.env
+.env.*
+!.env.example
 outputs/
 data/
+logs/
+*.log
+.cache/
+.pytest_cache/
 *.egg-info/
+
+# Generated local validation reports (canonical release report lives in reports/)
+/LumenFin_*.md
+/FinAgentBench_Correctness_Report.md
+
+# Local one-off rerun helpers retained for workstation history
+scripts/rerun_hardening_failures.py
+scripts/rerun_tesla_baseline_after.py
