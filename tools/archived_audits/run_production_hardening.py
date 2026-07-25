@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Production Hardening validation — claim coverage, failure recovery, reliability.
+"""ARCHIVED AUDIT SCRIPT — unsupported release interface.
+
+Historical purpose: production-hardening phase validation.
+Replacement: scripts/run_rc_validation.py.
+Last compatible schema: FinRun 1.0 transition.
+Do not run against production fixtures.
 
 Focus (no new claim rules):
   1) Long-document diligence

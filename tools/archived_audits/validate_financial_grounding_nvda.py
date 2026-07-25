@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Validate Financial Grounding Layer on NVIDIA 10-K via FinAgentBench (live APIs)."""
+"""ARCHIVED AUDIT SCRIPT — unsupported release interface.
+
+Historical purpose: focused NVIDIA financial-grounding validation.
+Replacement: issuer fixtures and scripts/run_rc_validation.py.
+Last compatible schema: FinRun 1.0 transition.
+Do not run against production fixtures.
+"""
 
 from __future__ import annotations
 

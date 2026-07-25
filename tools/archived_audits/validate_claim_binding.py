@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Before/After Claim → Evidence Binding validation via FinAgentBench (live APIs)."""
+"""ARCHIVED AUDIT SCRIPT — unsupported release interface.
+
+Historical purpose: Before/After claim-to-evidence binding validation.
+Replacement: current claim-binding tests and scripts/run_rc_validation.py.
+Last compatible schema: FinRun 1.0 transition.
+Do not run against production fixtures.
+"""
 
 from __future__ import annotations
 

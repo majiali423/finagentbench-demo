@@ -10,7 +10,19 @@ logs/
 *.log
 .cache/
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
 *.egg-info/
+dist/
+build/
+*.db
+*.sqlite
+*.sqlite3
+milvus*
+downloads/
+.local-fixtures/
 
 # Generated local validation reports (canonical release report lives in reports/)
 /LumenFin_*.md

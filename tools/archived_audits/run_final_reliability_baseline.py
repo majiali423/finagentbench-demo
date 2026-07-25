@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""LumenFin reliability baseline with corrected FinAgentBench (live APIs, no mocks).
+"""ARCHIVED AUDIT SCRIPT — unsupported release interface.
+
+Historical purpose: produce the pre-RC LumenFin reliability baseline.
+Replacement: scripts/run_rc_validation.py.
+Last compatible schema: FinRun 1.0 transition.
+Do not run against production fixtures.
 
 Canonical path only:
   LumenFin state → lumenfin.finrun.export_finrun_state() → FinAgentBench evaluate

@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Evaluate LumenFin Before/After E2E states via FinAgentBench (no LumenFin code changes).
+"""ARCHIVED AUDIT SCRIPT — unsupported release interface.
+
+Historical purpose: evaluate LumenFin Before/After E2E states.
+Replacement: scripts/validate_cross_repo.py and scripts/run_rc_validation.py.
+Last compatible schema: legacy/FinRun 1.0 transition.
+Do not run against production fixtures.
 
 Converts exported ``*_state.json`` through the lumenfin adapter into FinRun JSON,
 evaluates with the same ``case_lumenfin_generic.json``, builds mutation detection,
