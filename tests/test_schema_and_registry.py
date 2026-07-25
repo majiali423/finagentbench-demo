@@ -18,6 +18,15 @@ class SchemaAndRegistryTestCase(unittest.TestCase):
         with self.assertRaises(ValidationError):
             validate_finrun({"run_id": "bad"})
 
+    def test_unsupported_finrun_schema_version_is_rejected(self) -> None:
+        run = load_fixture("pass_finrun.json")
+        run["schema_version"] = "99.0"
+        with self.assertRaisesRegex(ValidationError, "Unsupported FinRun schema_version"):
+            validate_finrun(run)
+
+    def test_legacy_finrun_without_schema_version_remains_supported(self) -> None:
+        validate_finrun(load_fixture("pass_finrun.json"))
+
     def test_case_can_enable_metric_subset(self) -> None:
         case = load_fixture("case_numeric_only.json")
         metrics = resolve_metrics(case)

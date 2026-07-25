@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import asdict
 from typing import Any
 
+from ..schema import FINRUN_SCHEMA_VERSION
 from .cache import MemoryCache
 from .retrieval import InMemoryRetriever
 from .tools import FinancialStatementTool, MarketDataTool
@@ -67,6 +68,7 @@ def run_reference_agent(query: str | None = None) -> dict[str, Any]:
     )
 
     return {
+        "schema_version": FINRUN_SCHEMA_VERSION,
         "run_id": "reference-agent-bigtech-fcf",
         "query": query or "Compare AAPL, MSFT, and NVDA free cash flow margin and valuation risk.",
         "metadata": {

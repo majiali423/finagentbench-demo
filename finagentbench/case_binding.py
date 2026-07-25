@@ -8,8 +8,11 @@ def resolve_case_for_run(run: dict[str, Any], case: dict[str, Any]) -> dict[str,
 
     When ``derive_entities_from_run`` is true, expected_entities are taken from
     the exported FinRun so one generic case can gate arbitrary LumenFin queries.
+    ``forbidden_entities`` are never overwritten by derivation.
     """
     resolved = dict(case)
+    if "forbidden_entities" not in resolved:
+        resolved["forbidden_entities"] = []
     if resolved.get("derive_entities_from_run"):
         entities = [_entity_name(item) for item in run.get("entities") or []]
         resolved["expected_entities"] = [name for name in entities if name]

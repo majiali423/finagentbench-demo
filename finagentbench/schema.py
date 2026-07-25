@@ -3,6 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
+FINRUN_SCHEMA_VERSION = "1.0"
+SUPPORTED_FINRUN_SCHEMA_VERSIONS = frozenset({"0", FINRUN_SCHEMA_VERSION})
+
 
 @dataclass(frozen=True)
 class Finding:
@@ -41,6 +44,12 @@ class ValidationError(ValueError):
 
 
 def validate_finrun(run: dict[str, Any]) -> None:
+    schema_version = str(run.get("schema_version") or "0")
+    if schema_version not in SUPPORTED_FINRUN_SCHEMA_VERSIONS:
+        raise ValidationError(
+            f"Unsupported FinRun schema_version={schema_version}; "
+            f"supported={sorted(SUPPORTED_FINRUN_SCHEMA_VERSIONS)}"
+        )
     required_fields = ("run_id", "final_output")
     for field_name in required_fields:
         if field_name not in run:
