@@ -31,6 +31,7 @@
   },
   "enabled_metrics": [
     "entity_coverage",
+    "entity_leakage",
     "step_presence",
     "section_presence",
     "numeric_correctness",
@@ -44,6 +45,7 @@
     "runtime_compliance",
     "retrieval_provenance"
   ],
+  "forbidden_entities": [],
   "require_input_guardrail": true,
   "expected_violation_codes": [],
   "require_retrieval_provenance": true,

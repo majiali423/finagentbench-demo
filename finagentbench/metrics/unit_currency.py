@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..schema import Finding, MetricResult
-from .common import input_currency, input_unit
+from .common import empty_check_result, input_currency, input_unit
 
 
 def unit_currency_consistency(run: dict[str, Any], case: dict[str, Any]) -> MetricResult:
@@ -33,7 +33,16 @@ def unit_currency_consistency(run: dict[str, Any], case: dict[str, Any]) -> Metr
             continue
         passed += 1
 
-    score = 100.0 if checked == 0 else round(passed / checked * 100, 2)
+    if checked == 0:
+        empty = empty_check_result(
+            "unit_currency_consistency",
+            case,
+            detail="no metric inputs with unit/currency metadata were exported",
+        )
+        if empty is not None:
+            return empty
+        return MetricResult("unit_currency_consistency", 100.0, True, [])
+    score = round(passed / checked * 100, 2)
     return MetricResult("unit_currency_consistency", score, not findings, findings)
 
 

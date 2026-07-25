@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..schema import Finding, MetricResult
+from .common import empty_check_result
 
 
 def evidence_coverage(run: dict[str, Any], case: dict[str, Any]) -> MetricResult:
@@ -13,6 +14,14 @@ def evidence_coverage(run: dict[str, Any], case: dict[str, Any]) -> MetricResult
         if entity and item.get("citation"):
             evidence_by_entity.setdefault(entity, 0)
             evidence_by_entity[entity] += 1
+    if not evidence_by_entity:
+        empty = empty_check_result(
+            "evidence_coverage",
+            case,
+            detail="no cited evidence items were exported",
+        )
+        if empty is not None:
+            return empty
     missing = sorted(entity for entity in expected_entities if evidence_by_entity.get(entity, 0) == 0)
     findings = [
         Finding(

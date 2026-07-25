@@ -8,7 +8,10 @@ if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from finagentbench.metrics.evidence_consistency import evidence_consistency
+from finagentbench.metrics.evidence import evidence_coverage
 from finagentbench.metrics.numeric import numeric_correctness
+from finagentbench.metrics.temporal import temporal_consistency
+from finagentbench.metrics.unit_currency import unit_currency_consistency
 from finagentbench.provenance import attach_provenance, case_hash
 from finagentbench.runner import evaluate_run
 
@@ -45,6 +48,39 @@ class FailClosedAndProvenanceTestCase(unittest.TestCase):
             _empty_run(),
             {
                 "require_evidence_consistency": True,
+                "require_checkable_metrics": True,
+            },
+        )
+        self.assertFalse(result.passed)
+        self.assertEqual(result.score, 0.0)
+
+    def test_evidence_coverage_empty_trace_fails_when_require_checkable(self) -> None:
+        result = evidence_coverage(
+            _empty_run(),
+            {
+                "expected_entities": ["NVIDIA"],
+                "require_checkable_metrics": True,
+            },
+        )
+        self.assertFalse(result.passed)
+        self.assertEqual(result.score, 0.0)
+
+    def test_unit_currency_empty_trace_fails_when_require_checkable(self) -> None:
+        result = unit_currency_consistency(
+            _empty_run(),
+            {
+                "enabled_metrics": ["unit_currency_consistency"],
+                "require_checkable_metrics": True,
+            },
+        )
+        self.assertFalse(result.passed)
+        self.assertEqual(result.score, 0.0)
+
+    def test_temporal_empty_trace_fails_when_require_checkable(self) -> None:
+        result = temporal_consistency(
+            _empty_run(),
+            {
+                "require_temporal_consistency": True,
                 "require_checkable_metrics": True,
             },
         )

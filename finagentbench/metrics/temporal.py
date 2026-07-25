@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..schema import Finding, MetricResult
-from .common import input_period
+from .common import empty_check_result, input_period
 
 
 def temporal_consistency(run: dict[str, Any], case: dict[str, Any]) -> MetricResult:
@@ -46,7 +46,16 @@ def temporal_consistency(run: dict[str, Any], case: dict[str, Any]) -> MetricRes
         else:
             findings.append(_finding(f"Market data for {item.get('entity', 'unknown')} has no as_of date."))
 
-    score = 100.0 if checked == 0 else round(passed / checked * 100, 2)
+    if checked == 0:
+        empty = empty_check_result(
+            "temporal_consistency",
+            case,
+            detail="no metrics, evidence, or market data with temporal metadata were exported",
+        )
+        if empty is not None:
+            return empty
+        return MetricResult("temporal_consistency", 100.0, True, [])
+    score = round(passed / checked * 100, 2)
     return MetricResult("temporal_consistency", score, not findings, findings)
 
 
