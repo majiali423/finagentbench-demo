@@ -30,6 +30,8 @@ Framework**. It evaluates exported traces independently from an Agent runtime.
 | LumenFin cross-repository gate | PASS |
 | Key-free offline demo | PASS |
 | Linter | No new diagnostics |
+| Clean-tree validation commit | `cab5f810a9bef9cc1c29f1ed4c35f4240e792f2c` |
+| Worktree after validation | CLEAN |
 
 ## Mutation evidence
 
@@ -44,6 +46,7 @@ No `min_score`, severity block or metric threshold was lowered.
 
 ## Open release blocker
 
-The release tag does not yet exist and the working tree is dirty. Commit the
-reviewed benchmark changes, rerun CI, then create `v0.1.0-rc.1` before releasing
-the pinned LumenFin candidate.
+The local release commits and clean-tree validation are complete. The release
+tag does not yet exist, no remote operation has been performed, and no LICENSE
+has been selected. After the owner chooses a license, push the branch, wait for
+CI, and only then create `v0.1.0-rc.1`.
