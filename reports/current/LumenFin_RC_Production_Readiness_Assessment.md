@@ -1,7 +1,14 @@
 # LumenFin RC Production Readiness Assessment
 
-Canonical copy for FinAgentBench. Full assessment: sibling LumenFin `reports/current/LumenFin_RC_Production_Readiness_Assessment.md`.
+Generated: 2026-07-31T10:55:28.305201+00:00
 
-Frozen: 2026-07-26
+## Executive verdict
 
-**READY for Release Candidate** (live reliability): 8/8 judgment, provider deepseek, model deepseek-v4-flash, fallback 0, HTTP 401 0, FAB mean 92.97, floors 100/100/100, `LIVE_RC_EXIT=0`.
+**READY for Release Candidate**
+
+- Live RC pack: **8/8**
+- Offline gates: **PASS**
+- Mean FAB score (completed, informational): **100.0**
+
+- Final reliability: `C:\a_project\Projects\lumenfin-agent\reports\current\LumenFin_RC_Final_Reliability_Report.md`
+- RC validation JSON: `C:\a_project\Projects\finagentbench-demo\outputs\lumenfin_rc_validation\validation.json`

@@ -1,0 +1,11 @@
+{
+  "id": "visible_output_integrity_scoring_v2",
+  "scoring_version": "2",
+  "expected_entities": [],
+  "required_steps": [],
+  "enabled_metrics": ["visible_output_integrity"],
+  "metric_weights": {"visible_output_integrity": 0},
+  "min_score": 85,
+  "severity_penalties": {"high": 10, "medium": 6, "critical": 20},
+  "block_on_severity": ["high", "critical"]
+}

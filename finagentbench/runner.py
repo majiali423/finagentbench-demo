@@ -4,7 +4,7 @@ from typing import Any
 
 from .case_binding import resolve_case_for_run
 from .metrics.registry import resolve_metrics
-from .schema import EvalReport, validate_case, validate_finrun
+from .schema import DEFAULT_SCORING_VERSION, EvalReport, validate_case, validate_finrun
 
 
 def evaluate_run(run: dict[str, Any], case: dict[str, Any]) -> EvalReport:
@@ -24,6 +24,7 @@ def evaluate_run(run: dict[str, Any], case: dict[str, Any]) -> EvalReport:
         score=score,
         passed=passed,
         metrics=results,
+        scoring_version=str(case.get("scoring_version") or DEFAULT_SCORING_VERSION),
     )
 
 

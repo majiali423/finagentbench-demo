@@ -1,0 +1,27 @@
+{
+  "id": "visible_output_integrity_scoring_v2",
+  "case": "../../fixtures/case_output_integrity.json",
+  "items": [
+    {
+      "id": "clean",
+      "run": "../../fixtures/output_integrity_clean_finrun.json",
+      "failure_type": "none",
+      "expected_passed": true,
+      "expected_findings": []
+    },
+    {
+      "id": "reasoning_leak",
+      "run": "../../fixtures/output_integrity_reasoning_leak_finrun.json",
+      "failure_type": "reasoning_leak",
+      "expected_passed": false,
+      "expected_findings": ["visible_output_integrity"]
+    },
+    {
+      "id": "truncated",
+      "run": "../../fixtures/output_integrity_truncated_finrun.json",
+      "failure_type": "truncated",
+      "expected_passed": false,
+      "expected_findings": ["visible_output_integrity"]
+    }
+  ]
+}

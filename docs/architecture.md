@@ -14,6 +14,9 @@ Financial agents fail in different places: entity extraction, retrieval,
 calculation, market-data handling, synthesis, and compliance wording. A single
 final-answer score hides those failures. FinAgentBench asks agents to export a
 small normalized `FinRun` artifact, then runs deterministic checks on each part.
+`FinRun` is the internal canonical schema, not the only accepted input format.
+Native Agent traces remain first-class inputs and are normalized through the
+registered Agent-specific adapter before evaluation.
 
 ## Boundaries
 
@@ -22,6 +25,12 @@ small normalized `FinRun` artifact, then runs deterministic checks on each part.
 - Metric layer: small independent checks for reliability risks.
 - Runner layer: combines metric results into pass/fail reports.
 - CLI layer: supports local evaluation, regression comparison, and CI gates.
+
+The adapter registry and all registered adapters are part of the public Harness
+boundary. Core evaluation code must not import, start, or discover an Agent
+runtime. Agent-specific cross-repository validation, RC orchestration, and
+fixtures stay in integration/script layers. An Agent adapter may understand its
+native JSON shape, but may not import that Agent's Python package.
 
 ## Why This Is Not Coupled To One Agent
 

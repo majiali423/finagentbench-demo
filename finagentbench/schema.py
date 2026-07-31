@@ -5,6 +5,8 @@ from typing import Any
 
 FINRUN_SCHEMA_VERSION = "1.0"
 SUPPORTED_FINRUN_SCHEMA_VERSIONS = frozenset({"0", FINRUN_SCHEMA_VERSION})
+DEFAULT_SCORING_VERSION = "1"
+SUPPORTED_SCORING_VERSIONS = frozenset({DEFAULT_SCORING_VERSION, "2"})
 
 
 @dataclass(frozen=True)
@@ -37,6 +39,7 @@ class EvalReport:
     profile: str = ""
     adapter: str = ""
     enabled_metrics: list[str] = field(default_factory=list)
+    scoring_version: str = DEFAULT_SCORING_VERSION
 
 
 class ValidationError(ValueError):
@@ -64,6 +67,12 @@ def validate_finrun(run: dict[str, Any]) -> None:
 
 
 def validate_case(case: dict[str, Any]) -> None:
+    scoring_version = str(case.get("scoring_version") or DEFAULT_SCORING_VERSION)
+    if scoring_version not in SUPPORTED_SCORING_VERSIONS:
+        raise ValidationError(
+            f"Unsupported scoring_version={scoring_version}; "
+            f"supported={sorted(SUPPORTED_SCORING_VERSIONS)}"
+        )
     _require_list(case, "expected_entities")
     _require_list(case, "required_steps")
     if "min_score" in case:

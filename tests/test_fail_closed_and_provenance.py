@@ -76,6 +76,46 @@ class FailClosedAndProvenanceTestCase(unittest.TestCase):
         self.assertFalse(result.passed)
         self.assertEqual(result.score, 0.0)
 
+    def test_unit_currency_detects_absurd_billion_magnitude(self) -> None:
+        run = {
+            "run_id": "absurd-unit",
+            "entities": ["Microsoft"],
+            "steps": [],
+            "metrics": [
+                {
+                    "entity": "Microsoft",
+                    "name": "operating_margin",
+                    "value": 0.45,
+                    "formula": "operating_income / revenue",
+                    "inputs": {
+                        "operating_income": {
+                            "value": 109433.0,
+                            "unit": "billion",
+                            "currency": "USD",
+                            "period": "FY2024",
+                        },
+                        "revenue": {
+                            "value": 245122.0,
+                            "unit": "billion",
+                            "currency": "USD",
+                            "period": "FY2024",
+                        },
+                    },
+                }
+            ],
+            "evidence": [],
+            "final_output": "Microsoft analysis.",
+        }
+        result = unit_currency_consistency(
+            run,
+            {
+                "enabled_metrics": ["unit_currency_consistency"],
+                "require_unit_currency_consistency": True,
+            },
+        )
+        self.assertFalse(result.passed)
+        self.assertTrue(any("absurd billion-scale" in f.message for f in result.findings))
+
     def test_temporal_empty_trace_fails_when_require_checkable(self) -> None:
         result = temporal_consistency(
             _empty_run(),
@@ -109,6 +149,7 @@ class FailClosedAndProvenanceTestCase(unittest.TestCase):
         self.assertEqual(report.case_id, "prov_case")
         self.assertEqual(report.profile, "ci")
         self.assertEqual(report.adapter, "generic-json")
+        self.assertEqual(report.scoring_version, "1")
         self.assertEqual(report.enabled_metrics, ["entity_coverage"])
         self.assertEqual(report.case_hash, case_hash(case))
         self.assertTrue(report.tool_version)

@@ -9,7 +9,7 @@ if __package__ in {None, ""}:
 
 from finagentbench.metrics.registry import available_metrics, resolve_metrics
 from finagentbench.runner import evaluate_run
-from finagentbench.schema import ValidationError, validate_finrun
+from finagentbench.schema import ValidationError, validate_case, validate_finrun
 from tests.helpers import load_fixture
 
 
@@ -45,6 +45,13 @@ class SchemaAndRegistryTestCase(unittest.TestCase):
         self.assertIn("evidence_support", names)
         self.assertIn("risk_quality", names)
         self.assertIn("compliance_semantic", names)
+        self.assertIn("visible_output_integrity", names)
+
+    def test_unsupported_scoring_version_is_rejected(self) -> None:
+        case = load_fixture("case_numeric_only.json")
+        case["scoring_version"] = "99"
+        with self.assertRaisesRegex(ValidationError, "Unsupported scoring_version"):
+            validate_case(case)
 
 if __name__ == "__main__":
     unittest.main()

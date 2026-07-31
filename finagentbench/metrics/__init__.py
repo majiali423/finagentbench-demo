@@ -17,6 +17,7 @@ from .compliance import compliance_language
 from .retrieval_provenance import retrieval_provenance
 from .runtime_compliance import runtime_compliance
 from .compliance_semantic import compliance_semantic
+from .visible_output_integrity import visible_output_integrity
 
 
 BUILTIN_METRICS = (
@@ -38,4 +39,5 @@ BUILTIN_METRICS = (
     input_safety,
     runtime_compliance,
     retrieval_provenance,
+    visible_output_integrity,
 )

@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "run_id": "output-integrity-reasoning-leak",
+  "entities": [{"name": "Apple"}, {"name": "Microsoft"}],
+  "steps": [],
+  "metrics": [],
+  "evidence": [],
+  "market_data": [],
+  "final_output": "We need to write a peer comparison based on provided metrics.\nThe instruction says to compare the issuers.\nLet's draft the answer.\nWhich company leads"
+}

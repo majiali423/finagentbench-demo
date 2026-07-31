@@ -40,4 +40,5 @@ def attach_provenance(
         profile=profile,
         adapter=adapter,
         enabled_metrics=enabled,
+        scoring_version=report.scoring_version,
     )

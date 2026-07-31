@@ -15,6 +15,11 @@ leakage proof. Release gates pair issuer and compare cases.
 
 - `step_presence`: required Agent stages executed.
 - `section_presence`: required report headings/aliases exist.
+- `visible_output_integrity`: deterministically checks only `final_output` for
+  reasoning/prompt leakage, unfinished text, empty Markdown headings, and invalid
+  comparison claims. It uses generic Markdown/output structure and FinRun entity
+  context, not LumenFin-specific report titles. Findings are `high` severity so
+  scoring v2 cases can block them even when the metric has zero scoring weight.
 
 ## Financial correctness
 
@@ -53,3 +58,9 @@ unit/currency and temporal checks with zero checkable items return score `0`,
 
 Cases own `min_score`, weights and severity blocks. Release changes must review
 case hashes. This RC did not lower any threshold.
+
+Scoring is explicitly versioned. Cases without `scoring_version` use scoring v1;
+their enabled metrics and weights remain unchanged. Scoring v2 cases opt in with
+`"scoring_version": "2"` and may enable `visible_output_integrity` at zero
+weight while retaining high-severity blocking. Unsupported scoring versions are
+rejected before evaluation.

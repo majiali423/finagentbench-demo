@@ -61,6 +61,7 @@ def _render_markdown(report: EvalReport) -> str:
         f"- Case hash: `{report.case_hash or 'n/a'}`",
         f"- Profile: `{report.profile or 'n/a'}`",
         f"- Adapter: `{report.adapter or 'n/a'}`",
+        f"- Scoring version: `{report.scoring_version}`",
         f"- Enabled metrics: `{', '.join(report.enabled_metrics) if report.enabled_metrics else 'n/a'}`",
         "",
         "## Metrics",
@@ -101,6 +102,7 @@ def _render_html(report: EvalReport) -> str:
         <p><strong>Run:</strong> {escape(report.run_id)}</p>
         <p><strong>Score:</strong> {report.score}</p>
         <p><strong>Status:</strong> <span class="{status.lower()}">{status}</span></p>
+        <p><strong>Scoring version:</strong> {escape(report.scoring_version)}</p>
         <table>
           <thead><tr><th>Metric</th><th>Score</th><th>Passed</th><th>Findings</th></tr></thead>
           <tbody>{''.join(metric_rows)}</tbody>

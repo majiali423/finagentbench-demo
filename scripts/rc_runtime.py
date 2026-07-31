@@ -168,6 +168,13 @@ def export_finrun(state: dict[str, Any]) -> dict[str, Any]:
 
 
 def evaluate_finrun(run: dict[str, Any], case_path: Path, out_dir: Path) -> dict[str, Any]:
+    import sys
+
+    fab_root = Path(__file__).resolve().parents[1]
+    fab_root_s = str(fab_root)
+    if fab_root_s not in sys.path:
+        sys.path.insert(0, fab_root_s)
+
     from finagentbench.profiles import apply_profile
     from finagentbench.provenance import attach_provenance
     from finagentbench.report import write_eval_report
@@ -186,7 +193,10 @@ def evaluate_finrun(run: dict[str, Any], case_path: Path, out_dir: Path) -> dict
 
 
 def claim_coverage(state: dict[str, Any], final_output: str) -> dict[str, Any]:
+    import re
+
     from lumenfin.claims import claims_from_state, filter_verified
+    from lumenfin.reporting import humanize_citation
 
     claims = claims_from_state(state)
     verified = filter_verified(claims)
@@ -203,13 +213,22 @@ def claim_coverage(state: dict[str, Any], final_output: str) -> dict[str, Any]:
             bucket["risk"] += 1
         elif claim.claim_type == "investment_conclusion":
             bucket["investment"] += 1
-    in_report = sum(
-        1 for c in verified if c.primary_citation and c.primary_citation in final_output
-    )
+
+    def _citation_in_report(citation: str) -> bool:
+        if not citation:
+            return False
+        if citation in final_output:
+            return True
+        human = humanize_citation(citation)
+        return bool(human) and human in final_output
+
+    in_report = sum(1 for c in verified if _citation_in_report(c.primary_citation))
     companies = list(state.get("companies") or [])
     entities_with_numeric = sum(
         1 for e in companies if (by_entity.get(e) or {}).get("numeric", 0) > 0
     )
+    # Clerk reports may render `#pN` as `p.N`; count either form.
+    citation_markers = final_output.count("#p") + len(re.findall(r"\bp\.\d+\b", final_output))
     return {
         "binding": binding,
         "verified_total": len(verified),
@@ -221,7 +240,7 @@ def claim_coverage(state: dict[str, Any], final_output: str) -> dict[str, Any]:
             round(entities_with_numeric / len(companies), 4) if companies else 0.0
         ),
         "page_anchored": binding.get("page_anchored_verified", 0),
-        "citation_markers": final_output.count("#p"),
+        "citation_markers": citation_markers,
     }
 
 
@@ -285,8 +304,10 @@ def judge_row(row: dict[str, Any]) -> dict[str, Any]:
                 }
             )
         fab = row.get("fab") or {}
-        if fab:
-            detail = fab.get("metric_detail") or {}
+        # Only score FAB when evaluation succeeded (has metric_detail). An {"error": ...}
+        # payload must not look like a failed evidence/numeric gate.
+        detail = fab.get("metric_detail") or {}
+        if detail:
             checks.append(
                 {
                     "name": "fab_evidence_coverage",
@@ -309,6 +330,14 @@ def judge_row(row: dict[str, Any]) -> dict[str, Any]:
                         "detail": str((detail.get("entity_leakage") or {}).get("score")),
                     }
                 )
+        elif fab.get("error"):
+            checks.append(
+                {
+                    "name": "fab_evaluate",
+                    "ok": False,
+                    "detail": str(fab.get("error")),
+                }
+            )
     else:
         checkable = row.get("checkable") or 0
         checks.append(
