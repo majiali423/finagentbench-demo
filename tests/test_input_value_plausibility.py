@@ -102,6 +102,71 @@ class InputValuePlausibilityTestCase(unittest.TestCase):
                 }
             )
 
+    def test_none_value_score_pass_consistent(self) -> None:
+        run = _run(100)
+        run["metrics"][0]["inputs"]["revenue"]["value"] = None
+        case = {
+            "enabled_metrics": ["input_value_plausibility"],
+            "input_value_bounds": {"revenue": {"unit": "billion_usd", "min": 0, "max": 1000}},
+        }
+        result = input_value_plausibility(run, case)
+        if result.findings:
+            self.assertFalse(result.passed)
+        else:
+            # No checkable values → empty contract (100/True), never score=0 with passed=True.
+            self.assertEqual(result.score, 100.0)
+            self.assertTrue(result.passed)
+
+    def test_mixed_none_and_valid_scores_only_valid(self) -> None:
+        run = {
+            "run_id": "mixed",
+            "entities": ["Microsoft"],
+            "steps": [],
+            "metrics": [
+                {
+                    "entity": "Microsoft",
+                    "name": "x",
+                    "value": 1,
+                    "inputs": {
+                        "revenue": {"value": 250.0, "unit": "billion_usd", "currency": "USD"},
+                        "operating_income": {"value": None, "unit": "billion_usd", "currency": "USD"},
+                    },
+                }
+            ],
+            "evidence": [],
+            "market_data": [],
+            "final_output": "ok",
+        }
+        case = {
+            "enabled_metrics": ["input_value_plausibility"],
+            "input_value_bounds": {
+                "revenue": {"unit": "billion_usd", "min": 0, "max": 1000},
+                "operating_income": {"unit": "billion_usd", "min": -500, "max": 500},
+            },
+        }
+        result = input_value_plausibility(run, case)
+        self.assertTrue(result.passed)
+        self.assertEqual(result.score, 100.0)
+
+    def test_bounds_reject_nan_and_inf(self) -> None:
+        base = {
+            "id": "b",
+            "scoring_version": "2",
+            "expected_entities": [],
+            "required_steps": [],
+        }
+        for bad in (math.nan, math.inf, -math.inf, "nan", "inf"):
+            with self.subTest(bad=bad):
+                with self.assertRaises(Exception):
+                    validate_case(
+                        {
+                            **base,
+                            "input_value_bounds": {
+                                "revenue": {"unit": "billion_usd", "min": 0, "max": bad}
+                            },
+                        }
+                    )
+
 
 if __name__ == "__main__":
     unittest.main()
