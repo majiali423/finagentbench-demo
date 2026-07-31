@@ -89,6 +89,38 @@ def validate_case(case: dict[str, Any]) -> None:
         raise ValidationError("severity_penalties must be an object")
     if "block_on_severity" in case:
         _require_list(case, "block_on_severity")
+    if "entity_aliases" in case and not isinstance(case["entity_aliases"], dict):
+        raise ValidationError("entity_aliases must be an object")
+    if "peer_section_aliases" in case:
+        _require_list(case, "peer_section_aliases")
+    if "input_value_bounds" in case:
+        _validate_input_value_bounds(case["input_value_bounds"])
+
+
+def _validate_input_value_bounds(bounds: Any) -> None:
+    if not isinstance(bounds, dict):
+        raise ValidationError("input_value_bounds must be an object")
+    for name, rule in bounds.items():
+        if not isinstance(rule, dict):
+            raise ValidationError(f"input_value_bounds.{name} must be an object")
+        unit = rule.get("unit")
+        if not isinstance(unit, str) or not unit.strip():
+            raise ValidationError(f"input_value_bounds.{name}.unit must be a non-empty string")
+        if "min" not in rule and "max" not in rule:
+            raise ValidationError(f"input_value_bounds.{name} requires min and/or max")
+        minimum = maximum = None
+        if "min" in rule:
+            try:
+                minimum = float(rule["min"])
+            except (TypeError, ValueError) as exc:
+                raise ValidationError(f"input_value_bounds.{name}.min must be numeric") from exc
+        if "max" in rule:
+            try:
+                maximum = float(rule["max"])
+            except (TypeError, ValueError) as exc:
+                raise ValidationError(f"input_value_bounds.{name}.max must be numeric") from exc
+        if minimum is not None and maximum is not None and minimum > maximum:
+            raise ValidationError(f"input_value_bounds.{name}.min must be <= max")
 
 
 def _require_list(payload: dict[str, Any], field_name: str) -> None:

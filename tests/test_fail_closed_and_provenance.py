@@ -77,6 +77,9 @@ class FailClosedAndProvenanceTestCase(unittest.TestCase):
         self.assertEqual(result.score, 0.0)
 
     def test_unit_currency_detects_absurd_billion_magnitude(self) -> None:
+        # Magnitude checks moved to input_value_plausibility Case bounds.
+        from finagentbench.metrics.input_value_plausibility import input_value_plausibility
+
         run = {
             "run_id": "absurd-unit",
             "entities": ["Microsoft"],
@@ -90,13 +93,13 @@ class FailClosedAndProvenanceTestCase(unittest.TestCase):
                     "inputs": {
                         "operating_income": {
                             "value": 109433.0,
-                            "unit": "billion",
+                            "unit": "billion_usd",
                             "currency": "USD",
                             "period": "FY2024",
                         },
                         "revenue": {
                             "value": 245122.0,
-                            "unit": "billion",
+                            "unit": "billion_usd",
                             "currency": "USD",
                             "period": "FY2024",
                         },
@@ -106,15 +109,26 @@ class FailClosedAndProvenanceTestCase(unittest.TestCase):
             "evidence": [],
             "final_output": "Microsoft analysis.",
         }
-        result = unit_currency_consistency(
+        unit_result = unit_currency_consistency(
             run,
             {
                 "enabled_metrics": ["unit_currency_consistency"],
                 "require_unit_currency_consistency": True,
             },
         )
+        self.assertTrue(unit_result.passed)
+        result = input_value_plausibility(
+            run,
+            {
+                "enabled_metrics": ["input_value_plausibility"],
+                "input_value_bounds": {
+                    "revenue": {"unit": "billion_usd", "min": 0, "max": 1000},
+                    "operating_income": {"unit": "billion_usd", "min": -500, "max": 500},
+                },
+            },
+        )
         self.assertFalse(result.passed)
-        self.assertTrue(any("absurd billion-scale" in f.message for f in result.findings))
+        self.assertTrue(any("outside case-configured bounds" in f.message for f in result.findings))
 
     def test_temporal_empty_trace_fails_when_require_checkable(self) -> None:
         result = temporal_consistency(
