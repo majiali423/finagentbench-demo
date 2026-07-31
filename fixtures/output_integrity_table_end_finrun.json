@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "run_id": "output-integrity-table-end",
+  "entities": [{"name": "Apple"}, {"name": "Microsoft"}],
+  "steps": [],
+  "metrics": [],
+  "evidence": [],
+  "market_data": [],
+  "final_output": "# Comparison\n\n## Peer Comparison\n\n| Company | Operating Margin |\n| --- | --- |\n| Apple | 30% |\n| Microsoft | 45% |\n"
+}

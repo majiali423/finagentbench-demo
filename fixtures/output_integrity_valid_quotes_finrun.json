@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "run_id": "output-integrity-valid-quotes",
+  "entities": [{"name": "Apple"}],
+  "steps": [],
+  "metrics": [],
+  "evidence": [],
+  "market_data": [],
+  "final_output": "# Diligence Note\n\nManagement said, \"we need to invest in capacity.\" The company may need to raise capital.\n\n## Conclusion\n\nThe filing supports a cautious view."
+}

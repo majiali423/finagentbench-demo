@@ -1,0 +1,18 @@
+{
+  "id": "case_output_integrity_valid_corpus",
+  "scoring_version": "2",
+  "expected_entities": ["Apple", "Microsoft"],
+  "required_steps": [],
+  "enabled_metrics": ["visible_output_integrity"],
+  "min_score": 100,
+  "peer_section_aliases": [
+    "Peer Comparison",
+    "Comparable Companies",
+    "Peer Analysis",
+    "同业比较"
+  ],
+  "entity_aliases": {
+    "Microsoft": ["Microsoft", "MSFT"],
+    "Apple": ["Apple", "AAPL"]
+  }
+}

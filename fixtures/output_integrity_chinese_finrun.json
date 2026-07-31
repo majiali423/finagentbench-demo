@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "run_id": "output-integrity-chinese",
+  "entities": [{"name": "Apple"}, {"name": "Microsoft"}],
+  "steps": [],
+  "metrics": [],
+  "evidence": [],
+  "market_data": [],
+  "final_output": "# 发行人比较\n\n## 同业比较\n\n苹果与微软在毛利率与研发强度上存在差异。\n\n## 结论\n\n现有证据支持谨慎比较。"
+}

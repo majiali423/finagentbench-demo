@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "run_id": "output-integrity-ticker-alias",
+  "entities": [{"name": "Microsoft"}],
+  "steps": [],
+  "metrics": [],
+  "evidence": [],
+  "market_data": [],
+  "final_output": "# Issuer Note\n\n## Peer Comparison\n\nMSFT margin profile differs from the prior period.\n\n## Conclusion\n\nThe comparison uses the requested issuer only."
+}
