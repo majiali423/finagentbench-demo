@@ -227,7 +227,7 @@ def claim_coverage(state: dict[str, Any], final_output: str) -> dict[str, Any]:
     entities_with_numeric = sum(
         1 for e in companies if (by_entity.get(e) or {}).get("numeric", 0) > 0
     )
-    # Clerk reports may render `#pN` as `p.N`; count either form.
+    # Analyst-facing reports may render `#pN` as `p.N`; count either form.
     citation_markers = final_output.count("#p") + len(re.findall(r"\bp\.\d+\b", final_output))
     return {
         "binding": binding,
