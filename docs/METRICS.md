@@ -17,14 +17,21 @@ leakage proof. Release gates pair issuer and compare cases.
 - `section_presence`: required report headings/aliases exist.
 - `visible_output_integrity`: deterministically checks only `final_output` for
   reasoning/prompt leakage, unfinished text, empty Markdown headings, and invalid
-  comparison claims. It uses generic Markdown/output structure and FinRun entity
-  context, not LumenFin-specific report titles. Findings are `high` severity so
-  scoring v2 cases can block them even when the metric has zero scoring weight.
+  comparison claims. Ignores fenced code and blockquotes by default; treats tables
+  and lists as complete section bodies. Case contracts may supply
+  `peer_section_aliases` and `entity_aliases`. Regex-guessed unknown peers are at
+  most medium severity; `forbidden_entities` remain high blockers. Finding
+  `target.code` / `target.confidence` carry structured codes such as
+  `reasoning_leak` and `truncated_output`.
 
 ## Financial correctness
 
 - `numeric_correctness`: safely recomputes formulas from exported inputs.
-- `unit_currency_consistency`: checks explicit unit/currency alignment.
+- `unit_currency_consistency`: checks explicit unit/currency alignment only
+  (no hardcoded magnitude ceilings).
+- `input_value_plausibility`: optional Case-driven magnitude bounds via
+  `input_value_bounds` (min/max + unit). Absent bounds → no amplitude check.
+  Findings state case-bounds violations without asserting a definite root cause.
 - `temporal_consistency`: checks metric/evidence periods and market as-of dates.
 
 ## Evidence and provenance

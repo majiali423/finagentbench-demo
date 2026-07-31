@@ -22,6 +22,27 @@
       "failure_type": "truncated",
       "expected_passed": false,
       "expected_findings": ["visible_output_integrity"]
+    },
+    {
+      "id": "valid_quotes",
+      "run": "../../fixtures/output_integrity_valid_quotes_finrun.json",
+      "failure_type": "none",
+      "expected_passed": true,
+      "expected_findings": []
+    },
+    {
+      "id": "table_end",
+      "run": "../../fixtures/output_integrity_table_end_finrun.json",
+      "failure_type": "none",
+      "expected_passed": true,
+      "expected_findings": []
+    },
+    {
+      "id": "code_blockquote",
+      "run": "../../fixtures/output_integrity_code_blockquote_finrun.json",
+      "failure_type": "none",
+      "expected_passed": true,
+      "expected_findings": []
     }
   ]
 }

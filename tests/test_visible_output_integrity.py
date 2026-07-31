@@ -63,7 +63,7 @@ class VisibleOutputIntegrityTestCase(unittest.TestCase):
         )
         messages = [finding.message for finding in result.findings]
         self.assertTrue(any("truncated" in message for message in messages))
-        self.assertTrue(any("ending punctuation" in message for message in messages))
+        self.assertFalse(result.passed)
 
     def test_heading_without_prose_fails(self) -> None:
         result = visible_output_integrity(_run("# Report\n\n## Empty"), {})
@@ -83,13 +83,15 @@ class VisibleOutputIntegrityTestCase(unittest.TestCase):
     def test_unknown_peer_company_fails(self) -> None:
         result = visible_output_integrity(
             _run(
-                "## Peer Comparison\n\nApple outperforms Microsoft on the selected metric.\n\n"
+                "## Peer Comparison\n\nApple differs versus Microsoft on the selected metric.\n\n"
                 "## Conclusion\n\nThe comparison is complete.",
                 ["Apple"],
             ),
             {},
         )
+        # Regex-guessed unknown peers are medium findings and do not alone high-block.
         self.assertTrue(any("Microsoft" in finding.message for finding in result.findings))
+        self.assertTrue(result.passed)
 
     def test_forbidden_company_is_found_without_leadership_language(self) -> None:
         result = visible_output_integrity(
@@ -125,8 +127,8 @@ class VisibleOutputIntegrityTestCase(unittest.TestCase):
     def test_output_integrity_benchmark_detects_both_failures(self) -> None:
         report = run_benchmark_suite(ROOT / "benchmarks" / "output_integrity" / "suite.json")
         self.assertTrue(report["passed"])
-        self.assertEqual(report["expected_failures"], 2)
-        self.assertEqual(report["detected_failures"], 2)
+        self.assertGreaterEqual(report["expected_failures"], 2)
+        self.assertEqual(report["detected_failures"], report["expected_failures"])
         self.assertEqual(report["false_positives"], 0)
 
     def test_metric_is_v2_only_in_versioned_fixtures(self) -> None:

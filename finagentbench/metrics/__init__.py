@@ -18,6 +18,7 @@ from .retrieval_provenance import retrieval_provenance
 from .runtime_compliance import runtime_compliance
 from .compliance_semantic import compliance_semantic
 from .visible_output_integrity import visible_output_integrity
+from .input_value_plausibility import input_value_plausibility
 
 
 BUILTIN_METRICS = (
@@ -28,6 +29,7 @@ BUILTIN_METRICS = (
     numeric_correctness,
     temporal_consistency,
     unit_currency_consistency,
+    input_value_plausibility,
     evidence_coverage,
     evidence_consistency,
     evidence_support,
