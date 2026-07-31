@@ -36,10 +36,11 @@ def input_value_plausibility(run: dict[str, Any], case: dict[str, Any]) -> Metri
             if actual_unit != unit:
                 # Unit mismatches belong to unit_currency_consistency; skip bound.
                 continue
-            checked += 1
             raw = input_value(payload)
             if raw is None:
+                # Missing values are owned by completeness metrics; do not inflate checked.
                 continue
+            checked += 1
             try:
                 value = float(raw)
             except (TypeError, ValueError):

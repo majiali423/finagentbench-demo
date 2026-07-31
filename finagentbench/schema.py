@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -89,10 +90,25 @@ def validate_case(case: dict[str, Any]) -> None:
         raise ValidationError("severity_penalties must be an object")
     if "block_on_severity" in case:
         _require_list(case, "block_on_severity")
-    if "entity_aliases" in case and not isinstance(case["entity_aliases"], dict):
-        raise ValidationError("entity_aliases must be an object")
+    if "entity_aliases" in case:
+        if not isinstance(case["entity_aliases"], dict):
+            raise ValidationError("entity_aliases must be an object")
+        for key, aliases in case["entity_aliases"].items():
+            if not isinstance(key, str) or not key.strip():
+                raise ValidationError("entity_aliases keys must be non-empty strings")
+            if isinstance(aliases, str):
+                continue
+            if not isinstance(aliases, list) or not all(
+                isinstance(item, str) for item in aliases
+            ):
+                raise ValidationError(
+                    f"entity_aliases.{key} must be a string or list of strings"
+                )
     if "peer_section_aliases" in case:
         _require_list(case, "peer_section_aliases")
+        for item in case["peer_section_aliases"]:
+            if not isinstance(item, str) or not item.strip():
+                raise ValidationError("peer_section_aliases items must be non-empty strings")
     if "input_value_bounds" in case:
         _validate_input_value_bounds(case["input_value_bounds"])
 
@@ -101,6 +117,8 @@ def _validate_input_value_bounds(bounds: Any) -> None:
     if not isinstance(bounds, dict):
         raise ValidationError("input_value_bounds must be an object")
     for name, rule in bounds.items():
+        if not isinstance(name, str) or not name.strip():
+            raise ValidationError("input_value_bounds metric keys must be non-empty strings")
         if not isinstance(rule, dict):
             raise ValidationError(f"input_value_bounds.{name} must be an object")
         unit = rule.get("unit")
@@ -114,11 +132,15 @@ def _validate_input_value_bounds(bounds: Any) -> None:
                 minimum = float(rule["min"])
             except (TypeError, ValueError) as exc:
                 raise ValidationError(f"input_value_bounds.{name}.min must be numeric") from exc
+            if not math.isfinite(minimum):
+                raise ValidationError(f"input_value_bounds.{name}.min must be finite")
         if "max" in rule:
             try:
                 maximum = float(rule["max"])
             except (TypeError, ValueError) as exc:
                 raise ValidationError(f"input_value_bounds.{name}.max must be numeric") from exc
+            if not math.isfinite(maximum):
+                raise ValidationError(f"input_value_bounds.{name}.max must be finite")
         if minimum is not None and maximum is not None and minimum > maximum:
             raise ValidationError(f"input_value_bounds.{name}.min must be <= max")
 
