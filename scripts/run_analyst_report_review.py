@@ -1,4 +1,4 @@
-"""Live clerk-facing report review: Apple, AAPL vs MSFT, MSFT PDF."""
+"""Live analyst-facing report review: Apple, AAPL vs MSFT, MSFT PDF."""
 from __future__ import annotations
 
 import json
@@ -23,7 +23,7 @@ import rc_runtime as runtime  # noqa: E402
 
 
 def main() -> int:
-    out = fab / "outputs" / "lumenfin_clerk_review"
+    out = fab / "outputs" / "lumenfin_analyst_review"
     out.mkdir(parents=True, exist_ok=True)
 
     print("=== LIVE PREFLIGHT ===", flush=True)
@@ -77,7 +77,7 @@ def main() -> int:
         }
         for r in rows
     ]
-    (out / "clerk_review_summary.json").write_text(
+    (out / "analyst_review_summary.json").write_text(
         json.dumps(summary, indent=2), encoding="utf-8"
     )
     print("\n=== SUMMARY ===", flush=True)

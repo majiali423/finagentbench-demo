@@ -39,17 +39,17 @@ Canonical path: `LumenFin → export_finrun_state() → FinAgentBench (ci)`.
 
 ## Artifacts
 
-- `C:\a_project\Projects\finagentbench-demo\outputs\lumenfin_rc_validation\validation.json`
-- `C:\a_project\Projects\finagentbench-demo\outputs\lumenfin_rc_validation\offline_gates.json`
+- `outputs/lumenfin_rc_validation/validation.json`
+- `outputs/lumenfin_rc_validation/offline_gates.json`
 
 ## Prior phase evidence
 
 | Phase | Artifact | Present |
 |-------|----------|:-------:|
-| baseline | `C:\a_project\Projects\lumenfin-agent\LumenFin_Final_Reliability_Baseline.md` | Y |
-| grounding | `C:\a_project\Projects\lumenfin-agent\reports\history\LumenFin_Financial_Grounding_Validation.md` | Y |
-| claim_binding | `C:\a_project\Projects\lumenfin-agent\reports\history\LumenFin_Claim_Evidence_Binding_Report.md` | Y |
-| hardening | `C:\a_project\Projects\lumenfin-agent\reports\history\LumenFin_Production_Hardening_Report.md` | Y |
-| e2e | `C:\a_project\Projects\lumenfin-agent\reports\history\LumenFin_E2E_Audit_Report.md` | Y |
-| regression | `C:\a_project\Projects\lumenfin-agent\reports\history\LumenFin_Regression_Comparison.md` | Y |
-| rc_current | `C:\a_project\Projects\lumenfin-agent\reports\current\LumenFin_RC_Final_Reliability_Report.md` | Y |
+| baseline | `../lumenfin-agent/LumenFin_Final_Reliability_Baseline.md` | Y |
+| grounding | `../lumenfin-agent/reports/history/LumenFin_Financial_Grounding_Validation.md` | Y |
+| claim_binding | `../lumenfin-agent/reports/history/LumenFin_Claim_Evidence_Binding_Report.md` | Y |
+| hardening | `../lumenfin-agent/reports/history/LumenFin_Production_Hardening_Report.md` | Y |
+| e2e | `../lumenfin-agent/reports/history/LumenFin_E2E_Audit_Report.md` | Y |
+| regression | `../lumenfin-agent/reports/history/LumenFin_Regression_Comparison.md` | Y |
+| rc_current | `../lumenfin-agent/reports/current/LumenFin_RC_Final_Reliability_Report.md` | Y |
