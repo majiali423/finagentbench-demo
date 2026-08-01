@@ -51,6 +51,75 @@
           "value": "# Company Overview\nTargetCo is the subject of this review.\n\n# Financial Analysis\nDebt to assets is 40.0%.\n\n# Operations & Industry\nTargetCo operates in a competitive market.\n\n# Conclusion & Limitations\nThis is research output only and not investment advice."
         }
       ]
+    },
+    {
+      "id": "period_multi_rag_baseline",
+      "run": "../../fixtures/lumenfin_state_sample.json",
+      "case": "../../fixtures/case_lumenfin_diligence.json",
+      "adapter": "lumenfin",
+      "failure_type": "none",
+      "expected_passed": true
+    },
+    {
+      "id": "missing_metric_period_provenance",
+      "run": "../../fixtures/lumenfin_state_sample.json",
+      "case": "../../fixtures/case_lumenfin_diligence.json",
+      "adapter": "lumenfin",
+      "failure_type": "missing_metric_period_provenance",
+      "expected_passed": false,
+      "expected_findings": ["retrieval_provenance"],
+      "mutations": [
+        {"op": "set", "path": ["retrieved_docs", "Microsoft", "fundamental_provenance", "revenue", "period"], "value": null}
+      ]
+    },
+    {
+      "id": "query_period_source",
+      "run": "../../fixtures/lumenfin_state_sample.json",
+      "case": "../../fixtures/case_lumenfin_diligence.json",
+      "adapter": "lumenfin",
+      "failure_type": "query_period_source",
+      "expected_passed": false,
+      "expected_findings": ["retrieval_provenance"],
+      "mutations": [
+        {"op": "set", "path": ["retrieved_docs", "Microsoft", "fundamental_provenance", "revenue", "period_source"], "value": "query"}
+      ]
+    },
+    {
+      "id": "assumed_period_alignment",
+      "run": "../../fixtures/lumenfin_state_sample.json",
+      "case": "../../fixtures/case_lumenfin_diligence.json",
+      "adapter": "lumenfin",
+      "failure_type": "assumed_period_alignment",
+      "expected_passed": false,
+      "expected_findings": ["retrieval_provenance"],
+      "mutations": [
+        {"op": "set", "path": ["retrieved_docs", "Microsoft", "fundamental_provenance", "revenue", "period_alignment"], "value": "assumed_from_query"}
+      ]
+    },
+    {
+      "id": "missing_source_record",
+      "run": "../../fixtures/lumenfin_state_sample.json",
+      "case": "../../fixtures/case_lumenfin_diligence.json",
+      "adapter": "lumenfin",
+      "failure_type": "missing_source_record",
+      "expected_passed": false,
+      "expected_findings": ["retrieval_provenance"],
+      "mutations": [
+        {"op": "set", "path": ["retrieved_docs", "Microsoft", "fundamental_provenance", "revenue", "citation"], "value": null},
+        {"op": "set", "path": ["retrieved_docs", "Microsoft", "fundamental_provenance", "revenue", "source_record_id"], "value": null}
+      ]
+    },
+    {
+      "id": "formula_cross_period_inputs",
+      "run": "../../fixtures/lumenfin_state_sample.json",
+      "case": "../../fixtures/case_lumenfin_diligence.json",
+      "adapter": "lumenfin",
+      "failure_type": "formula_cross_period_inputs",
+      "expected_passed": false,
+      "expected_findings": ["retrieval_provenance"],
+      "mutations": [
+        {"op": "set", "path": ["retrieved_docs", "Microsoft", "fundamental_provenance", "revenue", "period"], "value": "FY2024"}
+      ]
     }
   ]
 }

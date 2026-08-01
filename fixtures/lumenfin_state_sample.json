@@ -49,6 +49,13 @@
         }
       ],
       "structured_source": "sample_db",
+      "fundamentals_meta": {"fiscal_year": 2025, "period_alignment": "exact"},
+      "fundamental_provenance": {
+        "revenue": {"source": "provider_record", "confidence": "high", "period": "FY2025", "period_source": "provider_record", "period_alignment": "exact", "citation": "sample://apple/fy2025/revenue", "source_record_id": "sample:apple:fy2025:revenue"},
+        "ebitda": {"source": "provider_record", "confidence": "high", "period": "FY2025", "period_source": "provider_record", "period_alignment": "exact", "citation": "sample://apple/fy2025/ebitda", "source_record_id": "sample:apple:fy2025:ebitda"},
+        "r_and_d": {"source": "provider_record", "confidence": "high", "period": "FY2025", "period_source": "provider_record", "period_alignment": "exact", "citation": "sample://apple/fy2025/r_and_d", "source_record_id": "sample:apple:fy2025:r_and_d"},
+        "operating_income": {"source": "provider_record", "confidence": "high", "period": "FY2025", "period_source": "provider_record", "period_alignment": "exact", "citation": "sample://apple/fy2025/operating_income", "source_record_id": "sample:apple:fy2025:operating_income"}
+      },
       "provenance": {
         "structured_source": "sample_db",
         "market_provider": "fake",
@@ -86,6 +93,13 @@
         }
       ],
       "structured_source": "sample_db",
+      "fundamentals_meta": {"fiscal_year": 2025, "period_alignment": "exact"},
+      "fundamental_provenance": {
+        "revenue": {"source": "provider_record", "confidence": "high", "period": "FY2025", "period_source": "provider_record", "period_alignment": "exact", "citation": "sample://microsoft/fy2025/revenue", "source_record_id": "sample:microsoft:fy2025:revenue"},
+        "ebitda": {"source": "provider_record", "confidence": "high", "period": "FY2025", "period_source": "provider_record", "period_alignment": "exact", "citation": "sample://microsoft/fy2025/ebitda", "source_record_id": "sample:microsoft:fy2025:ebitda"},
+        "r_and_d": {"source": "provider_record", "confidence": "high", "period": "FY2025", "period_source": "provider_record", "period_alignment": "exact", "citation": "sample://microsoft/fy2025/r_and_d", "source_record_id": "sample:microsoft:fy2025:r_and_d"},
+        "operating_income": {"source": "provider_record", "confidence": "high", "period": "FY2025", "period_source": "provider_record", "period_alignment": "exact", "citation": "sample://microsoft/fy2025/operating_income", "source_record_id": "sample:microsoft:fy2025:operating_income"}
+      },
       "provenance": {
         "structured_source": "sample_db",
         "market_provider": "fake",
@@ -128,14 +142,14 @@
       {
         "filename": "apple_supply_chain.md",
         "source_type": "markdown",
-        "snippet": "Apple supply chain risk is medium because manufacturing concentration remains material."
+        "snippet": "Apple FY2024 revenue was 383.3 billion USD. Apple FY2025 revenue was 412.0 billion USD and EBITDA was 141.2 billion USD. Supply chain risk is medium because manufacturing concentration remains material."
       }
     ],
     "Microsoft": [
       {
         "filename": "microsoft_cloud.md",
         "source_type": "markdown",
-        "snippet": "Microsoft sourcing is diversified across multiple geographies."
+        "snippet": "Microsoft FY2024 revenue was 245.1 billion USD. Microsoft FY2025 revenue was 288.7 billion USD and EBITDA was 122.5 billion USD. Sourcing is diversified across multiple geographies."
       }
     ]
   },

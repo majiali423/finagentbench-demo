@@ -14,7 +14,7 @@ from finagentbench.benchmark import run_benchmark_suite
 
 
 class MutationSuiteTestCase(unittest.TestCase):
-    def test_all_four_reliability_mutations_are_detected(self) -> None:
+    def test_all_reliability_mutations_are_detected(self) -> None:
         report = run_benchmark_suite(ROOT / "benchmarks" / "mutations" / "suite.json")
 
         self.assertTrue(report["passed"])
@@ -27,10 +27,14 @@ class MutationSuiteTestCase(unittest.TestCase):
             and not item["actual_passed"]
             and not item["missing_expected_findings"]
         }
-        self.assertEqual(
-            detected,
-            {"wrong_number", "wrong_entity", "missing_citation", "missing_risk"},
-        )
+        self.assertEqual(detected, {
+            "wrong_number", "wrong_entity", "missing_citation", "missing_risk",
+            "missing_metric_period_provenance", "query_period_source",
+            "assumed_period_alignment", "missing_source_record",
+            "formula_cross_period_inputs",
+        })
+        multi = next(item for item in report["items"] if item["id"] == "period_multi_rag_baseline")
+        self.assertTrue(multi["actual_passed"])
 
     def test_offline_demo_emits_baseline_and_mutation_reports(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

@@ -50,6 +50,7 @@
   "require_input_guardrail": true,
   "expected_violation_codes": [],
   "require_retrieval_provenance": true,
+  "require_factual_period_provenance": true,
   "forbidden_structured_sources": [
     "none"
   ],

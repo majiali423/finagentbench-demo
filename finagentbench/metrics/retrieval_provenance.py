@@ -4,6 +4,14 @@ from typing import Any
 
 from ..schema import Finding, MetricResult
 
+_FACTUAL_PERIOD_SOURCES = {
+    "sec_companyfacts", "provider_record", "document_text", "table_header",
+    "structured_table", "filing_fact",
+}
+_ASSUMED_ALIGNMENTS = {
+    "assumed_from_query", "fallback_latest", "upload_labeled", "unspecified", "unknown",
+}
+
 
 def retrieval_provenance(run: dict[str, Any], case: dict[str, Any]) -> MetricResult:
     if not case.get("require_retrieval_provenance"):
@@ -58,6 +66,9 @@ def retrieval_provenance(run: dict[str, Any], case: dict[str, Any]) -> MetricRes
                 )
             )
 
+        if case.get("require_factual_period_provenance"):
+            findings.extend(_period_provenance_findings(run, entity))
+
     if checked == 0:
         return MetricResult(
             "retrieval_provenance",
@@ -75,6 +86,60 @@ def retrieval_provenance(run: dict[str, Any], case: dict[str, Any]) -> MetricRes
 
     score = round((checked - len(findings)) / checked * 100, 2)
     return MetricResult("retrieval_provenance", score, not findings, findings)
+
+
+def _period_provenance_findings(run: dict[str, Any], entity: str) -> list[Finding]:
+    findings: list[Finding] = []
+    for metric in run.get("metrics") or []:
+        if str(metric.get("entity") or "") != entity or not metric.get("formula"):
+            continue
+        periods: set[str] = set()
+        for input_name, raw in (metric.get("inputs") or {}).items():
+            record = raw if isinstance(raw, dict) else {}
+            period = str(record.get("period") or "").strip()
+            period_source = str(record.get("period_source") or "").strip().casefold()
+            alignment = str(record.get("period_alignment") or "").strip().casefold()
+            record_proof = bool(
+                str(record.get("citation") or "").strip()
+                or str(record.get("source_record_id") or "").strip()
+            )
+            reason = None
+            if not period:
+                reason = "period missing"
+            elif period_source not in _FACTUAL_PERIOD_SOURCES:
+                reason = f"non-factual period_source={period_source or 'missing'}"
+            elif alignment in _ASSUMED_ALIGNMENTS or not alignment:
+                reason = f"non-exact period_alignment={alignment or 'missing'}"
+            elif not record_proof:
+                reason = "citation/source_record_id missing"
+            if reason:
+                findings.append(_period_finding(entity, metric, str(input_name), reason))
+            else:
+                periods.add(period)
+        metric_period = str(metric.get("period") or "").strip()
+        if len(periods) > 1 or (periods and metric_period not in periods):
+            findings.append(
+                _period_finding(
+                    entity, metric, "formula", f"formula periods disagree: {sorted(periods)}"
+                )
+            )
+    return findings
+
+
+def _period_finding(
+    entity: str, metric: dict[str, Any], input_name: str, reason: str
+) -> Finding:
+    return Finding(
+        metric="retrieval_provenance",
+        severity="high",
+        message=(
+            f"{entity} {metric.get('name')} input {input_name} has invalid period provenance: "
+            f"{reason}."
+        ),
+        recommendation="Export factual per-metric period provenance and an auditable source record.",
+        action="retrieve",
+        target={"entity": entity, "metric": metric.get("name"), "input": input_name},
+    )
 
 
 def _derive_from_entities(run: dict[str, Any]) -> dict[str, dict[str, Any]]:

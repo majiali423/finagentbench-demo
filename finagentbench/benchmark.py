@@ -14,7 +14,7 @@ def run_benchmark_suite(suite_path: str | Path) -> dict[str, Any]:
     path = Path(suite_path)
     suite = json.loads(path.read_text(encoding="utf-8"))
     root = path.parent
-    case = json.loads((root / suite["case"]).resolve().read_text(encoding="utf-8"))
+    default_case = json.loads((root / suite["case"]).resolve().read_text(encoding="utf-8"))
 
     items = []
     detected_failures = 0
@@ -23,6 +23,9 @@ def run_benchmark_suite(suite_path: str | Path) -> dict[str, Any]:
     covered_failure_types = set()
 
     for item in suite.get("items", []):
+        case = default_case
+        if item.get("case"):
+            case = json.loads((root / item["case"]).resolve().read_text(encoding="utf-8"))
         run_path = (root / item["run"]).resolve()
         raw_run = json.loads(run_path.read_text(encoding="utf-8"))
         for mutation in item.get("mutations", []):
