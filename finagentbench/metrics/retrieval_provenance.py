@@ -84,7 +84,7 @@ def retrieval_provenance(run: dict[str, Any], case: dict[str, Any]) -> MetricRes
             ],
         )
 
-    score = round((checked - len(findings)) / checked * 100, 2)
+    score = round(max(0.0, (checked - len(findings)) / checked * 100), 2)
     return MetricResult("retrieval_provenance", score, not findings, findings)
 
 

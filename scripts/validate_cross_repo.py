@@ -111,7 +111,7 @@ def _require(path: Path, label: str) -> None:
 
 def _git_revision(root: Path) -> str:
     proc = subprocess.run(
-        ["git", "rev-parse", "HEAD"],
+        ["git", "-c", f"safe.directory={root.as_posix()}", "rev-parse", "HEAD"],
         cwd=root,
         capture_output=True,
         text=True,
@@ -122,7 +122,7 @@ def _git_revision(root: Path) -> str:
 
 def _git_dirty(root: Path) -> bool | str:
     proc = subprocess.run(
-        ["git", "status", "--porcelain"],
+        ["git", "-c", f"safe.directory={root.as_posix()}", "status", "--porcelain"],
         cwd=root,
         capture_output=True,
         text=True,
