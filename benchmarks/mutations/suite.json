@@ -120,6 +120,31 @@
       "mutations": [
         {"op": "set", "path": ["retrieved_docs", "Microsoft", "fundamental_provenance", "revenue", "period"], "value": "FY2024"}
       ]
+    },
+    {
+      "id": "missing_period_alignment",
+      "run": "../../fixtures/lumenfin_state_sample.json",
+      "case": "../../fixtures/case_lumenfin_diligence.json",
+      "adapter": "lumenfin",
+      "failure_type": "missing_period_alignment",
+      "expected_passed": false,
+      "expected_findings": ["retrieval_provenance"],
+      "mutations": [
+        {"op": "set", "path": ["retrieved_docs", "Apple", "fundamental_provenance", "revenue", "period_alignment"], "value": null}
+      ]
+    },
+    {
+      "id": "metric_period_drift",
+      "run": "../../fixtures/lumenfin_state_sample.json",
+      "case": "../../fixtures/case_lumenfin_diligence.json",
+      "adapter": "lumenfin",
+      "failure_type": "metric_period_drift",
+      "expected_passed": false,
+      "expected_findings": ["retrieval_provenance"],
+      "mutations": [
+        {"op": "set", "path": ["rag_evidence", "Apple", 0, "snippet"], "value": "Apple revenue was 412.0 billion USD. Operating income for FY2024 was 123.6 billion USD."},
+        {"op": "set", "path": ["retrieved_docs", "Apple", "fundamental_provenance", "revenue", "period"], "value": "FY2024"}
+      ]
     }
   ]
 }

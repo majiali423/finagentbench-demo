@@ -31,7 +31,8 @@ class MutationSuiteTestCase(unittest.TestCase):
             "wrong_number", "wrong_entity", "missing_citation", "missing_risk",
             "missing_metric_period_provenance", "query_period_source",
             "assumed_period_alignment", "missing_source_record",
-            "formula_cross_period_inputs",
+            "formula_cross_period_inputs", "missing_period_alignment",
+            "metric_period_drift",
         })
         multi = next(item for item in report["items"] if item["id"] == "period_multi_rag_baseline")
         self.assertTrue(multi["actual_passed"])
