@@ -2,6 +2,8 @@
 
 Candidate: `0.1.0rc2`
 Recommended tag: `v0.1.0-rc.2` (not created in this closure)
+Package bump commit: `e8d148a895b9f2181c01a80dcb56b37178af4893`
+Tag target: tip of `master` after CI green for this closure
 FinRun schema: `1.0`
 Scoring versions: `1` (default), `2` (opt-in visible output integrity)
 Python: `3.11`, `3.12`
