@@ -12,7 +12,7 @@
     {"name": "risk_disclosure", "score": 100.0, "passed": true, "findings": []},
     {"name": "compliance_language", "score": 100.0, "passed": true, "findings": []}
   ],
-  "tool_version": "0.1.0rc1",
+  "tool_version": "0.1.0rc2",
   "case_id": "due_diligence_001",
   "profile": "ci",
   "adapter": "generic"
