@@ -4,8 +4,8 @@ Current schema version: **1.0**.
 
 | Producer | FinRun schema | Supported |
 |----------|---------------|:---------:|
-| LumenFin `0.1.0rc1` | `1.0` | YES |
-| FinAgentBench reference runtime `0.1.0rc1` | `1.0` | YES |
+| LumenFin `0.1.0rc2` (`v0.1.0-rc.2`) | `1.0` | YES |
+| FinAgentBench reference runtime `0.1.0rc2` | `1.0` | YES |
 | Legacy unversioned fixtures | `legacy-0` | YES (transition only) |
 | Unknown future schema | other | NO (fail closed) |
 

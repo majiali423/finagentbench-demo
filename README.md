@@ -1,17 +1,13 @@
 # FinAgentBench
 
-**Replay-first reliability evaluation for financial Agents.**
+FinAgentBench is a replay-first reliability evaluation framework.
+It evaluates exported Agent traces independently from Agent runtime.
 
-FinAgentBench evaluates an exported Agent trace instead of judging only the
-final answer. It turns financial calculations, entities, evidence, citations,
-risks and execution steps into deterministic findings that can block CI.
-
-Project status: **Release Candidate / Internal Portfolio Release**
-Package: `0.1.0rc1` | FinRun schema: `1.0`
+Package: `0.1.0rc2` | Recommended tag: `v0.1.0-rc.2` | FinRun schema: `1.0`
 
 ## Why replay the trace?
 
-A fluent report can still:
+A fluent final answer can still:
 
 - omit one company in a comparison;
 - calculate a ratio from the wrong inputs;
@@ -19,61 +15,92 @@ A fluent report can still:
 - hide missing market data;
 - pass an evaluator that had nothing checkable.
 
-FinAgentBench addresses those failure modes with a framework-independent
-artifact and fail-closed metrics.
+Judging only the final answer is not enough for financial Agent reliability.
 
 ## How it works
 
 ```text
-Agent state or FinRun
-        ?
-        ?
- Adapter / schema validation
-        ?
-        ?
- Deterministic metrics ?? optional semantic judge
-        ?
-        ?
- Findings + EvalReport
-        ?
-        ?
- CI pass / fail
+FinRun export
+    → adapter / schema validation
+    → deterministic metrics (+ optional semantic judge)
+    → Findings + EvalReport
+    → CI pass / fail
 ```
 
-## Core features
+Case contracts decide which fields must be checkable. Scores depend on exported
+trace observability. The default release path is deterministic-first; semantic
+judges remain optional.
 
-- Framework-independent `FinRun` contract
-- Deterministic-first entity, numeric, temporal and unit checks
-- Evidence coverage and numeric evidence consistency
-- Entity leakage detection for issuer and comparison cases
-- Fail-closed behavior when required checks have zero inputs
-- Four-mutation evaluator regression suite
-- JSON, Markdown and HTML EvalReports
-- Optional semantic audit profile
-- Portable LumenFin compatibility gate
+## Core metrics
 
-## Minimal FinRun
+Deterministic CI coverage includes:
 
-```json
-{
-  "schema_version": "1.0",
-  "run_id": "demo-001",
-  "query": "Compare Company A and Company B",
-  "entities": [{"name": "Company A"}, {"name": "Company B"}],
-  "steps": [{"name": "retrieval", "status": "ok"}],
-  "metrics": [],
-  "evidence": [],
-  "market_data": [],
-  "final_output": "Research output with disclosed limitations."
-}
+- entity coverage and leakage;
+- numeric correctness;
+- unit/currency and temporal consistency;
+- Case-driven input value plausibility (finite bounds only);
+- evidence coverage and consistency;
+- retrieval / period provenance;
+- visible output integrity (scoring v2 opt-in);
+- required execution steps and report sections;
+- risk disclosure and compliance language.
+
+See [Metrics](docs/METRICS.md) and
+[FinRun compatibility](docs/FINRUN_COMPATIBILITY.md).
+
+## Core mutations
+
+The CI mutation gate must detect these four reliability failures:
+
+1. wrong number
+2. wrong entity
+3. missing citation
+4. missing risk
+
+Report these separately as **Core reliability mutations: 4/4**.
+
+## Extended mutations
+
+Extended provenance/period negative controls are also enforced and reported
+separately (not folded into the core 4/4):
+
+- missing metric period provenance
+- query-period source
+- assumed period alignment
+- missing source record / citation
+- formula cross-period inputs
+- missing period alignment
+- metric-period drift
+
+## LumenFin integration
+
+Clone `lumenfin-agent` next to this repository, or set environment variables:
+
+```bash
+export LUMENFIN_ROOT=/path/to/lumenfin-agent
+export FINAGENTBENCH_DIR=/path/to/finagentbench-demo
+python scripts/validate_cross_repo.py --profile ci
 ```
 
-Cases decide which fields must be checkable. An empty list does not receive a
-free pass when `require_checkable_metrics` is enabled.
+Validated against frozen LumenFin `v0.1.0-rc.2`
+(`d075b6851739be82ec2fb71fea7ad08d92d76511`), FinRun schema `1.0`.
+
+The summary records both repository commits, worktree state, FinRun schema,
+benchmark profile, core mutations, and extended mutations.
+
+Full live RC orchestration (requires configured LumenFin providers):
+
+```bash
+python scripts/run_rc_validation.py --help
+python scripts/run_rc_validation.py --dry-run
+```
+
+Infrastructure failures are non-pass and must not be reported as Agent-quality
+success.
 
 ## Quick start
 
-Requires Python 3.11+.
+Requires Python 3.11+ (CI validates 3.11 and 3.12).
 
 ```bash
 python -m venv .venv
@@ -99,9 +126,6 @@ Exit codes for `evaluate` / `gate` / `benchmark`:
 | `1` | evaluation / gate failed (expected for known-fail fixtures) |
 | non-`0` other | CLI / IO / argument error |
 
-When a Quick Start example intentionally evaluates a failing fixture, exit code
-`1` is success for the demo narrative, not a broken install.
-
 Key-free release demo:
 
 ```bash
@@ -117,84 +141,43 @@ python scripts/run_correctness_validation.py
 
 Supported validation commands: [docs/VALIDATION_COMMANDS.md](docs/VALIDATION_COMMANDS.md).
 
-## LumenFin integration
+## Validated results (local RC2 closure)
 
-Clone `lumenfin-agent` and `finagentbench-demo` as sibling directories, or set
-`LUMENFIN_ROOT` / `FINAGENTBENCH_DIR`.
+| Gate | Result |
+|------|--------|
+| Unit tests | 127 PASS |
+| Offline demo | PASS |
+| Correctness validation | PASS |
+| Core reliability mutations | 4/4 |
+| Extended provenance/period mutations | 7/7 |
+| Total negative controls | 11/11 |
+| LumenFin `v0.1.0-rc.2` cross-repo | PASS |
 
-```bash
-python scripts/validate_cross_repo.py --profile ci
-```
-
-The summary records both repository commits, worktree state, FinRun schema,
-benchmark profile and mutation results.
-
-Full live RC orchestration:
-
-```bash
-python scripts/run_rc_validation.py --help
-python scripts/run_rc_validation.py --dry-run
-python scripts/run_rc_validation.py
-```
-
-This command requires the configured LumenFin live providers. Infrastructure
-failures are non-pass and must not be reported as Agent-quality success.
-
-## Metrics
-
-The deterministic CI profile covers:
-
-- entity coverage and leakage;
-- numeric correctness;
-- unit/currency and temporal consistency;
-- evidence coverage and consistency;
-- required execution steps and report sections;
-- risk disclosure and compliance language.
-
-See [Metrics](docs/METRICS.md) and
-[FinRun compatibility](docs/FINRUN_COMPATIBILITY.md).
+Evidence:
+[reports/current/FinAgentBench_Final_Release_Report.md](reports/current/FinAgentBench_Final_Release_Report.md).
 
 ## Benchmark integrity
 
 - No metric threshold is changed to match a tested Agent.
 - Required empty checks fail with diagnostic findings.
-- The mutation gate must detect wrong number, wrong entity, missing citation
-  and missing risk.
-- The CI profile removes optional semantic metrics; it does not lower case
-  thresholds.
+- Unsupported FinRun schema versions and unsupported scoring versions are rejected.
 - Case hashes and enabled metrics are recorded in EvalReports.
-
-## Repository structure
-
-```text
-finagentbench/       evaluator, adapters, metrics and report model
-benchmarks/          deterministic suites, mutations and semantic gold data
-fixtures/            small synthetic FinRuns and case contracts
-tests/               unit and cross-project regression tests
-scripts/             supported release and validation entrypoints
-docs/                schema, metrics, integration and CI guides
-reports/current/     current release evidence
-reports/history/     superseded engineering evidence
-tools/archived_audits/ unsupported historical audit scripts
-examples/            sanitized demo artifacts
-```
+- Passing does not prove investment quality; human review remains required.
 
 ## Limitations
 
-- This is a reliability framework, not an academic leaderboard.
-- Scores depend on the case contract and exported trace quality.
-- Optional semantic judges introduce provider and prompt variability.
-- Passing a benchmark does not prove investment performance or universal
-  factual correctness.
-- Human financial review remains required.
+FinAgentBench is **not**:
 
-## Documentation
+- an academic leaderboard;
+- a universal factual-correctness proof;
+- an investment-performance evaluator;
+- a production certification.
 
-Start with [docs/README.md](docs/README.md). The current release evidence is in
-[reports/current/FinAgentBench_Final_Release_Report.md](reports/current/FinAgentBench_Final_Release_Report.md).
+It is a replay-first reliability framework. Case contracts decide evaluation
+requirements; optional semantic judges introduce provider variability; human
+financial review remains required.
 
 ## License status
 
-No public license grant has been selected. The current repository is intended
-for private/internal portfolio review unless the owner explicitly adds a
-license.
+No public license grant has been selected. The repository is intended for
+private/internal portfolio review unless the owner explicitly adds a license.

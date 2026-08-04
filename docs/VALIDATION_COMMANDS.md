@@ -8,7 +8,7 @@ Supported release entrypoints only. Historical scripts under
 | Command family | `0` | `1` | Other non-zero |
 |----------------|-----|-----|----------------|
 | `python -m finagentbench evaluate/gate/benchmark` | pass | gate/eval failure | CLI/IO error |
-| `scripts/run_mutation_suite.py` | 4/4 mutations detected | mutation miss / suite fail | runtime error |
+| `scripts/run_mutation_suite.py` | core 4/4 and extended 7/7 detected | mutation miss / suite fail | runtime error |
 | `scripts/validate_cross_repo.py` | compatibility pass | gate fail | setup/runtime error |
 | `scripts/run_rc_validation.py --dry-run` | paths/schema OK | schema/path fail | missing optional fixtures (`3`) |
 | `scripts/run_rc_validation.py` (live) | RC pack pass | Agent/gate fail | provider/infra non-pass |
@@ -30,13 +30,29 @@ python scripts/run_offline_demo.py
 python -m unittest tests.test_rc_runner_import -v
 ```
 
+Expected mutation reporting:
+
+```text
+Core reliability mutations: 4/4
+Extended provenance/period mutations: 7/7
+Total negative controls: 11/11
+```
+
+Do not collapse extended provenance controls into the core 4/4 figure.
+
 ## 3. Cross-repository gate
 
-Requires sibling `lumenfin-agent` or `LUMENFIN_ROOT`.
+Requires sibling `lumenfin-agent` or `LUMENFIN_ROOT`. Uses a side-effect-free
+loader for `export_finrun_state()` so ordinary package-import app/DB side
+effects are not required.
 
 ```bash
+export LUMENFIN_ROOT=/path/to/lumenfin-agent
+export FINAGENTBENCH_DIR=/path/to/finagentbench-demo
 python scripts/validate_cross_repo.py --profile ci
 ```
+
+Validated producer pin for this RC: LumenFin `v0.1.0-rc.2`, FinRun schema `1.0`.
 
 ## 4. Live RC
 
@@ -57,5 +73,6 @@ failures are non-pass and must not be narrated as Agent-quality success.
 python scripts/run_mutation_suite.py
 ```
 
-Expected: 4/4 detections (wrong number, wrong entity, missing citation,
-missing risk). Thresholds are not lowered to match an Agent.
+Core: wrong number, wrong entity, missing citation, missing risk.
+Extended: period/provenance negative controls listed in
+`benchmarks/mutations/suite.json`. Thresholds are not lowered to match an Agent.

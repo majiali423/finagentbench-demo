@@ -1,18 +1,29 @@
 # CI Gate
 
-FinAgentBench `0.1.0rc1` provides a replay-first, offline release gate.
+FinAgentBench `0.1.0rc2` provides a replay-first, offline release gate.
 
 ## Default workflow
 
-The GitHub workflow runs:
+The GitHub workflow runs on `push` and `pull_request` with no secrets and no
+live providers.
+
+Matrix:
+
+| Python | Suite |
+|--------|-------|
+| 3.11 | unit tests + CLI/schema smoke + known-fail block |
+| 3.12 | full unit + benchmark + mutation + static semantic replay + pinned LumenFin cross-repo |
+
+Full suite includes:
 
 1. Unit tests
 2. Deterministic fixture gates
 3. Due-diligence and LumenFin regression suites
-4. Four-mutation reliability gate
-5. Static semantic replay suites
+4. Core + extended reliability mutation gate
+5. Static semantic replay suites (no network)
 6. Expected-failure blocking assertion
 7. Reference runtime export/evaluation
+8. Optional pinned cross-repo gate: `majiali423/lumenfin-agent@v0.1.0-rc.2`
 
 Generated `outputs/` reports are uploaded as CI artifacts.
 
@@ -24,11 +35,12 @@ python scripts/validate_cross_repo.py --profile ci
 
 The summary records:
 
-- LumenFin commit
+- LumenFin commit and tag pin
 - FinAgentBench commit
 - FinRun schema version
 - benchmark profile
-- mutation detection rate/results
+- core mutation result
+- extended mutation result
 - final pass/fail
 
 The command prints evaluator diagnostics and writes

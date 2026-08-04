@@ -1,5 +1,10 @@
 # FinAgentBench Documentation
 
+FinAgentBench is a replay-first reliability evaluation framework.
+It evaluates exported Agent traces independently from Agent runtime.
+
+Current package: `0.1.0rc2` | FinRun schema: `1.0`
+
 ## Start here
 
 - [Architecture](architecture.md)
