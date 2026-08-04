@@ -7,13 +7,21 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - python-version: "3.11"
+            suite: smoke
+          - python-version: "3.12"
+            suite: full
 
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: ${{ matrix.python-version }}
 
       - name: Install package
         run: python -m pip install -e .
@@ -21,37 +29,63 @@ jobs:
       - name: Run unit tests
         run: python -m unittest discover -s tests -v
 
+      - name: Run CLI/schema smoke gates
+        if: matrix.suite == 'smoke'
+        run: |
+          python -m finagentbench gate fixtures/pass_finrun.json --case fixtures/case_compare_rd.json --profile ci --out outputs/ci-rd-gate
+          python -m finagentbench gate fixtures/pass_due_diligence_finrun.json --case fixtures/case_due_diligence.json --profile ci --out outputs/ci-dd-gate
+          python -m finagentbench gate fixtures/lumenfin_state_sample.json --adapter lumenfin --case fixtures/case_lumenfin_diligence.json --profile ci --out outputs/ci-lumenfin-gate
+          set +e
+          python -m finagentbench evaluate fixtures/fail_due_diligence_finrun.json --case fixtures/case_due_diligence.json --profile ci --out outputs/ci-dd-fail
+          status=$?
+          set -e
+          if [ "$status" -eq 0 ]; then
+            echo "Expected fail_due_diligence_finrun.json to fail, but it passed."
+            exit 1
+          fi
+
       - name: Run R&D benchmark gate
+        if: matrix.suite == 'full'
         run: python -m finagentbench gate fixtures/pass_finrun.json --case fixtures/case_compare_rd.json --profile ci --out outputs/ci-rd-gate
 
       - name: Run big tech FCF benchmark gate
+        if: matrix.suite == 'full'
         run: python -m finagentbench gate fixtures/pass_bigtech_finrun.json --case fixtures/case_bigtech_fcf.json --profile ci --out outputs/ci-bigtech-gate
 
       - name: Run due diligence benchmark gate
+        if: matrix.suite == 'full'
         run: python -m finagentbench gate fixtures/pass_due_diligence_finrun.json --case fixtures/case_due_diligence.json --profile ci --out outputs/ci-dd-gate
 
       - name: Run curated due diligence benchmark suite
+        if: matrix.suite == 'full'
         run: python -m finagentbench benchmark benchmarks/due_diligence/suite.json --out outputs/dd-suite-report.json
 
       - name: Run LumenFin regression suite
+        if: matrix.suite == 'full'
         run: python -m finagentbench benchmark benchmarks/lumenfin_regression/suite.json --out outputs/lumenfin-regression-report.json
 
-      - name: Run four-mutation reliability gate
+      - name: Run reliability mutation gate
+        if: matrix.suite == 'full'
         run: python scripts/run_mutation_suite.py --out outputs/mutation_detection_report.json
 
-      - name: Run LumenFin real-trace gate
+      - name: Run LumenFin sample adapter gate
+        if: matrix.suite == 'full'
         run: python -m finagentbench gate fixtures/lumenfin_state_sample.json --adapter lumenfin --case fixtures/case_lumenfin_diligence.json --profile ci --out outputs/ci-lumenfin-gate
 
       - name: Run semantic static replay suite
+        if: matrix.suite == 'full'
         run: python -m finagentbench semantic-benchmark benchmarks/semantic_audit/evidence_support_golden.json --out outputs/evidence-support-golden.json
 
       - name: Run risk quality semantic replay suite
+        if: matrix.suite == 'full'
         run: python -m finagentbench semantic-benchmark benchmarks/semantic_audit/risk_quality_golden.json --out outputs/risk-quality-golden.json
 
       - name: Run compliance semantic replay suite
+        if: matrix.suite == 'full'
         run: python -m finagentbench semantic-benchmark benchmarks/semantic_audit/compliance_semantic_golden.json --out outputs/compliance-semantic-golden.json
 
       - name: Assert failing due diligence run is blocked
+        if: matrix.suite == 'full'
         run: |
           set +e
           python -m finagentbench evaluate fixtures/fail_due_diligence_finrun.json --case fixtures/case_due_diligence.json --profile ci --out outputs/ci-dd-fail
@@ -63,14 +97,24 @@ jobs:
           fi
 
       - name: Run reference runtime and evaluate exported trace
+        if: matrix.suite == 'full'
         run: |
           python -m finagentbench run-reference --out outputs/reference-agent-run.json
           python -m finagentbench evaluate outputs/reference-agent-run.json --case fixtures/case_bigtech_fcf.json --out outputs/reference-agent-eval
+
+      - name: Optional pinned LumenFin cross-repo gate
+        if: matrix.suite == 'full'
+        continue-on-error: false
+        run: |
+          git clone --depth 1 --branch v0.1.0-rc.2 https://github.com/majiali423/lumenfin-agent.git "$RUNNER_TEMP/lumenfin-agent"
+          export LUMENFIN_ROOT="$RUNNER_TEMP/lumenfin-agent"
+          export FINAGENTBENCH_DIR="$GITHUB_WORKSPACE"
+          python scripts/validate_cross_repo.py --profile ci --out-dir outputs/cross_repo_validation
 
       - name: Upload benchmark reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: finagentbench-reports
+          name: finagentbench-reports-py${{ matrix.python-version }}
           path: outputs/
           if-no-files-found: error
