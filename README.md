@@ -3,7 +3,14 @@
 FinAgentBench is a replay-first reliability evaluation framework.
 It evaluates exported Agent traces independently from Agent runtime.
 
-Package: `0.1.0rc2` | Recommended tag: `v0.1.0-rc.2` | FinRun schema: `1.0`
+[![test](https://github.com/majiali423/finagentbench-demo/actions/workflows/test.yml/badge.svg)](https://github.com/majiali423/finagentbench-demo/actions/workflows/test.yml)
+
+Release `v0.1.0-rc.2` (pre-release) | Package `0.1.0rc2` | FinRun schema `1.0`
+
+[Docs index](docs/README.md) · [Metrics](docs/METRICS.md) ·
+[FinRun schema](docs/finrun_schema.md) ·
+[Validation commands](docs/VALIDATION_COMMANDS.md) ·
+[Release report](reports/current/FinAgentBench_Final_Release_Report.md)
 
 ## Why replay the trace?
 
@@ -31,9 +38,77 @@ Case contracts decide which fields must be checkable. Scores depend on exported
 trace observability. The default release path is deterministic-first; semantic
 judges remain optional.
 
-## Core metrics
+## Minimal FinRun
 
-Deterministic CI coverage includes:
+Any framework can produce this artifact; adapters exist for LumenFin and
+generic Agent state exports.
+
+```json
+{
+  "schema_version": "1.0",
+  "run_id": "demo-001",
+  "query": "Compare Company A and Company B",
+  "entities": [{"name": "Company A"}, {"name": "Company B"}],
+  "steps": [{"name": "retrieval", "status": "ok"}],
+  "metrics": [],
+  "evidence": [],
+  "market_data": [],
+  "final_output": "Research output with disclosed limitations."
+}
+```
+
+Cases decide which fields must be checkable. An empty list does not receive a
+free pass when `require_checkable_metrics` is enabled.
+
+Field reference: [docs/finrun_schema.md](docs/finrun_schema.md) and
+[docs/FINRUN_COMPATIBILITY.md](docs/FINRUN_COMPATIBILITY.md).
+
+## What a finding looks like
+
+Abridged from evaluating the bundled known-fail fixture
+(`fixtures/fail_due_diligence_finrun.json`, exit code `1`):
+
+```json
+{
+  "run_id": "fail-dd-targetco",
+  "score": 0.0,
+  "passed": false,
+  "metrics": [
+    {
+      "name": "numeric_correctness",
+      "score": 0.0,
+      "passed": false,
+      "findings": [
+        {
+          "metric": "numeric_correctness",
+          "severity": "high",
+          "message": "TargetCo debt_to_assets mismatch: expected 0.4, got 0.5",
+          "recommendation": "Recompute financial ratios with deterministic tools instead of relying on model text."
+        }
+      ]
+    },
+    {
+      "name": "evidence_consistency",
+      "score": 50.0,
+      "passed": false,
+      "findings": [
+        {
+          "metric": "evidence_consistency",
+          "severity": "high",
+          "message": "TargetCo debt_to_assets input total_liabilities=120.0 is not supported by numeric evidence.",
+          "recommendation": "Check that cited evidence text contains the same financial input values used by the calculation."
+        }
+      ]
+    }
+  ]
+}
+```
+
+Each run also emits Markdown and HTML reports alongside the JSON.
+
+## Metrics
+
+Default deterministic CI coverage:
 
 - entity coverage and leakage;
 - numeric correctness;
@@ -41,9 +116,15 @@ Deterministic CI coverage includes:
 - Case-driven input value plausibility (finite bounds only);
 - evidence coverage and consistency;
 - retrieval / period provenance;
-- visible output integrity (scoring v2 opt-in);
 - required execution steps and report sections;
 - risk disclosure and compliance language.
+
+Opt-in metrics:
+
+- visible output integrity (requires `"scoring_version": "2"`; blocks on high
+  severity while carrying zero weight);
+- semantic judges (evidence support, risk quality, compliance) — audit profile
+  only, never part of deterministic release evidence.
 
 See [Metrics](docs/METRICS.md) and
 [FinRun compatibility](docs/FINRUN_COMPATIBILITY.md).
@@ -57,12 +138,12 @@ The CI mutation gate must detect these four reliability failures:
 3. missing citation
 4. missing risk
 
-Report these separately as **Core reliability mutations: 4/4**.
+The suite reports them as **Core reliability mutations: 4/4**.
 
 ## Extended mutations
 
-Extended provenance/period negative controls are also enforced and reported
-separately (not folded into the core 4/4):
+Extended provenance/period negative controls are enforced and counted
+separately from the core four:
 
 - missing metric period provenance
 - query-period source
@@ -71,6 +152,8 @@ separately (not folded into the core 4/4):
 - formula cross-period inputs
 - missing period alignment
 - metric-period drift
+
+Details: [docs/MUTATION_TESTING.md](docs/MUTATION_TESTING.md).
 
 ## LumenFin integration
 
@@ -88,22 +171,26 @@ Validated against frozen LumenFin `v0.1.0-rc.2`
 The summary records both repository commits, worktree state, FinRun schema,
 benchmark profile, core mutations, and extended mutations.
 
-Full live RC orchestration (requires configured LumenFin providers):
+Release-candidate orchestration across both repositories:
 
 ```bash
 python scripts/run_rc_validation.py --help
-python scripts/run_rc_validation.py --dry-run
+python scripts/run_rc_validation.py --dry-run      # paths, fixtures, schema only
+python scripts/run_rc_validation.py --offline-only # deterministic gates, no live Agent calls
 ```
 
+Running it without `--offline-only` requires configured LumenFin providers.
 Infrastructure failures are non-pass and must not be reported as Agent-quality
 success.
 
 ## Quick start
 
-Requires Python 3.11+ (CI validates 3.11 and 3.12).
+Requires Python 3.11+ (CI validates 3.11 and 3.12). Every command in this
+section is deterministic and offline: no API key and no network access.
 
 ```bash
 python -m venv .venv
+source .venv/bin/activate        # Windows: .\.venv\Scripts\Activate.ps1
 python -m pip install -e .
 python -m unittest discover -s tests -v
 ```
@@ -124,7 +211,7 @@ Exit codes for `evaluate` / `gate` / `benchmark`:
 |------|---------|
 | `0` | evaluation / gate passed |
 | `1` | evaluation / gate failed (expected for known-fail fixtures) |
-| non-`0` other | CLI / IO / argument error |
+| other non-zero | CLI / IO / argument error |
 
 Key-free release demo:
 
@@ -141,7 +228,7 @@ python scripts/run_correctness_validation.py
 
 Supported validation commands: [docs/VALIDATION_COMMANDS.md](docs/VALIDATION_COMMANDS.md).
 
-## Validated results (local RC2 closure)
+## Validated results (`v0.1.0-rc.2`)
 
 | Gate | Result |
 |------|--------|
@@ -152,6 +239,10 @@ Supported validation commands: [docs/VALIDATION_COMMANDS.md](docs/VALIDATION_COM
 | Extended provenance/period mutations | 7/7 |
 | Total negative controls | 11/11 |
 | LumenFin `v0.1.0-rc.2` cross-repo | PASS |
+
+Every gate above is reproducible offline and also runs in GitHub Actions
+(Python 3.11 smoke lane, Python 3.12 full lane including the mutation suite and
+a cross-repo check pinned to the public LumenFin tag).
 
 Evidence:
 [reports/current/FinAgentBench_Final_Release_Report.md](reports/current/FinAgentBench_Final_Release_Report.md).
@@ -173,11 +264,51 @@ FinAgentBench is **not**:
 - an investment-performance evaluator;
 - a production certification.
 
-It is a replay-first reliability framework. Case contracts decide evaluation
-requirements; optional semantic judges introduce provider variability; human
-financial review remains required.
+Scope boundaries:
+
+- Case contracts decide evaluation requirements, so scores are only as strong as
+  the case and the exported trace.
+- Claim–Evidence binding is **not** a dedicated independent metric in this
+  release; citation checks are covered indirectly by evidence and provenance
+  metrics.
+- Optional semantic judges introduce provider variability and are excluded from
+  release evidence.
+- Human financial review remains required.
+
+## Repository layout
+
+```text
+finagentbench/    evaluator, adapters, metrics and report model
+benchmarks/       deterministic suites, mutations and semantic gold data
+fixtures/         synthetic FinRuns and case contracts
+tests/            unit and cross-project regression tests
+scripts/          supported release and validation entrypoints
+docs/             schema, metrics, integration and CI guides
+reports/current/  current release evidence
+reports/history/  superseded engineering evidence
+examples/         sanitized demo artifacts
+tools/            archived, unsupported audit scripts
+```
+
+## Documentation map
+
+| Doc | Purpose |
+|-----|---------|
+| [docs/README.md](docs/README.md) | Doc index |
+| [docs/architecture.md](docs/architecture.md) | Evaluator architecture |
+| [docs/finrun_schema.md](docs/finrun_schema.md) | FinRun field reference |
+| [docs/FINRUN_COMPATIBILITY.md](docs/FINRUN_COMPATIBILITY.md) | Producer/schema support matrix |
+| [docs/METRICS.md](docs/METRICS.md) | Metric definitions and thresholds policy |
+| [docs/MUTATION_TESTING.md](docs/MUTATION_TESTING.md) | Core and extended negative controls |
+| [docs/CI_GATE.md](docs/CI_GATE.md) | CI lanes and failure interpretation |
+| [docs/agent_integration_guide.md](docs/agent_integration_guide.md) | Integrating a new Agent |
+| [docs/adapter_guide.md](docs/adapter_guide.md) | Writing an adapter |
+| [docs/VALIDATION_COMMANDS.md](docs/VALIDATION_COMMANDS.md) | Supported commands and exit codes |
+| [CHANGELOG.md](CHANGELOG.md) | Version history |
 
 ## License status
 
-No public license grant has been selected. The repository is intended for
-private/internal portfolio review unless the owner explicitly adds a license.
+No open-source license has been selected: the repository is source-available for
+review and evaluation, and no redistribution or production-use rights are
+granted. Evaluation output is for engineering assessment only and is not
+investment advice.
