@@ -1,5 +1,7 @@
 # FinAgentBench
 
+**English** | [中文](README.zh-CN.md)
+
 FinAgentBench is a replay-first reliability evaluation framework.
 It evaluates exported Agent traces independently from Agent runtime.
 
