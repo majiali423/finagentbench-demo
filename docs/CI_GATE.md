@@ -1,6 +1,6 @@
 # CI Gate
 
-FinAgentBench `0.1.0rc2` provides a replay-first, offline release gate.
+FinAgentBench `0.1.0rc3` provides a replay-first, offline release gate.
 
 ## Default workflow
 

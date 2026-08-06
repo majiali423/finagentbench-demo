@@ -7,7 +7,7 @@ FinAgentBench 是一个 **replay-first（先回放）** 的可靠性评测框架
 
 [![test](https://github.com/majiali423/finagentbench-demo/actions/workflows/test.yml/badge.svg)](https://github.com/majiali423/finagentbench-demo/actions/workflows/test.yml)
 
-Release `v0.1.0-rc.2`（pre-release）| Package `0.1.0rc2` | FinRun schema `1.0`
+Release `v0.1.0-rc.3`（pre-release）| Package `0.1.0rc3` | FinRun schema `1.0`
 
 [文档索引](docs/README.md) · [指标说明](docs/METRICS.md) ·
 [FinRun schema](docs/finrun_schema.md) ·
@@ -226,17 +226,19 @@ python scripts/run_correctness_validation.py
 
 支持的验证命令见 [docs/VALIDATION_COMMANDS.md](docs/VALIDATION_COMMANDS.md)。
 
-## 已验证结果（`v0.1.0-rc.2`）
+## 已验证结果（`v0.1.0-rc.3`）
 
 | Gate | Result |
 |------|--------|
-| Unit tests | 127 PASS |
+| Unit tests | 149 PASS |
 | Offline demo | PASS |
 | Correctness validation | PASS |
 | Core reliability mutations | 4/4 |
 | Extended provenance/period mutations | 7/7 |
 | Total negative controls | 11/11 |
-| LumenFin `v0.1.0-rc.2` cross-repo | PASS |
+| Nested FinRun / Case validation hardening | PASS |
+| Metamorphic anti-gaming invariants | PASS |
+| LumenFin `v0.1.0-rc.2` cross-repo producer pin | PASS |
 
 以上门禁均可离线复现，并在 GitHub Actions 中运行（Python 3.11 smoke lane、
 Python 3.12 full lane，含 mutation suite 以及 pin 到公开 LumenFin tag 的跨仓检查）。

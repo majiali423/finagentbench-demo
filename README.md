@@ -7,7 +7,7 @@ It evaluates exported Agent traces independently from Agent runtime.
 
 [![test](https://github.com/majiali423/finagentbench-demo/actions/workflows/test.yml/badge.svg)](https://github.com/majiali423/finagentbench-demo/actions/workflows/test.yml)
 
-Release `v0.1.0-rc.2` (pre-release) | Package `0.1.0rc2` | FinRun schema `1.0`
+Release `v0.1.0-rc.3` (pre-release) | Package `0.1.0rc3` | FinRun schema `1.0`
 
 [Docs index](docs/README.md) · [Metrics](docs/METRICS.md) ·
 [FinRun schema](docs/finrun_schema.md) ·
@@ -230,17 +230,19 @@ python scripts/run_correctness_validation.py
 
 Supported validation commands: [docs/VALIDATION_COMMANDS.md](docs/VALIDATION_COMMANDS.md).
 
-## Validated results (`v0.1.0-rc.2`)
+## Validated results (`v0.1.0-rc.3`)
 
 | Gate | Result |
 |------|--------|
-| Unit tests | 127 PASS |
+| Unit tests | 149 PASS |
 | Offline demo | PASS |
 | Correctness validation | PASS |
 | Core reliability mutations | 4/4 |
 | Extended provenance/period mutations | 7/7 |
 | Total negative controls | 11/11 |
-| LumenFin `v0.1.0-rc.2` cross-repo | PASS |
+| Nested FinRun / Case validation hardening | PASS |
+| Metamorphic anti-gaming invariants | PASS |
+| LumenFin `v0.1.0-rc.2` cross-repo producer pin | PASS |
 
 Every gate above is reproducible offline and also runs in GitHub Actions
 (Python 3.11 smoke lane, Python 3.12 full lane including the mutation suite and

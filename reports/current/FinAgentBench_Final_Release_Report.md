@@ -1,13 +1,12 @@
 # FinAgentBench Final Release Report
 
-Candidate: `0.1.0rc2`
-Recommended tag: `v0.1.0-rc.2` (not created in this closure)
-Package bump commit: `e8d148a895b9f2181c01a80dcb56b37178af4893`
+Candidate: `0.1.0rc3`
+Recommended tag: `v0.1.0-rc.3`
 Tag target: tip of `master` after CI green for this closure
 FinRun schema: `1.0`
 Scoring versions: `1` (default), `2` (opt-in visible output integrity)
 Python: `3.11`, `3.12`
-Assessment date: 2026-08-05
+Assessment date: 2026-08-06
 
 ## Positioning
 
@@ -29,14 +28,22 @@ Requires Python `>=3.11`.
 
 ```text
 FinRun export
-  → adapter / schema validation
+  → adapter / nested schema validation
   → deterministic metrics (+ optional semantic judge)
-  → Findings + EvalReport
+  → Findings + EvalReport (case_mode / derived_expectations)
   → CI pass / fail
 ```
 
 Case contracts decide checkable requirements. Scores depend on trace
 observability. Deterministic-first; semantic judges optional.
+
+## Highlights in `0.1.0rc3`
+
+- Nested FinRun validation before metric execution
+- Explicit Case numeric hardening (NaN/Inf/bool/negative weights/penalties)
+- `case_mode: quality | compatibility` and derived-expectation boundary
+- Score fail-closed for non-finite / out-of-range metric results
+- Metamorphic anti-gaming invariants
 
 ## Metrics registry
 
@@ -60,19 +67,18 @@ Claim–Evidence binding is **not** a registered independent metric in this RC.
 
 | Gate | Result |
 |------|--------|
-| Unit tests | 127 PASS |
+| Unit tests | 149 PASS |
 | Offline demo | PASS |
 | Correctness validation | PASS |
 | Core reliability mutations | 4/4 |
 | Extended provenance/period mutations | 7/7 |
 | Total negative controls | 11/11 |
+| Nested FinRun / Case validation hardening | PASS |
+| Metamorphic anti-gaming invariants | PASS |
 | Known-fail fixture blocked | PASS |
 | Unsupported FinRun schema rejected | PASS |
 | Unsupported scoring version rejected | PASS |
-| Visible-output valid corpus | no high-severity false positives |
-| Invalid output corpus | detected |
-| Case-driven bounds reject NaN/Infinity | PASS |
-| LumenFin `v0.1.0-rc.2` cross-repo | PASS |
+| LumenFin `v0.1.0-rc.2` producer pin (CI) | PASS |
 | Secrets / API keys required | none for offline gates |
 
 ### Core reliability mutations
@@ -100,13 +106,11 @@ Claim–Evidence binding is **not** a registered independent metric in this RC.
 
 | Field | Value |
 |-------|-------|
-| LumenFin tag | `v0.1.0-rc.2` |
-| LumenFin commit | `d075b6851739be82ec2fb71fea7ad08d92d76511` |
+| Producer pin in FAB CI | LumenFin `v0.1.0-rc.2` |
 | FinRun schema | `1.0` |
 | Profile | `ci` |
-| Adapter dependency on `revenue_2025` | no (canonical + period-suffixed accepted) |
-| Claims field in export | present; does not break schema/runner |
-| LumenFin files modified | none |
+| Claims field in export | present; nested claim validation when present |
+| LumenFin files modified | none in this RC |
 
 Local command (set sibling checkout paths via environment variables):
 
@@ -116,24 +120,24 @@ export FINAGENTBENCH_DIR=/path/to/finagentbench-demo
 python scripts/validate_cross_repo.py --profile ci
 ```
 
-CI pins the public tag `majiali423/lumenfin-agent@v0.1.0-rc.2` and does not
-read sibling workstation paths.
+CI pins the public tag `majiali423/lumenfin-agent@v0.1.0-rc.2` as the
+producer under test and does not read sibling workstation paths.
 
 ## Case / scoring governance
 
 - Existing release cases keep `min_score` at prior values (no threshold lowering).
-- Diligence case added `require_factual_period_provenance: true` (stricter).
-- Scoring v2 is opt-in for visible output integrity cases.
+- `derive_entities_from_run` is limited to compatibility/smoke Cases.
+- Scoring v2 remains opt-in for visible output integrity cases.
 - Metric weights were not retuned to improve LumenFin scores.
 
-## Threshold-change audit (since `v0.1.0-rc.1`)
+## Threshold-change audit (since `v0.1.0-rc.2`)
 
 | Change | Direction |
 |--------|-----------|
 | `min_score` on existing release cases | unchanged |
-| `require_factual_period_provenance` | added / stricter |
-| New output-integrity cases | new opt-in scoring v2 contracts |
-| Plausibility bounds | case-owned; finite-only validation |
+| Nested FinRun / Case validation | stricter |
+| Derived-entity Case contract | stricter (`case_mode` required for derive) |
+| Aggregate score NaN / out-of-range path | fail-closed |
 
 ## CI
 
@@ -166,12 +170,11 @@ Workflow: `.github/workflows/test.yml`
 Do **not** create the tag until human review of this closure commit and CI green.
 
 ```powershell
-git tag -a v0.1.0-rc.2 -m "FinAgentBench replay-first reliability release candidate v0.1.0-rc.2"
-git push origin v0.1.0-rc.2
+git tag -a v0.1.0-rc.3 -m "FinAgentBench replay-first reliability release candidate v0.1.0-rc.3"
+git push origin v0.1.0-rc.3
 ```
 
 ## Historical note
 
-`0.1.0rc1` evidence (including older unit-test counts such as 75 PASS and the
-pre-push license blocker narrative) lives under `reports/history/` and earlier
-commits. This file describes the current `0.1.0rc2` candidate only.
+Earlier release-candidate closures remain in git history and prior report
+commits. This file describes the current `0.1.0rc3` candidate only.

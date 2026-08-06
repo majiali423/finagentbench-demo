@@ -1,5 +1,50 @@
 # Changelog
 
+## 0.1.0rc3 — 2026-08-06
+
+Hardens FinRun / Case validation and scoring fail-closed behavior before
+release consumers (including LumenFin) pin this candidate.
+
+### Added
+
+- Nested FinRun validation for entities, steps, metrics, formula inputs,
+  evidence, market data, and claims before metric execution
+- Explicit rejection of Python `bool` values used as numbers
+- `case_mode: quality | compatibility` with derived-entity boundary
+- EvalReport / Markdown / HTML provenance fields for `case_mode` and
+  `derived_expectations`
+- Metamorphic anti-gaming tests (ordering, evidence removal, numeric error
+  monotonicity, forbidden entities, citation/risk spam, number stuffing)
+- Score-invariant fail-closed path for non-finite or out-of-range metric scores
+
+### Changed
+
+- `derive_entities_from_run=true` requires `case_mode=compatibility` (or
+  `allow_derived_expectations=true`)
+- `compare_runs()` freezes baseline-derived expectations so entity regressions
+  cannot be masked
+- Generic LumenFin fixture marked as compatibility smoke, not quality proof
+
+### Compatibility
+
+- FinRun schema remains `1.0`
+- Existing legal fixtures and release Cases remain valid
+- Invalid Cases / malformed FinRuns now fail earlier with field-path
+  `ValidationError` (intentional contract tightening)
+
+### Security / release
+
+- No secrets required for offline gates
+- No thresholds or metric weights were lowered for Agent score matching
+- Recommended tag: `v0.1.0-rc.3`
+
+### Known limitations
+
+- Semantic live judge remains optional and non-deterministic
+- Claim–Evidence binding is not a registered independent metric in this RC
+- Evidence consistency still primarily matches entity + numeric support text;
+  richer period/unit binding remains future work
+
 ## 0.1.0rc2 — 2026-08-05
 
 Replay-first reliability release candidate aligned with LumenFin `v0.1.0-rc.2`.
