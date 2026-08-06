@@ -27,7 +27,12 @@ class GenericCaseTestCase(unittest.TestCase):
             "evidence": [],
             "market_data": [],
         }
-        case = {"expected_entities": [], "required_steps": [], "derive_entities_from_run": True}
+        case = {
+            "expected_entities": [],
+            "required_steps": [],
+            "case_mode": "compatibility",
+            "derive_entities_from_run": True,
+        }
         resolved = resolve_case_for_run(run, case)
         self.assertEqual(resolved["expected_entities"], ["NVIDIA", "AMD"])
 
