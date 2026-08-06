@@ -167,6 +167,8 @@ class FailClosedAndProvenanceTestCase(unittest.TestCase):
         self.assertEqual(report.enabled_metrics, ["entity_coverage"])
         self.assertEqual(report.case_hash, case_hash(case))
         self.assertTrue(report.tool_version)
+        self.assertEqual(report.case_mode, "quality")
+        self.assertFalse(report.derived_expectations)
 
 
 def _empty_run() -> dict:

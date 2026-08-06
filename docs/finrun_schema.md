@@ -22,6 +22,11 @@ this shape before scoring.
 | --- | --- | --- |
 | `query` | string | User request that triggered the run. |
 | `metadata` | object | Agent version, prompt version, model, dataset, or timestamp. |
+| `claims` | array | Optional verified claims. When present, each item must be an object with typed fields. |
+
+Nested validation rejects illegal containers (null entities, string steps, NaN metric
+values, non-object evidence/market_data/claims) before scoring. Metric `inputs` may be
+bare finite numbers (legacy fixtures) or objects with a finite `value` (LumenFin export).
 
 ## Entity Shape
 

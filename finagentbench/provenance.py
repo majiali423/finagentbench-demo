@@ -41,4 +41,8 @@ def attach_provenance(
         adapter=adapter,
         enabled_metrics=enabled,
         scoring_version=report.scoring_version,
+        case_mode=report.case_mode or str(case.get("case_mode") or "quality"),
+        derived_expectations=bool(
+            report.derived_expectations or case.get("derive_entities_from_run")
+        ),
     )

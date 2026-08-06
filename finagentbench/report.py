@@ -62,10 +62,24 @@ def _render_markdown(report: EvalReport) -> str:
         f"- Profile: `{report.profile or 'n/a'}`",
         f"- Adapter: `{report.adapter or 'n/a'}`",
         f"- Scoring version: `{report.scoring_version}`",
+        f"- Case mode: `{report.case_mode}`",
+        f"- Derived expectations: `{report.derived_expectations}`",
         f"- Enabled metrics: `{', '.join(report.enabled_metrics) if report.enabled_metrics else 'n/a'}`",
         "",
-        "## Metrics",
     ]
+    if report.case_mode == "compatibility" or report.derived_expectations:
+        lines.extend(
+            [
+                "> Compatibility / derived-expectation PASS is a schema/smoke gate, "
+                "not proof of entity correctness.",
+                "",
+            ]
+        )
+    lines.extend(
+        [
+            "## Metrics",
+        ]
+    )
     for metric in report.metrics:
         lines.append(f"### {metric.name}")
         lines.append(f"- Score: `{metric.score}`")
@@ -103,6 +117,14 @@ def _render_html(report: EvalReport) -> str:
         <p><strong>Score:</strong> {report.score}</p>
         <p><strong>Status:</strong> <span class="{status.lower()}">{status}</span></p>
         <p><strong>Scoring version:</strong> {escape(report.scoring_version)}</p>
+        <p><strong>Case mode:</strong> {escape(report.case_mode)}</p>
+        <p><strong>Derived expectations:</strong> {report.derived_expectations}</p>
+        {
+            "<p><em>Compatibility / derived-expectation PASS is a schema/smoke gate, "
+            "not proof of entity correctness.</em></p>"
+            if report.case_mode == "compatibility" or report.derived_expectations
+            else ""
+        }
         <table>
           <thead><tr><th>Metric</th><th>Score</th><th>Passed</th><th>Findings</th></tr></thead>
           <tbody>{''.join(metric_rows)}</tbody>

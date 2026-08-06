@@ -1,6 +1,7 @@
 {
   "id": "lumenfin_generic_001",
   "query": "Generic LumenFin release gate for arbitrary company sets exported from a real run.",
+  "case_mode": "compatibility",
   "derive_entities_from_run": true,
   "expected_entities": [],
   "required_steps": [
