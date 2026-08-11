@@ -1,4 +1,4 @@
-"""Expose package-init side effects that break offline cross-repo validation."""
+"""Verify offline cross-repo imports remain side-effect free."""
 
 from __future__ import annotations
 
@@ -29,8 +29,8 @@ class CrossRepoExporterImportTestCase(unittest.TestCase):
         except RuntimeError as exc:
             raise unittest.SkipTest(str(exc)) from exc
 
-    def test_package_import_triggers_app_side_effects(self) -> None:
-        """Document why validate_cross_repo must not import the LumenFin package root."""
+    def test_package_import_is_side_effect_free(self) -> None:
+        """LumenFin helpers can be imported without starting the API or a database."""
         env = os.environ.copy()
         env.pop("MAS_ALLOW_SQLITE_DEV", None)
         env["APP_ENV"] = "dev"
@@ -49,13 +49,9 @@ class CrossRepoExporterImportTestCase(unittest.TestCase):
             env=env,
             check=False,
         )
-        self.assertNotEqual(
-            proc.returncode,
-            0,
-            "Expected LumenFin package import to fail closed without DB opt-in; "
-            "if this starts passing, revisit the side-effect-free loader assumption.",
-        )
-        self.assertIn("SQLite is disabled", proc.stderr)
+        self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+        self.assertIn("export_finrun_state", proc.stdout)
+        self.assertNotIn("SQLite is disabled", proc.stderr)
 
     def test_validate_cross_repo_runs_without_sqlite_opt_in(self) -> None:
         env = os.environ.copy()
