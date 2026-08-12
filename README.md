@@ -167,8 +167,9 @@ export FINAGENTBENCH_DIR=/path/to/finagentbench-demo
 python scripts/validate_cross_repo.py --profile ci
 ```
 
-Validated against frozen LumenFin `v0.1.0-rc.3`, FinRun schema `1.0`.
-The historical producer pin for FinAgentBench `v0.1.0-rc.3` remains LumenFin
+Current package `0.1.0rc4` / tag `v0.1.0-rc.4` pins the required CI producer to
+published LumenFin `v0.1.0-rc.3` (FinRun schema `1.0`). The earlier
+FinAgentBench `v0.1.0-rc.3` release historically pinned LumenFin
 `v0.1.0-rc.2` (`d075b6851739be82ec2fb71fea7ad08d92d76511`).
 
 The summary records both repository commits, worktree state, FinRun schema,

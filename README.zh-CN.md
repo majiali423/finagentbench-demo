@@ -164,9 +164,10 @@ export FINAGENTBENCH_DIR=/path/to/finagentbench-demo
 python scripts/validate_cross_repo.py --profile ci
 ```
 
-已对冻结的 LumenFin `v0.1.0-rc.3` 验证，FinRun schema `1.0`。
-FinAgentBench `v0.1.0-rc.3` 的历史 producer pin 仍为 LumenFin
-`v0.1.0-rc.2`（`d075b6851739be82ec2fb71fea7ad08d92d76511`）。
+当前包 `0.1.0rc4` / 标签 `v0.1.0-rc.4` 将必跑 CI producer pin 到已发布的
+LumenFin `v0.1.0-rc.3`（FinRun schema `1.0`）。更早的 FinAgentBench
+`v0.1.0-rc.3` 历史上 pin 的是 LumenFin `v0.1.0-rc.2`
+（`d075b6851739be82ec2fb71fea7ad08d92d76511`）。
 
 摘要会记录双方仓库 commit、worktree 状态、FinRun schema、benchmark profile，
 以及 core / extended mutation 结果。
