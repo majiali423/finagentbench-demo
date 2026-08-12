@@ -11,6 +11,7 @@ Release `v0.1.0-rc.4`（pre-release）| Package `0.1.0rc4` | FinRun schema `1.0`
 
 [文档索引](docs/README.md) · [指标说明](docs/METRICS.md) ·
 [FinRun schema](docs/finrun_schema.md) ·
+[作品集入口](docs/PORTFOLIO.md) ·
 [验证命令](docs/VALIDATION_COMMANDS.md) ·
 [发布报告](reports/current/FinAgentBench_Final_Release_Report.md)
 
@@ -25,6 +26,19 @@ Release `v0.1.0-rc.4`（pre-release）| Package `0.1.0rc4` | FinRun schema `1.0`
 - 在“没有任何可检查项”时仍被评测器放行。
 
 只看最终答案，不足以判断金融 Agent 的可靠性。
+
+## 为什么要单独一个评测仓库？
+
+FinAgentBench **刻意**不放在 Agent 仓里：
+
+- **独立门禁** — 分数阈值与 mutation 用例在本仓，生产者不能悄悄调参刷分
+- **回放契约** — Agent 导出 FinRun；本仓评测轨迹，发布路径不依赖 Agent 运行时
+- **可复用适配** — 同一 schema 可评其他会说 FinRun 的 Agent，不只 LumenFin
+- **CI 消费 pin** — Python 3.12 全量 lane 会克隆已发布的 LumenFin `v0.1.0-rc.3`
+  并对该不可变 producer 跑跨仓门禁
+
+LumenFin CI 仍将本评测器 pin 在 FinAgentBench `v0.1.0-rc.3`，而当前包标签为
+`v0.1.0-rc.4`（文档/pin 升级，未改评测阈值）。
 
 ## 工作方式
 
@@ -192,8 +206,18 @@ python scripts/run_rc_validation.py --offline-only # 确定性门禁，不调用
 python -m venv .venv
 source .venv/bin/activate        # Windows: .\.venv\Scripts\Activate.ps1
 python -m pip install -e .
+python scripts/run_offline_demo.py
+```
+
+可选全量单测（建议在离线 demo 之后）：
+
+```bash
 python -m unittest discover -s tests -v
 ```
+
+若同级存在 `../lumenfin-agent`，跨仓测试通过 `scripts/repo_paths.py` 加载
+FinRun 导出，**不要求**本 venv 安装 LumenFin 的 FastAPI 依赖。149 PASS 指本包
+在 CI 下的套件（LumenFin 仅在 pinned 跨仓 job 中克隆）。
 
 评测内置的合成尽调样本：
 

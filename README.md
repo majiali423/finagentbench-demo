@@ -11,6 +11,7 @@ Release `v0.1.0-rc.4` (pre-release) | Package `0.1.0rc4` | FinRun schema `1.0`
 
 [Docs index](docs/README.md) · [Metrics](docs/METRICS.md) ·
 [FinRun schema](docs/finrun_schema.md) ·
+[Portfolio pack](docs/PORTFOLIO.md) ·
 [Validation commands](docs/VALIDATION_COMMANDS.md) ·
 [Release report](reports/current/FinAgentBench_Final_Release_Report.md)
 
@@ -25,6 +26,23 @@ A fluent final answer can still:
 - pass an evaluator that had nothing checkable.
 
 Judging only the final answer is not enough for financial Agent reliability.
+
+## Why a separate evaluator repository?
+
+FinAgentBench is intentionally **not** inside the Agent repo:
+
+- **Independent gate** — scoring thresholds and mutation cases live here, so the
+  producer cannot quietly tune them to pass a demo.
+- **Replay contract** — Agents export FinRun; this repo judges the trace without
+  importing Agent app/runtime code on the release path.
+- **Reusable adapters** — the same schema can score other Agents that speak
+  FinRun, not only LumenFin.
+- **Pinned CI consumer** — the full Python 3.12 lane clones published LumenFin
+  `v0.1.0-rc.3` and runs the cross-repo gate against that immutable producer.
+
+LumenFin's CI still pins this evaluator at FinAgentBench `v0.1.0-rc.3` while the
+current package tag is `v0.1.0-rc.4` (docs/pin bump without changing evaluator
+thresholds).
 
 ## How it works
 
@@ -196,8 +214,19 @@ section is deterministic and offline: no API key and no network access.
 python -m venv .venv
 source .venv/bin/activate        # Windows: .\.venv\Scripts\Activate.ps1
 python -m pip install -e .
+python scripts/run_offline_demo.py
+```
+
+Optional full unit suite (after the offline demo):
+
+```bash
 python -m unittest discover -s tests -v
 ```
+
+If a sibling `../lumenfin-agent` checkout is present, cross-repo tests load
+FinRun export via `scripts/repo_paths.py` **without** requiring LumenFin's
+FastAPI dependencies in this venv. The 149-pass claim is for this package's
+suite under CI (LumenFin is cloned only for the pinned cross-repo job).
 
 Evaluate the included synthetic due-diligence run:
 

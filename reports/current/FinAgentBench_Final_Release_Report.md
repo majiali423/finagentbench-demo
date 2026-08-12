@@ -1,8 +1,8 @@
 # FinAgentBench Final Release Report
 
 Candidate: `0.1.0rc4`
-Recommended tag: `v0.1.0-rc.4`
-Tag target: tip of `master` after CI green for this closure
+Published tag: `v0.1.0-rc.4`
+Tag commit: tip of `master` at release (docs commits may land afterward)
 FinRun schema: `1.0`
 Scoring versions: `1` (default), `2` (opt-in visible output integrity)
 Python: `3.11`, `3.12`
@@ -177,14 +177,11 @@ FinAgentBench declares no third-party runtime dependencies. Python build tools,
 CI actions, LumenFin integration, and external FinRun inputs retain their own
 licenses and data terms; see `THIRD_PARTY_NOTICES.md`.
 
-## Recommended tag command (manual)
+## Published tag
 
-Do **not** create the tag until human review of this closure commit and CI green.
-
-```powershell
-git tag -a v0.1.0-rc.4 -m "FinAgentBench MIT license and LumenFin v0.1.0-rc.3 producer pin"
-git push origin v0.1.0-rc.4
-```
+Immutable tag **`v0.1.0-rc.4`** is published on GitHub. Do not move or reuse it;
+cut a new RC if another immutable snapshot is required. Post-tag docs commits on
+`master` may clarify pins without changing evaluator thresholds.
 
 ## Historical note
 

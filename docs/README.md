@@ -7,6 +7,7 @@ Current package: `0.1.0rc4` | FinRun schema: `1.0`
 
 ## Start here
 
+- [Portfolio pack (demo / repro / limits)](PORTFOLIO.md)
 - [Architecture](architecture.md)
 - [FinRun schema](finrun_schema.md)
 - [FinRun compatibility](FINRUN_COMPATIBILITY.md)
@@ -14,6 +15,8 @@ Current package: `0.1.0rc4` | FinRun schema: `1.0`
 - [CI gate](CI_GATE.md)
 - [Mutation testing](MUTATION_TESTING.md)
 - [Validation commands](VALIDATION_COMMANDS.md)
+- [Current release report](../reports/current/FinAgentBench_Final_Release_Report.md)
+- [Offline demo script](../scripts/run_offline_demo.py)
 - [MIT license](../LICENSE)
 - [Third-party notices](../THIRD_PARTY_NOTICES.md)
 

@@ -18,7 +18,7 @@ SCRIPTS = ROOT / "scripts"
 if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
-from repo_paths import lumenfin_root  # noqa: E402
+from repo_paths import load_lumenfin_export_finrun_state, lumenfin_root  # noqa: E402
 
 
 class CrossRepoExporterImportTestCase(unittest.TestCase):
@@ -30,16 +30,20 @@ class CrossRepoExporterImportTestCase(unittest.TestCase):
             raise unittest.SkipTest(str(exc)) from exc
 
     def test_package_import_is_side_effect_free(self) -> None:
-        """LumenFin helpers can be imported without starting the API or a database."""
+        """Load FinRun export without importing LumenFin's FastAPI package root."""
         env = os.environ.copy()
         env.pop("MAS_ALLOW_SQLITE_DEV", None)
         env["APP_ENV"] = "dev"
         env.pop("MAS_DATABASE_URL", None)
+        # Import via repo_paths helper so sibling checkouts without LumenFin
+        # deps (fastapi, etc.) still exercise the offline FinRun surface.
         probe = (
             "import sys\n"
-            f"sys.path.insert(0, r'{self.lumen / 'src'}')\n"
-            "from lumenfin.finrun import export_finrun_state\n"
+            f"sys.path.insert(0, r'{SCRIPTS}')\n"
+            "from repo_paths import load_lumenfin_export_finrun_state\n"
+            "export_finrun_state = load_lumenfin_export_finrun_state()\n"
             "print(export_finrun_state)\n"
+            "assert callable(export_finrun_state)\n"
         )
         proc = subprocess.run(
             [sys.executable, "-c", probe],
@@ -52,6 +56,9 @@ class CrossRepoExporterImportTestCase(unittest.TestCase):
         self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
         self.assertIn("export_finrun_state", proc.stdout)
         self.assertNotIn("SQLite is disabled", proc.stderr)
+        # Also exercise in-process loader once (same contract as validate_cross_repo).
+        export = load_lumenfin_export_finrun_state()
+        self.assertTrue(callable(export))
 
     def test_validate_cross_repo_runs_without_sqlite_opt_in(self) -> None:
         env = os.environ.copy()

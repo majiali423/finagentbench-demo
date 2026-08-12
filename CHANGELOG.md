@@ -19,7 +19,7 @@ Evaluator thresholds, mutation suite, and FinRun schema `1.0` are unchanged.
 
 - FinRun schema remains `1.0`
 - No metric thresholds or scoring weights were changed
-- Recommended tag: `v0.1.0-rc.4`
+- Published tag: `v0.1.0-rc.4`
 
 ## 0.1.0rc3 — 2026-08-06
 
