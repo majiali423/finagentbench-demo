@@ -100,7 +100,7 @@ def main() -> int:
         "lumenfin_root": str(lumen),
         "finagentbench_root": str(fab),
         "lumenfin_commit": _git_revision(lumen),
-        "lumenfin_tag": _git_tag_at_head(lumen, "v0.1.0-rc.2"),
+        "lumenfin_tag": _git_tag_at_head(lumen, "v0.1.0-rc.3"),
         "finagentbench_commit": _git_revision(fab),
         "lumenfin_worktree_dirty": _git_dirty(lumen),
         "finagentbench_worktree_dirty": _git_dirty(fab),

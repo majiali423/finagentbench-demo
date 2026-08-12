@@ -3,7 +3,7 @@
 FinAgentBench is a replay-first reliability evaluation framework.
 It evaluates exported Agent traces independently from Agent runtime.
 
-Current package: `0.1.0rc3` | FinRun schema: `1.0`
+Current package: `0.1.0rc4` | FinRun schema: `1.0`
 
 ## Start here
 
@@ -14,6 +14,8 @@ Current package: `0.1.0rc3` | FinRun schema: `1.0`
 - [CI gate](CI_GATE.md)
 - [Mutation testing](MUTATION_TESTING.md)
 - [Validation commands](VALIDATION_COMMANDS.md)
+- [MIT license](../LICENSE)
+- [Third-party notices](../THIRD_PARTY_NOTICES.md)
 
 ## Integrating an Agent
 

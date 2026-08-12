@@ -7,7 +7,7 @@ FinAgentBench 是一个 **replay-first（先回放）** 的可靠性评测框架
 
 [![test](https://github.com/majiali423/finagentbench-demo/actions/workflows/test.yml/badge.svg)](https://github.com/majiali423/finagentbench-demo/actions/workflows/test.yml)
 
-Release `v0.1.0-rc.3`（pre-release）| Package `0.1.0rc3` | FinRun schema `1.0`
+Release `v0.1.0-rc.4`（pre-release）| Package `0.1.0rc4` | FinRun schema `1.0`
 
 [文档索引](docs/README.md) · [指标说明](docs/METRICS.md) ·
 [FinRun schema](docs/finrun_schema.md) ·
@@ -164,8 +164,9 @@ export FINAGENTBENCH_DIR=/path/to/finagentbench-demo
 python scripts/validate_cross_repo.py --profile ci
 ```
 
-已对冻结的 LumenFin `v0.1.0-rc.2`
-（`d075b6851739be82ec2fb71fea7ad08d92d76511`）验证，FinRun schema `1.0`。
+已对冻结的 LumenFin `v0.1.0-rc.3` 验证，FinRun schema `1.0`。
+FinAgentBench `v0.1.0-rc.3` 的历史 producer pin 仍为 LumenFin
+`v0.1.0-rc.2`（`d075b6851739be82ec2fb71fea7ad08d92d76511`）。
 
 摘要会记录双方仓库 commit、worktree 状态、FinRun schema、benchmark profile，
 以及 core / extended mutation 结果。
@@ -226,7 +227,7 @@ python scripts/run_correctness_validation.py
 
 支持的验证命令见 [docs/VALIDATION_COMMANDS.md](docs/VALIDATION_COMMANDS.md)。
 
-## 已验证结果（`v0.1.0-rc.3`）
+## 已验证结果（`v0.1.0-rc.4`）
 
 | Gate | Result |
 |------|--------|
@@ -238,7 +239,7 @@ python scripts/run_correctness_validation.py
 | Total negative controls | 11/11 |
 | Nested FinRun / Case validation hardening | PASS |
 | Metamorphic anti-gaming invariants | PASS |
-| LumenFin `v0.1.0-rc.2` cross-repo producer pin | PASS |
+| LumenFin `v0.1.0-rc.3` cross-repo producer pin | PASS |
 
 以上门禁均可离线复现，并在 GitHub Actions 中运行（Python 3.11 smoke lane、
 Python 3.12 full lane，含 mutation suite 以及 pin 到公开 LumenFin tag 的跨仓检查）。
@@ -302,7 +303,9 @@ tools/            已归档、不受支持的审计脚本
 | [docs/VALIDATION_COMMANDS.md](docs/VALIDATION_COMMANDS.md) | 支持的命令与退出码 |
 | [CHANGELOG.md](CHANGELOG.md) | 版本历史 |
 
-## 许可状态
+## 许可
 
-尚未选择开源许可证：仓库以 source-available 形式供审阅与评估，**不授予**再分发
-或生产使用权利。评测输出仅用于工程评估，不构成投资建议。
+FinAgentBench 自有源码采用 [MIT License](LICENSE)，且没有第三方运行时依赖。
+构建/集成边界与外部输入数据权利见
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。评测输出仅用于工程评估，
+不构成投资建议。

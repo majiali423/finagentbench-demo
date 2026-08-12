@@ -1,12 +1,16 @@
 # FinAgentBench Final Release Report
 
-Candidate: `0.1.0rc3`
-Recommended tag: `v0.1.0-rc.3`
+Candidate: `0.1.0rc4`
+Recommended tag: `v0.1.0-rc.4`
 Tag target: tip of `master` after CI green for this closure
 FinRun schema: `1.0`
 Scoring versions: `1` (default), `2` (opt-in visible output integrity)
 Python: `3.11`, `3.12`
-Assessment date: 2026-08-06
+Assessment date: 2026-08-12
+
+> Builds on the published `0.1.0rc3` / `v0.1.0-rc.3` evaluator. This closure
+> adds MIT licensing and updates the CI producer pin to LumenFin
+> `v0.1.0-rc.3`. Metric thresholds and FinRun schema `1.0` are unchanged.
 
 ## Positioning
 
@@ -78,7 +82,7 @@ Claim–Evidence binding is **not** a registered independent metric in this RC.
 | Known-fail fixture blocked | PASS |
 | Unsupported FinRun schema rejected | PASS |
 | Unsupported scoring version rejected | PASS |
-| LumenFin `v0.1.0-rc.2` producer pin (CI) | PASS |
+| LumenFin `v0.1.0-rc.3` producer pin (CI) | PASS |
 | Secrets / API keys required | none for offline gates |
 
 ### Core reliability mutations
@@ -106,7 +110,7 @@ Claim–Evidence binding is **not** a registered independent metric in this RC.
 
 | Field | Value |
 |-------|-------|
-| Producer pin in FAB CI | LumenFin `v0.1.0-rc.2` |
+| Producer pin in FAB CI | LumenFin `v0.1.0-rc.3` |
 | FinRun schema | `1.0` |
 | Profile | `ci` |
 | Claims field in export | present; nested claim validation when present |
@@ -120,7 +124,7 @@ export FINAGENTBENCH_DIR=/path/to/finagentbench-demo
 python scripts/validate_cross_repo.py --profile ci
 ```
 
-CI pins the public tag `majiali423/lumenfin-agent@v0.1.0-rc.2` as the
+CI pins the public tag `majiali423/lumenfin-agent@v0.1.0-rc.3` as the
 producer under test and does not read sibling workstation paths.
 
 ## Case / scoring governance
@@ -156,7 +160,8 @@ Workflow: `.github/workflows/test.yml`
 - Claim–Evidence binding is not an independent metric yet.
 - Passing does not prove investment quality.
 - Human financial review remains required.
-- No public LICENSE grant; not marketed as open source.
+- Project-owned source is MIT licensed; external FinRun inputs retain their own
+  data rights.
 
 ## Worktree / hygiene
 
@@ -165,16 +170,23 @@ Workflow: `.github/workflows/test.yml`
 - Cross-repo local commands use `LUMENFIN_ROOT` / `FINAGENTBENCH_DIR`.
 - No `.env` / API keys committed.
 
+## License
+
+Project-owned source is licensed under MIT, copyright 2026 Jiali Ma.
+FinAgentBench declares no third-party runtime dependencies. Python build tools,
+CI actions, LumenFin integration, and external FinRun inputs retain their own
+licenses and data terms; see `THIRD_PARTY_NOTICES.md`.
+
 ## Recommended tag command (manual)
 
 Do **not** create the tag until human review of this closure commit and CI green.
 
 ```powershell
-git tag -a v0.1.0-rc.3 -m "FinAgentBench replay-first reliability release candidate v0.1.0-rc.3"
-git push origin v0.1.0-rc.3
+git tag -a v0.1.0-rc.4 -m "FinAgentBench MIT license and LumenFin v0.1.0-rc.3 producer pin"
+git push origin v0.1.0-rc.4
 ```
 
 ## Historical note
 
 Earlier release-candidate closures remain in git history and prior report
-commits. This file describes the current `0.1.0rc3` candidate only.
+commits. This file describes the current `0.1.0rc4` candidate only.

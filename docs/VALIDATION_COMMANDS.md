@@ -52,7 +52,7 @@ export FINAGENTBENCH_DIR=/path/to/finagentbench-demo
 python scripts/validate_cross_repo.py --profile ci
 ```
 
-Validated producer pin for this RC: LumenFin `v0.1.0-rc.2`, FinRun schema `1.0`.
+Validated producer pin for this RC: LumenFin `v0.1.0-rc.3`, FinRun schema `1.0`.
 
 ## 4. Live RC
 

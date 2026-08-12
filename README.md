@@ -7,7 +7,7 @@ It evaluates exported Agent traces independently from Agent runtime.
 
 [![test](https://github.com/majiali423/finagentbench-demo/actions/workflows/test.yml/badge.svg)](https://github.com/majiali423/finagentbench-demo/actions/workflows/test.yml)
 
-Release `v0.1.0-rc.3` (pre-release) | Package `0.1.0rc3` | FinRun schema `1.0`
+Release `v0.1.0-rc.4` (pre-release) | Package `0.1.0rc4` | FinRun schema `1.0`
 
 [Docs index](docs/README.md) · [Metrics](docs/METRICS.md) ·
 [FinRun schema](docs/finrun_schema.md) ·
@@ -167,8 +167,9 @@ export FINAGENTBENCH_DIR=/path/to/finagentbench-demo
 python scripts/validate_cross_repo.py --profile ci
 ```
 
-Validated against frozen LumenFin `v0.1.0-rc.2`
-(`d075b6851739be82ec2fb71fea7ad08d92d76511`), FinRun schema `1.0`.
+Validated against frozen LumenFin `v0.1.0-rc.3`, FinRun schema `1.0`.
+The historical producer pin for FinAgentBench `v0.1.0-rc.3` remains LumenFin
+`v0.1.0-rc.2` (`d075b6851739be82ec2fb71fea7ad08d92d76511`).
 
 The summary records both repository commits, worktree state, FinRun schema,
 benchmark profile, core mutations, and extended mutations.
@@ -230,7 +231,7 @@ python scripts/run_correctness_validation.py
 
 Supported validation commands: [docs/VALIDATION_COMMANDS.md](docs/VALIDATION_COMMANDS.md).
 
-## Validated results (`v0.1.0-rc.3`)
+## Validated results (`v0.1.0-rc.4`)
 
 | Gate | Result |
 |------|--------|
@@ -242,7 +243,7 @@ Supported validation commands: [docs/VALIDATION_COMMANDS.md](docs/VALIDATION_COM
 | Total negative controls | 11/11 |
 | Nested FinRun / Case validation hardening | PASS |
 | Metamorphic anti-gaming invariants | PASS |
-| LumenFin `v0.1.0-rc.2` cross-repo producer pin | PASS |
+| LumenFin `v0.1.0-rc.3` cross-repo producer pin | PASS |
 
 Every gate above is reproducible offline and also runs in GitHub Actions
 (Python 3.11 smoke lane, Python 3.12 full lane including the mutation suite and
@@ -310,9 +311,10 @@ tools/            archived, unsupported audit scripts
 | [docs/VALIDATION_COMMANDS.md](docs/VALIDATION_COMMANDS.md) | Supported commands and exit codes |
 | [CHANGELOG.md](CHANGELOG.md) | Version history |
 
-## License status
+## License
 
-No open-source license has been selected: the repository is source-available for
-review and evaluation, and no redistribution or production-use rights are
-granted. Evaluation output is for engineering assessment only and is not
-investment advice.
+FinAgentBench's own source code is licensed under the
+[MIT License](LICENSE). It has no third-party runtime dependencies.
+Build/integration boundaries and external input-data rights are documented in
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Evaluation output is for
+engineering assessment only and is not investment advice.

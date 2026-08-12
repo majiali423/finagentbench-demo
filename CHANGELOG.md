@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.1.0rc4 — 2026-08-12
+
+License closure and producer-pin update for LumenFin `v0.1.0-rc.3`.
+Evaluator thresholds, mutation suite, and FinRun schema `1.0` are unchanged.
+
+### Added
+
+- MIT `LICENSE` for project-owned source, copyright 2026 Jiali Ma
+- `THIRD_PARTY_NOTICES.md` for build/CI/integration and external FinRun inputs
+
+### Changed
+
+- CI and local cross-repo producer pin: LumenFin `v0.1.0-rc.2` → `v0.1.0-rc.3`
+- Package metadata declares MIT license classifiers
+
+### Compatibility
+
+- FinRun schema remains `1.0`
+- No metric thresholds or scoring weights were changed
+- Recommended tag: `v0.1.0-rc.4`
+
 ## 0.1.0rc3 — 2026-08-06
 
 Hardens FinRun / Case validation and scoring fail-closed behavior before

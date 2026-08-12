@@ -1,8 +1,12 @@
 # LumenFin RC Final Reliability Report
 
+> Historical LumenFin + FinAgentBench joint reliability snapshot (2026-07-31).
+> Not FinAgentBench `0.1.0rc4` release authority. See
+> `FinAgentBench_Final_Release_Report.md`.
+
 Generated: 2026-07-31T10:55:28.304137+00:00
 
-Release Candidate validation of **current** LumenFin + FinAgentBench.
+Release Candidate validation of **then-current** LumenFin + FinAgentBench.
 No new claim/citation rules. No evaluator threshold changes.
 
 Canonical path: `LumenFin → export_finrun_state() → FinAgentBench (ci)`.

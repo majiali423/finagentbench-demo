@@ -1,6 +1,6 @@
 # CI Gate
 
-FinAgentBench `0.1.0rc3` provides a replay-first, offline release gate.
+FinAgentBench `0.1.0rc4` provides a replay-first, offline release gate.
 
 ## Default workflow
 
@@ -23,7 +23,8 @@ Full suite includes:
 5. Static semantic replay suites (no network)
 6. Expected-failure blocking assertion
 7. Reference runtime export/evaluation
-8. Optional pinned cross-repo gate: `majiali423/lumenfin-agent@v0.1.0-rc.2`
+8. Required pinned cross-repo gate on the Python 3.12 full lane:
+   `majiali423/lumenfin-agent@v0.1.0-rc.3`
 
 Generated `outputs/` reports are uploaded as CI artifacts.
 
