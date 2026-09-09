@@ -1,28 +1,25 @@
-# FinAgentBench Documentation
+# FinAgentBench documentation
 
-FinAgentBench is a replay-first reliability evaluation framework.
-It evaluates exported Agent traces independently from Agent runtime.
+Start with the [project overview](../README.md) or [中文说明](../README.zh-CN.md).
+The published source at
+[`40f7599`](https://github.com/majiali423/finagentbench-demo/commit/40f7599e408f317515583405cb90249b811179c0)
+includes opt-in scoring v3; the older `v0.1.0-rc.4` package tag remains frozen.
+FinRun schema is `1.0`.
 
-Current package: `0.1.0rc4` | FinRun schema: `1.0`
+## Try and understand
 
-## Start here
-
-- [Portfolio pack (demo / repro / limits)](PORTFOLIO.md)
+- [Offline demo](../scripts/run_offline_demo.py)
 - [Architecture](architecture.md)
-- [FinRun schema](finrun_schema.md)
-- [FinRun compatibility](FINRUN_COMPATIBILITY.md)
-- [Metrics](METRICS.md)
-- [CI gate](CI_GATE.md)
+- [Metric semantics](METRICS.md)
 - [Mutation testing](MUTATION_TESTING.md)
+- [CI gates](CI_GATE.md)
 - [Validation commands](VALIDATION_COMMANDS.md)
-- [Current release report](../reports/current/FinAgentBench_Final_Release_Report.md)
-- [Offline demo script](../scripts/run_offline_demo.py)
-- [MIT license](../LICENSE)
-- [Third-party notices](../THIRD_PARTY_NOTICES.md)
 
-## Integrating an Agent
+## Integrate an Agent
 
-- [Agent integration guide](agent_integration_guide.md)
+- [FinRun schema](finrun_schema.md)
+- [Compatibility policy](FINRUN_COMPATIBILITY.md)
+- [Agent integration](agent_integration_guide.md)
 - [Adapter guide](adapter_guide.md)
 - [Due-diligence integration](due_diligence_integration.md)
 - [LumenFin case selection](lumenfin_case_selection.md)
@@ -31,8 +28,18 @@ Current package: `0.1.0rc4` | FinRun schema: `1.0`
 ## Optional audit features
 
 - [Semantic judge validation](live_semantic_judge_validation.md)
-- [Human labeling guide](human_labeling_guide.md)
+- [Human labeling](human_labeling_guide.md)
 - [Reference runtime](reference_runtime.md)
 
-Current release reports live under `../reports/current/`. Superseded reports
-live under `../reports/history/` and are not current contracts.
+## Evidence and history
+
+- [Published v3 source CI](https://github.com/majiali423/finagentbench-demo/actions/runs/34329922587)
+- [Frozen rc.4 release evidence](../reports/current/FinAgentBench_Final_Release_Report.md)
+
+Superseded audits, staging plans and early sample reports are available in
+[Git history](https://github.com/majiali423/finagentbench-demo/tree/40f7599e408f317515583405cb90249b811179c0/reports/history).
+
+Frozen reports retain their original version and results. They are not a
+scoreboard for the current product's answer accuracy.
+
+[MIT license](../LICENSE) · [Third-party notices](../THIRD_PARTY_NOTICES.md)

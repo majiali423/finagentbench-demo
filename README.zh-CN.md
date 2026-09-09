@@ -2,340 +2,124 @@
 
 [English](README.md) | **中文**
 
-FinAgentBench 是一个 **replay-first（先回放）** 的可靠性评测框架。
-它独立于 Agent 运行时，只评测已导出的 Agent trace。
-
-**与 [LumenFin](https://github.com/majiali423/lumenfin-agent) 同一产品线：**
-本仓是 FinRun 导出的**兄弟契约门禁**，不是第三方市场榜单，也**不是**
-LumenFin 产品准确率。冻结的 14/14、11/11（或 core 4/4、extended 7/7）是
-**钉住用例上的合同证据**，不要当成当前页 QA 分数。
+**回放 Agent 的答案与证据，定位缺乏依据的财务断言。**
+FinAgentBench 接收 **FinRun 1.0** 导出，生成问题定位、报告和 CI 通过/失败结果，
+无需执行 Agent 本身。
 
 [![test](https://github.com/majiali423/finagentbench-demo/actions/workflows/test.yml/badge.svg)](https://github.com/majiali423/finagentbench-demo/actions/workflows/test.yml)
 
-Release `v0.1.0-rc.4`（pre-release）| Package `0.1.0rc4` | FinRun schema `1.0`
+[快速体验](#快速体验) · [指标](docs/METRICS.md) ·
+[FinRun schema](docs/finrun_schema.md) · [文档索引](docs/README.md)
 
-[文档索引](docs/README.md) · [指标说明](docs/METRICS.md) ·
-[FinRun schema](docs/finrun_schema.md) ·
-[作品集入口](docs/PORTFOLIO.md) ·
-[验证命令](docs/VALIDATION_COMMANDS.md) ·
-[发布报告](reports/current/FinAgentBench_Final_Release_Report.md)
+## 检查什么
 
-## 为什么要回放 trace？
+| 层次 | 示例 |
+|---|---|
+| 执行轨迹与证据 | 漏掉公司、计算输入不一致、缺引用、缺少必需检查 |
+| 可见断言：显式启用 v3 | 正文、表格、Claim Ledger 中错误的数字、单位、币种、期间或来源 |
+| 负向对照 | 故意改错数字/主体或移除引用/风险说明，必须被拦截 |
 
-一份流畅的最终答案仍可能：
-
-- 在对比任务中漏掉一家公司；
-- 用错误输入计算比率；
-- 引用另一个发行人的证据；
-- 隐瞒缺失的市场数据；
-- 在“没有任何可检查项”时仍被评测器放行。
-
-只看最终答案，不足以判断金融 Agent 的可靠性。
-
-## 为什么要单独一个评测仓库？
-
-FinAgentBench **刻意**不放在 Agent 仓里：
-
-- **独立门禁** — 分数阈值与 mutation 用例在本仓，生产者不能悄悄调参刷分
-- **回放契约** — Agent 导出 FinRun；本仓评测轨迹，发布路径不依赖 Agent 运行时
-- **可复用适配** — 同一 schema 可评其他会说 FinRun 的 Agent，不只 LumenFin
-- **CI 消费 pin** — Python 3.12 全量 lane 会克隆已发布的 LumenFin `v0.1.0-rc.3`
-  并对该不可变 producer 跑跨仓门禁
-
-LumenFin CI 仍将本评测器 pin 在 FinAgentBench `v0.1.0-rc.3`，而当前包标签为
-`v0.1.0-rc.4`（文档/pin 升级，未改评测阈值）。
-
-## 工作方式
+期间未知的证据不能支持具体年份的断言。内部指标正确，也不能抵消最终回答中的矛盾。
 
 ```text
-FinRun 导出
-    → adapter / schema 校验
-    → 确定性指标（+ 可选语义 judge）
-    → Findings + EvalReport
-    → CI 通过 / 失败
+FinRun → schema / adapter → 确定性检查 → 问题定位与报告 → CI 门禁
 ```
 
-Case contract 决定哪些字段必须可检查。分数取决于导出 trace 的可观测性。
-默认发布路径以确定性指标为主；语义 judge 仍为可选项。
+## 快速体验
 
-## 最小 FinRun
-
-任何框架都可以产出该工件；已提供 LumenFin 与通用 Agent state 的 adapter。
-
-```json
-{
-  "schema_version": "1.0",
-  "run_id": "demo-001",
-  "query": "Compare Company A and Company B",
-  "entities": [{"name": "Company A"}, {"name": "Company B"}],
-  "steps": [{"name": "retrieval", "status": "ok"}],
-  "metrics": [],
-  "evidence": [],
-  "market_data": [],
-  "final_output": "Research output with disclosed limitations."
-}
-```
-
-Case 决定哪些字段必须可检查。当启用 `require_checkable_metrics` 时，空列表
-不会自动得满分。
-
-字段说明见 [docs/finrun_schema.md](docs/finrun_schema.md) 与
-[docs/FINRUN_COMPATIBILITY.md](docs/FINRUN_COMPATIBILITY.md)。
-
-## Finding 长什么样
-
-以下摘自对内置 known-fail fixture 的评测
-（`fixtures/fail_due_diligence_finrun.json`，退出码 `1`）：
-
-```json
-{
-  "run_id": "fail-dd-targetco",
-  "score": 0.0,
-  "passed": false,
-  "metrics": [
-    {
-      "name": "numeric_correctness",
-      "score": 0.0,
-      "passed": false,
-      "findings": [
-        {
-          "metric": "numeric_correctness",
-          "severity": "high",
-          "message": "TargetCo debt_to_assets mismatch: expected 0.4, got 0.5",
-          "recommendation": "Recompute financial ratios with deterministic tools instead of relying on model text."
-        }
-      ]
-    },
-    {
-      "name": "evidence_consistency",
-      "score": 50.0,
-      "passed": false,
-      "findings": [
-        {
-          "metric": "evidence_consistency",
-          "severity": "high",
-          "message": "TargetCo debt_to_assets input total_liabilities=120.0 is not supported by numeric evidence.",
-          "recommendation": "Check that cited evidence text contains the same financial input values used by the calculation."
-        }
-      ]
-    }
-  ]
-}
-```
-
-每次运行还会同时产出 Markdown 与 HTML 报告。
-
-## 指标
-
-默认确定性 CI 覆盖：
-
-- 实体覆盖与实体泄漏；
-- 数值正确性；
-- 单位/币种与时间一致性；
-- Case 驱动的输入值合理性（仅有限区间）；
-- 证据覆盖与一致性；
-- 检索 / 期间 provenance；
-- 必要执行步骤与报告章节；
-- 风险披露与合规用语。
-
-Opt-in 指标：
-
-- visible output integrity（需要 `"scoring_version": "2"`；零权重，靠 high
-  severity 阻断）；
-- 语义 judge（evidence support、risk quality、compliance）— 仅用于 audit
-  profile，不进入确定性发布证据。
-
-详见 [Metrics](docs/METRICS.md) 与
-[FinRun compatibility](docs/FINRUN_COMPATIBILITY.md)。
-
-## 核心 mutation
-
-CI mutation 门禁必须检出以下四类可靠性失败：
-
-1. wrong number（错误数值）
-2. wrong entity（错误实体）
-3. missing citation（缺失引用）
-4. missing risk（缺失风险披露）
-
-套件将其报告为 **Core reliability mutations: 4/4**。
-
-## 扩展 mutation
-
-扩展的 provenance / period 负向对照单独按控并单独计数，不并入核心四项：
-
-- missing metric period provenance
-- query-period source
-- assumed period alignment
-- missing source record / citation
-- formula cross-period inputs
-- missing period alignment
-- metric-period drift
-
-详情见 [docs/MUTATION_TESTING.md](docs/MUTATION_TESTING.md)。
-
-## LumenFin 集成
-
-将 `lumenfin-agent` 克隆为同级目录，或设置环境变量：
+需要 Python **3.11+**，CI 覆盖 3.11 与 3.12。
+安装会下载构建依赖，以下演示不需要 API key 或在线模型调用。
 
 ```bash
-export LUMENFIN_ROOT=/path/to/lumenfin-agent
-export FINAGENTBENCH_DIR=/path/to/finagentbench-demo
-python scripts/validate_cross_repo.py --profile ci
-```
-
-当前包 `0.1.0rc4` / 标签 `v0.1.0-rc.4` 将必跑 CI producer pin 到已发布的
-LumenFin `v0.1.0-rc.3`（FinRun schema `1.0`）。更早的 FinAgentBench
-`v0.1.0-rc.3` 历史上 pin 的是 LumenFin `v0.1.0-rc.2`
-（`d075b6851739be82ec2fb71fea7ad08d92d76511`）。
-
-摘要会记录双方仓库 commit、worktree 状态、FinRun schema、benchmark profile，
-以及 core / extended mutation 结果。
-
-跨仓 Release Candidate 编排：
-
-```bash
-python scripts/run_rc_validation.py --help
-python scripts/run_rc_validation.py --dry-run      # 仅检查路径、fixture、schema
-python scripts/run_rc_validation.py --offline-only # 确定性门禁，不调用 live Agent
-```
-
-不带 `--offline-only` 运行时需要已配置的 LumenFin provider。
-基础设施失败属于 non-pass，不得叙述为 Agent 质量成功。
-
-## 快速开始
-
-需要 Python 3.11+（CI 验证 3.11 与 3.12）。本节全部命令均为确定性离线路径：
-无需 API key，也无需网络访问。
-
-```bash
+git clone https://github.com/majiali423/finagentbench-demo.git
+cd finagentbench-demo
 python -m venv .venv
-source .venv/bin/activate        # Windows: .\.venv\Scripts\Activate.ps1
+```
+
+PowerShell 激活：`.\.venv\Scripts\Activate.ps1`。
+POSIX shell 激活：`source .venv/bin/activate`。
+
+```bash
 python -m pip install -e .
 python scripts/run_offline_demo.py
 ```
 
-可选全量单测（建议在离线 demo 之后）：
+查看生成的 JSON、Markdown 和 HTML 报告。显式运行可见输出 v3 基线：
+
+```bash
+python -m finagentbench evaluate fixtures/product_quality_visible_baseline_finrun.json --case fixtures/case_lumenfin_product_quality_v1.json --profile ci --out outputs/visible
+```
+
+问题定位会指出指标与错误原因，例如：
+
+```text
+NVIDIA operating_income is stated for FY2025 but verified period is unknown.
+```
+
+退出码 **0** 表示通过，**1** 表示未通过（错误 fixture 的预期结果），
+其他非零值表示命令或执行错误。
+
+## 为什么单独维护评测仓？
+
+[LumenFin](https://github.com/majiali423/lumenfin-agent) 生成答案，
+FinAgentBench 评测导出产物。版本化边界使生成端、评分器及兼容性变更可以分别审查。
+其他 Agent 也可以实现同一 [FinRun 接口](docs/agent_integration_guide.md)。
+
+两个仓库由同一作者维护。它们提供作者自有的契约门禁；
+分仓或高分本身不构成第三方验证，也不等于真实问题准确率。
+
+## 评分与发布版本
+
+评分版本、Python 包版本和 FinRun schema 分别管理。
+
+| 用途 | 版本 / 证据 |
+|---|---|
+| 包含 scoring v3 的已发布源码 | [`40f7599`](https://github.com/majiali423/finagentbench-demo/commit/40f7599e408f317515583405cb90249b811179c0) |
+| 历史包与标签 | `0.1.0rc4` / `v0.1.0-rc.4`；冻结标签早于 v3 |
+| FinRun 外层协议 | `1.0` |
+| 默认评分 | v1，保留原有 case 语义 |
+| 可见输出评分 | 显式配置 v3，并启用 `visible_supported_claims` |
+| 冻结生成端兼容性 | 本仓完整 CI 使用 LumenFin `v0.1.0-rc.3` |
+
+[`40f7599` 的 2026-09-09 CI](https://github.com/majiali423/finagentbench-demo/actions/runs/34329922587)
+已通过。LumenFin 的
+[Product quality v3 门禁](https://github.com/majiali423/lumenfin-agent/actions/runs/34329999879)
+固定使用该评分器提交，rc.3/rc.4 评分器仍用于冻结契约兼容性。
+
+详细规则见[指标语义](docs/METRICS.md)与[兼容策略](docs/FINRUN_COMPATIBILITY.md)。
+历史 rc.4 结果保留在[发布报告](reports/current/FinAgentBench_Final_Release_Report.md)。
+
+## 验证
 
 ```bash
 python -m unittest discover -s tests -v
-```
-
-若同级存在 `../lumenfin-agent`，跨仓测试通过 `scripts/repo_paths.py` 加载
-FinRun 导出，**不要求**本 venv 安装 LumenFin 的 FastAPI 依赖。149 PASS 指本包
-在 CI 下的套件（LumenFin 仅在 pinned 跨仓 job 中克隆）。
-
-评测内置的合成尽调样本：
-
-```bash
-python -m finagentbench evaluate \
-  fixtures/pass_due_diligence_finrun.json \
-  --case fixtures/case_due_diligence.json \
-  --profile ci \
-  --out outputs/example
-```
-
-`evaluate` / `gate` / `benchmark` 退出码：
-
-| Code | Meaning |
-|------|---------|
-| `0` | 评测 / 门禁通过 |
-| `1` | 评测 / 门禁失败（known-fail fixture 预期如此） |
-| 其他非零 | CLI / IO / 参数错误 |
-
-免密钥发布演示：
-
-```bash
-python scripts/run_offline_demo.py
-```
-
-Mutation 与正确性门禁：
-
-```bash
 python scripts/run_mutation_suite.py
 python scripts/run_correctness_validation.py
 ```
 
-支持的验证命令见 [docs/VALIDATION_COMMANDS.md](docs/VALIDATION_COMMANDS.md)。
+联合检查需要安装当前 LumenFin 源码，显式配置
+`LUMENFIN_ROOT` / `FINAGENTBENCH_DIR`，再运行
+`python scripts/validate_cross_repo.py --profile ci`。
+[验证命令](docs/VALIDATION_COMMANDS.md)说明环境配置与可选在线 RC 路径。
 
-## 已验证结果（`v0.1.0-rc.4`）
+## 能力边界
 
-| Gate | Result |
-|------|--------|
-| Unit tests | 149 PASS |
-| Offline demo | PASS |
-| Correctness validation | PASS |
-| Core reliability mutations | 4/4 |
-| Extended provenance/period mutations | 7/7 |
-| Total negative controls | 11/11 |
-| Nested FinRun / Case validation hardening | PASS |
-| Metamorphic anti-gaming invariants | PASS |
-| LumenFin `v0.1.0-rc.3` cross-repo producer pin | PASS |
+- Case 定义必需检查与阈值；必需检查没有可检查项时失败，未知协议或评分版本会被拒绝。
+- v3 覆盖支持范围内的财务断言语法，不证明任意自然语言的真实性。
+  语义 judge 为可选项，不纳入确定性发布证据。
+- 突变检出率和冻结契约分只反映相应用例，不评估投资收益，也不认证生产就绪。
+- 来源质量与财务结论仍需人工审查。
 
-以上门禁均可离线复现，并在 GitHub Actions 中运行（Python 3.11 smoke lane、
-Python 3.12 full lane，含 mutation suite 以及 pin 到公开 LumenFin tag 的跨仓检查）。
+## 目录导览
 
-证据：
-[reports/current/FinAgentBench_Final_Release_Report.md](reports/current/FinAgentBench_Final_Release_Report.md)。
+| 路径 | 职责 |
+|---|---|
+| `finagentbench/` | 协议、适配器、指标、报告与命令行 |
+| `benchmarks/`、`fixtures/` | 用例及负向对照 |
+| `tests/` | 单测、回归及兼容性验证 |
+| `scripts/` | 正式演示和验证入口 |
+| `docs/` | 指标、接入与运行说明 |
+| `reports/` | 版本化发布证据与历史记录 |
 
-## Benchmark 诚信原则
-
-- 不会为了匹配某个被测 Agent 而降低指标阈值。
-- 必填检查项为空时 fail closed，并给出诊断 finding。
-- 不支持的 FinRun schema 与 scoring version 会在评分前被拒绝。
-- Case hash 与启用的指标会写入 EvalReport。
-- 通过评测不等于投资质量；仍需人工财务审阅。
-
-## 局限
-
-FinAgentBench **不是**：
-
-- 学术排行榜；
-- 普遍事实正确性证明；
-- 投资表现评估器；
-- 生产就绪认证。
-
-范围边界：
-
-- Case contract 决定评测要求，因此分数强度取决于 case 与导出 trace。
-- 本版本中 Claim–Evidence Binding **尚未**成为独立指标；引用相关检查由证据与
-  provenance 指标间接覆盖。
-- 可选语义 judge 会引入 provider 波动，不纳入发布证据。
-- 仍需人工财务审阅。
-
-## 仓库结构
-
-```text
-finagentbench/    评测器、adapter、指标与报告模型
-benchmarks/       确定性套件、mutation 与语义金标数据
-fixtures/         合成 FinRun 与 case contract
-tests/            单元与跨项目回归测试
-scripts/          受支持的发布与验证入口
-docs/             schema、指标、集成与 CI 指南
-reports/current/  当前发布证据
-reports/history/  已归档的工程证据
-examples/         脱敏演示工件
-tools/            已归档、不受支持的审计脚本
-```
-
-## 文档地图
-
-| Doc | Purpose |
-|-----|---------|
-| [docs/README.md](docs/README.md) | 文档索引 |
-| [docs/architecture.md](docs/architecture.md) | 评测器架构 |
-| [docs/finrun_schema.md](docs/finrun_schema.md) | FinRun 字段说明 |
-| [docs/FINRUN_COMPATIBILITY.md](docs/FINRUN_COMPATIBILITY.md) | 生产者 / schema 支持矩阵 |
-| [docs/METRICS.md](docs/METRICS.md) | 指标定义与阈值治理 |
-| [docs/MUTATION_TESTING.md](docs/MUTATION_TESTING.md) | 核心与扩展负向对照 |
-| [docs/CI_GATE.md](docs/CI_GATE.md) | CI lane 与失败分类 |
-| [docs/agent_integration_guide.md](docs/agent_integration_guide.md) | 接入新 Agent |
-| [docs/adapter_guide.md](docs/adapter_guide.md) | 编写 adapter |
-| [docs/VALIDATION_COMMANDS.md](docs/VALIDATION_COMMANDS.md) | 支持的命令与退出码 |
-| [CHANGELOG.md](CHANGELOG.md) | 版本历史 |
-
-## 许可
-
-FinAgentBench 自有源码采用 [MIT License](LICENSE)，且没有第三方运行时依赖。
-构建/集成边界与外部输入数据权利见
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。评测输出仅用于工程评估，
-不构成投资建议。
+项目自有代码采用 [MIT](LICENSE) 许可证；
+外部依赖和输入遵循[第三方声明](THIRD_PARTY_NOTICES.md)。

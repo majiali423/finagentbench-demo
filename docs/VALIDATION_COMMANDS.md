@@ -1,7 +1,8 @@
 # FinAgentBench Validation Commands
 
-Supported release entrypoints only. Historical scripts under
-`tools/archived_audits/` are unsupported and are not gates.
+Supported release entrypoints are listed below. Superseded audit scripts and
+staging reports were removed from the checkout; use these commands for current
+validation.
 
 ## Exit codes
 

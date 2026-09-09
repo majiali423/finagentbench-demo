@@ -34,14 +34,18 @@ That binding is intentional for mutation detection, not for arbitrary queries.
 
 ## Fail-loud when fundamentals are missing
 
-If a company has no sample DB row and no PDF-extractable metrics:
+For a financial question that requires ratios, missing permitted structured
+inputs must not be filled with invented numbers:
 
 1. Retrieval sets `fatal_data_gap=true` and skips the silent replan→quant loop.
 2. Graph routes `retrieval → synthesizer`.
 3. `workflow_status=incomplete_data` with an explicit report banner.
 4. FinAgentBench gate is **expected to fail** (`structured_source=none`, no checkable metrics).
 
-This is correct: the stack refuses to invent numbers.
+LumenFin's current TaskSpec also allows evidence-backed risk questions to
+proceed without unrelated ratios. That narrative path does not satisfy a case
+that explicitly requires financial metrics. Upload-only requests cannot use
+sample fundamentals as an implicit repair.
 
 **User action:** upload a filing PDF, or analyze a demo sample company
 (Apple / Microsoft / NVIDIA / AMD / Tesla / …).

@@ -28,6 +28,13 @@ Full suite includes:
 
 Generated `outputs/` reports are uploaded as CI artifacts.
 
+The [2026-09-09 source baseline](https://github.com/majiali423/finagentbench-demo/actions/runs/34329922587)
+passed at `40f7599`. LumenFin's separate
+[Product quality v3 job](https://github.com/majiali423/lumenfin-agent/actions/runs/34329999879)
+installs that evaluator commit via `FINAGENTBENCH_PRODUCT_REF` and runs the
+product workflow tests. Frozen rc.3/rc.4 evaluator jobs cover compatibility;
+they do not replace that v3 job.
+
 ## Cross-repository gate
 
 ```bash
