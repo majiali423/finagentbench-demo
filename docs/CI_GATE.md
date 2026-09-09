@@ -7,6 +7,11 @@ FinAgentBench `0.1.0rc4` provides a replay-first, offline release gate.
 The GitHub workflow runs on `push` and `pull_request` with no secrets and no
 live providers.
 
+Both Python lanes require the known-fail fixture to exit with status `1` and
+produce a fresh evaluation report with the expected run ID and `passed=false`.
+A CLI crash, missing report or unexpected success fails CI; a nonzero exit
+alone is not proof of a valid negative-control rejection.
+
 Matrix:
 
 | Python | Suite |
