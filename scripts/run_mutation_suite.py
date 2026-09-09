@@ -41,15 +41,22 @@ def main() -> int:
     args = parser.parse_args()
 
     report = run_benchmark_suite(args.suite)
-    core_ok = _detected(report, CORE_MUTATIONS)
-    extended_ok = _detected(report, EXTENDED_MUTATIONS)
-    report["core_mutations_detected"] = f"{sum(core_ok.values())}/{len(CORE_MUTATIONS)}"
+    present = {item["failure_type"] for item in report.get("items") or []}
+    core_needed = tuple(name for name in CORE_MUTATIONS if name in present)
+    extended_needed = tuple(name for name in EXTENDED_MUTATIONS if name in present)
+    core_ok = _detected(report, core_needed)
+    extended_ok = _detected(report, extended_needed)
+    report["core_mutations_detected"] = (
+        f"{sum(core_ok.values())}/{len(core_needed)}" if core_needed else "n/a"
+    )
     report["extended_mutations_detected"] = (
-        f"{sum(extended_ok.values())}/{len(EXTENDED_MUTATIONS)}"
+        f"{sum(extended_ok.values())}/{len(extended_needed)}" if extended_needed else "n/a"
     )
     report["total_negative_controls"] = (
         f"{sum(core_ok.values()) + sum(extended_ok.values())}/"
-        f"{len(CORE_MUTATIONS) + len(EXTENDED_MUTATIONS)}"
+        f"{len(core_needed) + len(extended_needed)}"
+        if core_needed or extended_needed
+        else "n/a"
     )
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(report, indent=2), encoding="utf-8")
@@ -101,35 +108,42 @@ def _write_markdown(
             f"- Gate: `{'PASS' if report['passed'] and all(core_ok.values()) and all(extended_ok.values()) else 'FAIL'}`"
         ),
         "",
-        "## Core reliability mutations",
-        "",
-        "| Mutation | Detected | Findings |",
-        "|----------|:--------:|----------|",
     ]
     by_type = {
         item["failure_type"]: item
         for item in report["items"]
         if item["failure_type"] != "none"
     }
-    for name in CORE_MUTATIONS:
-        item = by_type.get(name, {})
-        findings = ", ".join(item.get("actual_findings") or []) or "-"
-        lines.append(f"| {name} | {'YES' if core_ok.get(name) else 'NO'} | {findings} |")
-    lines.extend(
-        [
-            "",
-            "## Extended provenance/period mutations",
-            "",
-            "| Mutation | Detected | Findings |",
-            "|----------|:--------:|----------|",
-        ]
-    )
-    for name in EXTENDED_MUTATIONS:
-        item = by_type.get(name, {})
-        findings = ", ".join(item.get("actual_findings") or []) or "-"
-        lines.append(
-            f"| {name} | {'YES' if extended_ok.get(name) else 'NO'} | {findings} |"
+    if core_ok:
+        lines.extend(
+            [
+                "## Core reliability mutations",
+                "",
+                "| Mutation | Detected | Findings |",
+                "|----------|:--------:|----------|",
+            ]
         )
+        for name in core_ok:
+            item = by_type.get(name, {})
+            findings = ", ".join(item.get("actual_findings") or []) or "-"
+            lines.append(f"| {name} | {'YES' if core_ok.get(name) else 'NO'} | {findings} |")
+        lines.append("")
+    if extended_ok:
+        lines.extend(
+            [
+                "## Extended provenance/period mutations",
+                "",
+                "| Mutation | Detected | Findings |",
+                "|----------|:--------:|----------|",
+            ]
+        )
+        for name in extended_ok:
+            item = by_type.get(name, {})
+            findings = ", ".join(item.get("actual_findings") or []) or "-"
+            lines.append(
+                f"| {name} | {'YES' if extended_ok.get(name) else 'NO'} | {findings} |"
+            )
+        lines.append("")
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 

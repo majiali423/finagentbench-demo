@@ -5,6 +5,12 @@
 FinAgentBench is a replay-first reliability evaluation framework.
 It evaluates exported Agent traces independently from Agent runtime.
 
+**Same product line as [LumenFin](https://github.com/majiali423/lumenfin-agent):**
+this repo is the **sibling contract gate** for FinRun exports, not a
+third-party market benchmark and **not** LumenFin product accuracy.
+Frozen 14/14 / 11/11 (or core 4/4, extended 7/7) numbers are **contract
+evidence** on pinned cases — do not quote them as this-page QA.
+
 [![test](https://github.com/majiali423/finagentbench-demo/actions/workflows/test.yml/badge.svg)](https://github.com/majiali423/finagentbench-demo/actions/workflows/test.yml)
 
 Release `v0.1.0-rc.4` (pre-release) | Package `0.1.0rc4` | FinRun schema `1.0`

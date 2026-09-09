@@ -5,6 +5,11 @@
 FinAgentBench 是一个 **replay-first（先回放）** 的可靠性评测框架。
 它独立于 Agent 运行时，只评测已导出的 Agent trace。
 
+**与 [LumenFin](https://github.com/majiali423/lumenfin-agent) 同一产品线：**
+本仓是 FinRun 导出的**兄弟契约门禁**，不是第三方市场榜单，也**不是**
+LumenFin 产品准确率。冻结的 14/14、11/11（或 core 4/4、extended 7/7）是
+**钉住用例上的合同证据**，不要当成当前页 QA 分数。
+
 [![test](https://github.com/majiali423/finagentbench-demo/actions/workflows/test.yml/badge.svg)](https://github.com/majiali423/finagentbench-demo/actions/workflows/test.yml)
 
 Release `v0.1.0-rc.4`（pre-release）| Package `0.1.0rc4` | FinRun schema `1.0`

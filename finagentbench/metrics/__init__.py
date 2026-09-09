@@ -18,6 +18,7 @@ from .retrieval_provenance import retrieval_provenance
 from .runtime_compliance import runtime_compliance
 from .compliance_semantic import compliance_semantic
 from .visible_output_integrity import visible_output_integrity
+from .visible_supported_claims import visible_supported_claims
 from .input_value_plausibility import input_value_plausibility
 
 
@@ -42,4 +43,5 @@ BUILTIN_METRICS = (
     runtime_compliance,
     retrieval_provenance,
     visible_output_integrity,
+    visible_supported_claims,
 )

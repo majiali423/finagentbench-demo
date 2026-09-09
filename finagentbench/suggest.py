@@ -21,6 +21,7 @@ ACTION_BY_METRIC = {
     "risk_quality": "review",
     "compliance_language": "rewrite",
     "compliance_semantic": "review",
+    "visible_supported_claims": "rewrite",
 }
 
 

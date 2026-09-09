@@ -81,6 +81,18 @@ def main() -> int:
         cwd=fab,
         check=False,
     )
+    product = subprocess.run(
+        [
+            sys.executable,
+            str(fab / "scripts" / "run_mutation_suite.py"),
+            "--suite",
+            str(fab / "benchmarks" / "mutations" / "product_quality_visible_v1.json"),
+            "--out",
+            str(args.out_dir / "product_quality_visible_mutations.json"),
+        ],
+        cwd=fab,
+        check=False,
+    )
     mutation_report_path = args.out_dir / "mutation_detection_report.json"
     mutation_report = (
         json.loads(mutation_report_path.read_text(encoding="utf-8"))
@@ -119,9 +131,13 @@ def main() -> int:
         "mutation_results": mutation_results,
         "claims_field_present": "claims" in finrun,
         "uses_legacy_revenue_2025_only": _legacy_revenue_only(finrun),
+        "execution_path": (finrun.get("metadata") or {}).get("execution_path"),
+        "product_visible_mutations_passed": product.returncode == 0,
     }
     summary["passed"] = bool(
-        summary["finagentbench_gate_passed"] and summary["mutation_gate_passed"]
+        summary["finagentbench_gate_passed"]
+        and summary["mutation_gate_passed"]
+        and summary["product_visible_mutations_passed"]
     )
     summary_path = args.out_dir / "validation_summary.json"
     summary_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")

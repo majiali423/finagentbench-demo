@@ -1,0 +1,151 @@
+{
+  "schema_version": "1.0",
+  "run_id": "product-quality-visible-baseline",
+  "query": "Compare Apple and Microsoft FY2025 EBITDA margin with cited sample fundamentals.",
+  "metadata": {
+    "adapter": "lumenfin",
+    "execution_path": "product_workflow",
+    "source_note": "Hand-authored visible-output fixture from SAMPLE_FINANCIAL_DATA contract values; not generated from a live run dump."
+  },
+  "entities": [{"name": "Apple"}, {"name": "Microsoft"}],
+  "steps": [
+    {"name": "query_planner", "status": "ok"},
+    {"name": "quant", "status": "ok"},
+    {"name": "claim_binder", "status": "ok"},
+    {"name": "synthesizer", "status": "ok"}
+  ],
+  "metrics": [
+    {
+      "entity": "Apple",
+      "name": "ebitda_margin",
+      "period": "FY2025",
+      "value": 0.342718,
+      "unit": "ratio",
+      "formula": "ebitda / revenue",
+      "evidence_ids": ["ev_apple_ebitda_fy2025", "ev_apple_revenue_fy2025"],
+      "inputs": {
+        "ebitda": {
+          "value": 141.2,
+          "unit": "billion",
+          "currency": "USD",
+          "period": "FY2025",
+          "evidence_ids": ["ev_apple_ebitda_fy2025"]
+        },
+        "revenue": {
+          "value": 412.0,
+          "unit": "billion",
+          "currency": "USD",
+          "period": "FY2025",
+          "evidence_ids": ["ev_apple_revenue_fy2025"]
+        }
+      }
+    },
+    {
+      "entity": "Microsoft",
+      "name": "ebitda_margin",
+      "period": "FY2025",
+      "value": 0.424316,
+      "unit": "ratio",
+      "formula": "ebitda / revenue",
+      "evidence_ids": ["ev_msft_ebitda_fy2025", "ev_msft_revenue_fy2025"],
+      "inputs": {
+        "ebitda": {
+          "value": 122.5,
+          "unit": "billion",
+          "currency": "USD",
+          "period": "FY2025",
+          "evidence_ids": ["ev_msft_ebitda_fy2025"]
+        },
+        "revenue": {
+          "value": 288.7,
+          "unit": "billion",
+          "currency": "USD",
+          "period": "FY2025",
+          "evidence_ids": ["ev_msft_revenue_fy2025"]
+        }
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev_apple_revenue_fy2025",
+      "entity": "Apple",
+      "metric": "revenue",
+      "value": 412.0,
+      "unit": "billion",
+      "currency": "USD",
+      "citation": "lumenfin:sample_db:Apple:FY2025",
+      "period": "FY2025",
+      "source_type": "sample_db",
+      "provider": "lumenfin",
+      "text": "Apple FY2025 revenue was 412.0 billion USD."
+    },
+    {
+      "id": "ev_apple_ebitda_fy2025",
+      "entity": "Apple",
+      "metric": "ebitda",
+      "value": 141.2,
+      "unit": "billion",
+      "currency": "USD",
+      "citation": "lumenfin:sample_db:Apple:FY2025",
+      "period": "FY2025",
+      "source_type": "sample_db",
+      "provider": "lumenfin",
+      "text": "Apple FY2025 EBITDA was 141.2 billion USD."
+    },
+    {
+      "id": "ev_msft_revenue_fy2025",
+      "entity": "Microsoft",
+      "metric": "revenue",
+      "value": 288.7,
+      "unit": "billion",
+      "currency": "USD",
+      "citation": "sample_notes.md#p1",
+      "period": "FY2025",
+      "source_type": "document",
+      "provider": "lumenfin",
+      "text": "Microsoft FY2025 revenue was 288.7 billion USD."
+    },
+    {
+      "id": "ev_msft_ebitda_fy2025",
+      "entity": "Microsoft",
+      "metric": "ebitda",
+      "value": 122.5,
+      "unit": "billion",
+      "currency": "USD",
+      "citation": "sample_notes.md#p1",
+      "period": "FY2025",
+      "source_type": "document",
+      "provider": "lumenfin",
+      "text": "Microsoft FY2025 EBITDA was 122.5 billion USD."
+    }
+  ],
+  "market_data": [],
+  "claims": [
+    {
+      "claim_id": "cl_num_Apple_ebitda_margin",
+      "entity": "Apple",
+      "claim_type": "numeric",
+      "metric_name": "ebitda_margin",
+      "value": 0.342718,
+      "unit": "ratio",
+      "period": "FY2025",
+      "statement": "Apple EBITDA margin is 34.3% for FY2025.",
+      "verification": "verified",
+      "evidence_ids": ["ev_apple_ebitda_fy2025", "ev_apple_revenue_fy2025"]
+    },
+    {
+      "claim_id": "cl_num_Microsoft_ebitda_margin",
+      "entity": "Microsoft",
+      "claim_type": "numeric",
+      "metric_name": "ebitda_margin",
+      "value": 0.424316,
+      "unit": "ratio",
+      "period": "FY2025",
+      "statement": "Microsoft EBITDA margin is 42.4% for FY2025.",
+      "verification": "verified",
+      "evidence_ids": ["ev_msft_ebitda_fy2025", "ev_msft_revenue_fy2025"]
+    }
+  ],
+  "final_output": "## Executive Summary\nThe workflow used 6 specialist nodes. See page 12 of the methodology handbook and Table 1 for process notes.\n\nApple EBITDA margin is 34.27% for FY2025 [lumenfin:sample_db:Apple:FY2025]. Microsoft EBITDA margin is 42.45% for FY2025 [sample_notes.md#p1]. Apple FY2025 revenue was 412.0 billion USD [lumenfin:sample_db:Apple:FY2025]. Microsoft trails Apple on nothing material; Microsoft has higher EBITDA margin than Apple.\n\n## Disclaimer\nResearch output only, not investment advice.\n"
+}

@@ -62,6 +62,10 @@ class LumenFinAdapter:
                 "input_guardrail_findings": payload.get("input_guardrail_findings") or [],
                 "compliance_violations": payload.get("compliance_violations") or [],
                 "retrieval_provenance": _retrieval_provenance(payload),
+                "claim_binding": payload.get("claim_binding") or {},
+                "verified_claim_count": len(payload.get("verified_claims") or []),
+                "claim_count": len(payload.get("claims") or []),
+                "execution_path": payload.get("execution_path") or "contract_replay",
             },
             "entities": [{"name": company} for company in _companies(payload)],
             "steps": _steps(payload),
@@ -69,6 +73,8 @@ class LumenFinAdapter:
             "evidence": _evidence(payload),
             "market_data": _market_data(payload),
             "final_output": str(payload.get("final_report") or ""),
+            "claims": list(payload.get("verified_claims") or payload.get("claims") or []),
+            "structured_answer": payload.get("structured_answer") or {},
         }
 
 
@@ -122,6 +128,31 @@ def period_label_from_meta(meta: dict[str, Any] | None, *, default: str = "lates
     return default
 
 
+UNKNOWN_PERIOD = "unknown"
+
+
+def export_field_period(field_prov: dict[str, Any] | None, company_period: str) -> str:
+    if isinstance(field_prov, dict) and field_prov:
+        raw = field_prov.get("period")
+        if raw in (None, ""):
+            return UNKNOWN_PERIOD
+        return str(raw)
+    return company_period or "latest"
+
+
+def evidence_period_value(period: str | None) -> str:
+    if period in (None, ""):
+        return "latest"
+    return str(period)
+
+
+def field_evidence_text(company: str, field: str, value: object, period: str) -> str:
+    label = field.replace("_", " ")
+    if period == UNKNOWN_PERIOD:
+        return f"{company} {label} was {value} billion USD (period not stated in the source)."
+    return f"{company} {period} {label} was {value} billion USD."
+
+
 def _companies(payload: dict[str, Any]) -> list[str]:
     return [str(company) for company in payload.get("companies") or []]
 
@@ -157,6 +188,10 @@ def _steps(payload: dict[str, Any]) -> list[dict[str, str]]:
     return steps
 
 
+def _fund_evidence_id(company: str, field: str, period: str) -> str:
+    return f"ev_fund_{company}_{field}_{period}"
+
+
 def _metrics(payload: dict[str, Any]) -> list[dict[str, Any]]:
     output = []
     financial_metrics = payload.get("financial_metrics") or {}
@@ -176,18 +211,26 @@ def _metrics(payload: dict[str, Any]) -> list[dict[str, Any]]:
             inputs = _metric_inputs(
                 input_map,
                 source_values,
+                company=str(company),
                 period=period,
                 provenance=bundle.get("fundamental_provenance"),
+                source_label=source,
             )
+            evidence_ids: list[str] = []
+            for nested in inputs.values():
+                evidence_ids.extend(str(item) for item in nested.get("evidence_ids") or [] if str(item))
+            field_prov = (bundle.get("fundamental_provenance") or {}).get(name) or {}
+            field_period = export_field_period(field_prov if isinstance(field_prov, dict) else {}, period)
             item = {
                 "entity": str(company),
                 "name": str(name),
-                "period": period,
+                "period": field_period,
                 "value": value,
                 "unit": "ratio" if formula else "",
                 "source": source,
                 "formula": formula,
                 "inputs": inputs,
+                "evidence_ids": list(dict.fromkeys(evidence_ids)),
                 "confidence": _metric_confidence(
                     metric_confidence.get(company) or {},
                     name,
@@ -202,8 +245,10 @@ def _metric_inputs(
     input_map: dict[str, str],
     source_values: dict[str, Any],
     *,
+    company: str,
     period: str,
     provenance: dict[str, Any] | None = None,
+    source_label: str = "market_data",
 ) -> dict[str, Any]:
     inputs = {}
     for input_name, source_key in input_map.items():
@@ -211,16 +256,21 @@ def _metric_inputs(
         if value is None:
             continue
         field_provenance = (provenance or {}).get(source_key) or {}
-        input_period = field_provenance.get("period") if isinstance(provenance, dict) else period
+        period_label = export_field_period(
+            field_provenance if isinstance(field_provenance, dict) else {},
+            period,
+        )
+        evidence_id = _fund_evidence_id(company, source_key, period_label)
         inputs[input_name] = {
             "value": value,
             "unit": "billion",
             "currency": "USD",
-            "period": input_period,
+            "period": period_label,
             "source": field_provenance.get("source") or "market_data",
             "period_source": field_provenance.get("period_source"),
             "period_alignment": field_provenance.get("period_alignment"),
             "citation": field_provenance.get("citation"),
+            "evidence_ids": [evidence_id],
             "source_record_id": (
                 field_provenance.get("source_record_id")
                 or field_provenance.get("provider_record_id")
@@ -312,22 +362,33 @@ def _evidence(payload: dict[str, Any]) -> list[dict[str, str]]:
             )
         market_data = bundle.get("market_data") or {}
         if market_data:
-            text = (
-                f"{company} {period} revenue was {get_fundamental(market_data, 'revenue')} billion USD, "
-                f"EBITDA was {get_fundamental(market_data, 'ebitda')} billion USD, "
-                f"R&D was {get_fundamental(market_data, 'r_and_d')} billion USD, and "
-                f"operating income was {get_fundamental(market_data, 'operating_income')} billion USD."
-            )
+            period = period_label_from_meta(bundle.get("fundamentals_meta"))
             source = str(bundle.get("structured_source") or "fundamentals")
-            _append_evidence(
-                evidence,
-                seen,
-                company=str(company),
-                citation=f"lumenfin:{source}:{company}:{period}",
-                source_type="fundamentals" if source != "sample_db" else "sample_db",
-                text=text,
-                period=period,
-            )
+            provenance = bundle.get("fundamental_provenance") or {}
+            for field in ("revenue", "ebitda", "r_and_d", "operating_income"):
+                value = get_fundamental(market_data, field)
+                if value is None:
+                    continue
+                field_prov = provenance.get(field) if isinstance(provenance, dict) else {}
+                field_period = export_field_period(field_prov if isinstance(field_prov, dict) else {}, period)
+                citation = str(
+                    (field_prov or {}).get("citation")
+                    or f"lumenfin:{source}:{company}:{field_period}"
+                )
+                _append_evidence(
+                    evidence,
+                    seen,
+                    company=str(company),
+                    citation=citation,
+                    source_type="fundamentals" if source != "sample_db" else "sample_db",
+                    text=field_evidence_text(str(company), field, value, field_period),
+                    period=field_period,
+                    evidence_id=_fund_evidence_id(str(company), field, field_period),
+                    metric=field,
+                    value=value,
+                    unit="billion",
+                    currency="USD",
+                )
     for company, scores in (payload.get("risk_scores") or {}).items():
         if not isinstance(scores, dict):
             continue
@@ -377,28 +438,43 @@ def _evidence(payload: dict[str, Any]) -> list[dict[str, str]]:
 
 def _append_evidence(
     evidence: list[dict[str, str]],
-    seen: set[tuple[str, str]],
+    seen: set[tuple[str, str, str]],
     *,
     company: str,
     citation: str,
     source_type: str,
     text: str,
     period: str | None = None,
+    evidence_id: str | None = None,
+    metric: str | None = None,
+    value: float | None = None,
+    unit: str | None = None,
+    currency: str | None = None,
 ) -> None:
-    key = (company, citation)
+    key = (company, citation, str(evidence_id or metric or ""))
     if key in seen:
         return
     seen.add(key)
-    evidence.append(
-        {
-            "entity": company,
-            "citation": citation,
-            "period": period or "latest",
-            "source_type": source_type,
-            "provider": "lumenfin",
-            "text": text,
-        }
-    )
+    row: dict[str, Any] = {
+        "entity": company,
+        "citation": citation,
+        "period": evidence_period_value(period),
+        "source_type": source_type,
+        "provider": "lumenfin",
+        "text": text,
+    }
+    if evidence_id:
+        row["id"] = evidence_id
+        row["evidence_id"] = evidence_id
+    if metric:
+        row["metric"] = metric
+    if value is not None:
+        row["value"] = value
+    if unit:
+        row["unit"] = unit
+    if currency:
+        row["currency"] = currency
+    evidence.append(row)
 
 
 def _market_data(payload: dict[str, Any]) -> list[dict[str, Any]]:

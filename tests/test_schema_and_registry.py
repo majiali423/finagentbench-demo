@@ -46,6 +46,12 @@ class SchemaAndRegistryTestCase(unittest.TestCase):
         self.assertIn("risk_quality", names)
         self.assertIn("compliance_semantic", names)
         self.assertIn("visible_output_integrity", names)
+        self.assertIn("visible_supported_claims", names)
+
+    def test_default_resolve_does_not_enable_visible_supported_claims(self) -> None:
+        names = [metric.__name__ for metric in resolve_metrics(load_fixture("case_bigtech_fcf.json"))]
+        self.assertNotIn("visible_supported_claims", names)
+        self.assertNotIn("evidence_support", names)
 
     def test_unsupported_scoring_version_is_rejected(self) -> None:
         case = load_fixture("case_numeric_only.json")

@@ -1,0 +1,29 @@
+{
+  "id": "lumenfin_product_quality_visible_v1",
+  "scoring_version": "3",
+  "execution_path": "product_workflow",
+  "query": "Compare Apple and Microsoft FY2025 EBITDA margin with cited sample fundamentals.",
+  "expected_entities": ["Apple", "Microsoft"],
+  "required_steps": ["quant", "claim_binder", "synthesizer"],
+  "required_sections": ["Executive Summary", "Disclaimer"],
+  "enabled_metrics": [
+    "visible_supported_claims",
+    "numeric_correctness",
+    "entity_coverage"
+  ],
+  "require_checkable_metrics": true,
+  "require_visible_claim_citations": true,
+  "numeric_tolerance": 0.001,
+  "visible_percent_tolerance": 0.05,
+  "min_score": 85,
+  "metric_weights": {
+    "visible_supported_claims": 2.0,
+    "numeric_correctness": 1.0,
+    "entity_coverage": 1.0
+  },
+  "severity_penalties": {
+    "high": 20,
+    "critical": 40
+  },
+  "block_on_severity": ["high", "critical"]
+}

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from ..schema import FINRUN_SCHEMA_VERSION
+
 
 class AgentStateAdapter:
     name = "agent-state"
@@ -11,6 +13,7 @@ class AgentStateAdapter:
 
     def normalize(self, payload: dict[str, Any]) -> dict[str, Any]:
         return {
+            "schema_version": FINRUN_SCHEMA_VERSION,
             "run_id": str(payload.get("run_id") or payload.get("thread_id") or "agent-state-run"),
             "query": payload.get("query", ""),
             "entities": _entities(payload),

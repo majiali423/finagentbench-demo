@@ -1,0 +1,341 @@
+{
+  "id": "product_quality_visible_mutations_v1",
+  "case": "../../fixtures/case_lumenfin_product_quality_v1.json",
+  "items": [
+    {
+      "id": "baseline",
+      "run": "../../fixtures/product_quality_visible_baseline_finrun.json",
+      "failure_type": "none",
+      "expected_passed": true
+    },
+    {
+      "id": "visible_wrong_number_999999",
+      "run": "../../fixtures/product_quality_visible_baseline_finrun.json",
+      "failure_type": "visible_wrong_number",
+      "expected_passed": false,
+      "expected_findings": ["visible_supported_claims"],
+      "mutations": [
+        {
+          "op": "replace_text",
+          "path": ["final_output"],
+          "old": "Apple EBITDA margin is 34.27% for FY2025",
+          "new": "Apple EBITDA margin is 999999% for FY2025"
+        }
+      ]
+    },
+    {
+      "id": "visible_wrong_unit",
+      "run": "../../fixtures/product_quality_visible_baseline_finrun.json",
+      "failure_type": "visible_wrong_unit",
+      "expected_passed": false,
+      "expected_findings": ["visible_supported_claims"],
+      "mutations": [
+        {
+          "op": "replace_text",
+          "path": ["final_output"],
+          "old": "Apple EBITDA margin is 34.27% for FY2025",
+          "new": "Apple EBITDA margin is 34.27 billion USD for FY2025"
+        }
+      ]
+    },
+    {
+      "id": "visible_wrong_period",
+      "run": "../../fixtures/product_quality_visible_baseline_finrun.json",
+      "failure_type": "visible_wrong_period",
+      "expected_passed": false,
+      "expected_findings": ["visible_supported_claims"],
+      "mutations": [
+        {
+          "op": "replace_text",
+          "path": ["final_output"],
+          "old": "Apple EBITDA margin is 34.27% for FY2025",
+          "new": "Apple EBITDA margin is 34.27% for FY2024"
+        }
+      ]
+    },
+    {
+      "id": "visible_wrong_direction",
+      "run": "../../fixtures/product_quality_visible_baseline_finrun.json",
+      "failure_type": "visible_wrong_direction",
+      "expected_passed": false,
+      "expected_findings": ["visible_supported_claims"],
+      "mutations": [
+        {
+          "op": "replace_text",
+          "path": ["final_output"],
+          "old": "Microsoft has higher EBITDA margin than Apple",
+          "new": "Apple has higher EBITDA margin than Microsoft"
+        }
+      ]
+    },
+    {
+      "id": "visible_wrong_entity",
+      "run": "../../fixtures/product_quality_visible_baseline_finrun.json",
+      "failure_type": "visible_wrong_entity",
+      "expected_passed": false,
+      "expected_findings": ["visible_supported_claims"],
+      "mutations": [
+        {
+          "op": "replace_text",
+          "path": ["final_output"],
+          "old": "Apple EBITDA margin is 34.27% for FY2025 [lumenfin:sample_db:Apple:FY2025].",
+          "new": "Tesla EBITDA margin is 34.27% for FY2025 [lumenfin:sample_db:Apple:FY2025]."
+        }
+      ]
+    },
+    {
+      "id": "visible_wrong_citation",
+      "run": "../../fixtures/product_quality_visible_baseline_finrun.json",
+      "failure_type": "visible_wrong_citation",
+      "expected_passed": false,
+      "expected_findings": ["visible_supported_claims"],
+      "mutations": [
+        {
+          "op": "replace_text",
+          "path": ["final_output"],
+          "old": "[lumenfin:sample_db:Apple:FY2025]",
+          "new": "[forged-10k.pdf#p99]"
+        }
+      ]
+    },
+    {
+      "id": "visible_missing_citation",
+      "run": "../../fixtures/product_quality_visible_baseline_finrun.json",
+      "failure_type": "visible_missing_citation",
+      "expected_passed": false,
+      "expected_findings": ["visible_supported_claims"],
+      "mutations": [
+        {
+          "op": "replace_text",
+          "path": ["final_output"],
+          "old": "Apple EBITDA margin is 34.27% for FY2025 [lumenfin:sample_db:Apple:FY2025].",
+          "new": "Apple EBITDA margin is 34.27% for FY2025."
+        }
+      ]
+    },
+    {
+      "id": "visible_percent_100x",
+      "run": "../../fixtures/product_quality_visible_baseline_finrun.json",
+      "failure_type": "visible_wrong_number",
+      "expected_passed": false,
+      "expected_findings": ["visible_supported_claims"],
+      "mutations": [
+        {
+          "op": "replace_text",
+          "path": ["final_output"],
+          "old": "Apple EBITDA margin is 34.27% for FY2025",
+          "new": "Apple EBITDA margin is 0.342718% for FY2025"
+        }
+      ]
+    },
+    {
+      "id": "visible_million_vs_billion",
+      "run": "../../fixtures/product_quality_visible_baseline_finrun.json",
+      "failure_type": "visible_wrong_number",
+      "expected_passed": false,
+      "expected_findings": ["visible_supported_claims"],
+      "mutations": [
+        {
+          "op": "replace_text",
+          "path": ["final_output"],
+          "old": "412.0 billion USD",
+          "new": "412.0 million USD"
+        }
+      ]
+    },
+    {
+      "id": "visible_usd_vs_eur",
+      "run": "../../fixtures/product_quality_visible_baseline_finrun.json",
+      "failure_type": "visible_wrong_unit",
+      "expected_passed": false,
+      "expected_findings": ["visible_supported_claims"],
+      "mutations": [
+        {
+          "op": "replace_text",
+          "path": ["final_output"],
+          "old": "412.0 billion USD",
+          "new": "412.0 billion EUR"
+        }
+      ]
+    },
+    {
+      "id": "visible_eur_not_usd_same_sentence",
+      "run": "../../fixtures/product_quality_visible_baseline_finrun.json",
+      "failure_type": "visible_wrong_unit",
+      "expected_passed": false,
+      "expected_findings": ["visible_supported_claims"],
+      "mutations": [
+        {
+          "op": "replace_text",
+          "path": ["final_output"],
+          "old": "412.0 billion USD",
+          "new": "412.0 billion EUR (figures are not USD)"
+        }
+      ]
+    },
+    {
+      "id": "visible_cny_vs_usd",
+      "run": "../../fixtures/product_quality_visible_baseline_finrun.json",
+      "failure_type": "visible_wrong_unit",
+      "expected_passed": false,
+      "expected_findings": ["visible_supported_claims"],
+      "mutations": [
+        {
+          "op": "replace_text",
+          "path": ["final_output"],
+          "old": "412.0 billion USD",
+          "new": "412.0 billion CNY"
+        }
+      ]
+    },
+    {
+      "id": "visible_same_entity_unrelated_citation",
+      "run": "../../fixtures/product_quality_visible_baseline_finrun.json",
+      "failure_type": "visible_wrong_citation",
+      "expected_passed": false,
+      "expected_findings": ["visible_supported_claims"],
+      "mutations": [
+        {
+          "op": "set",
+          "path": ["evidence"],
+          "value": [
+            {
+              "entity": "Apple",
+              "citation": "lumenfin:sample_db:Apple:FY2025",
+              "period": "FY2025",
+              "source_type": "sample_db",
+              "provider": "lumenfin",
+              "text": "Apple FY2025 revenue was 412.0 billion USD and EBITDA was 141.2 billion USD."
+            },
+            {
+              "entity": "Microsoft",
+              "citation": "sample_notes.md#p1",
+              "period": "FY2025",
+              "source_type": "document",
+              "provider": "lumenfin",
+              "text": "Microsoft FY2025 revenue was 288.7 billion USD and EBITDA was 122.5 billion USD."
+            },
+            {
+              "entity": "Apple",
+              "citation": "risk.md#p9",
+              "period": "FY2025",
+              "source_type": "document",
+              "text": "Apple FY2025 supply-chain concentration remains elevated in one assembly region."
+            }
+          ]
+        },
+        {
+          "op": "replace_text",
+          "path": ["final_output"],
+          "old": "Apple FY2025 revenue was 412.0 billion USD [lumenfin:sample_db:Apple:FY2025].",
+          "new": "Apple FY2025 revenue was 412.0 billion USD [risk.md#p9]."
+        }
+      ]
+    },
+    {
+      "id": "visible_truncated_412000",
+      "run": "../../fixtures/product_quality_visible_baseline_finrun.json",
+      "failure_type": "visible_wrong_number",
+      "expected_passed": false,
+      "expected_findings": ["visible_supported_claims"],
+      "mutations": [
+        {
+          "op": "replace_text",
+          "path": ["final_output"],
+          "old": "412.0 billion USD",
+          "new": "412000 billion USD"
+        }
+      ]
+    },
+    {
+      "id": "visible_prefix_eur",
+      "run": "../../fixtures/product_quality_visible_baseline_finrun.json",
+      "failure_type": "visible_wrong_unit",
+      "expected_passed": false,
+      "expected_findings": ["visible_supported_claims"],
+      "mutations": [
+        {
+          "op": "replace_text",
+          "path": ["final_output"],
+          "old": "412.0 billion USD",
+          "new": "EUR 412.0 billion"
+        }
+      ]
+    },
+    {
+      "id": "visible_undisclosed_keyword_citation",
+      "run": "../../fixtures/product_quality_visible_baseline_finrun.json",
+      "failure_type": "visible_wrong_citation",
+      "expected_passed": false,
+      "expected_findings": ["visible_supported_claims"],
+      "mutations": [
+        {
+          "op": "replace_text",
+          "path": ["final_output"],
+          "old": "[lumenfin:sample_db:Apple:FY2025]",
+          "new": "[missing.md#p9]"
+        }
+      ]
+    },
+    {
+      "id": "visible_evidence_currency_eur",
+      "run": "../../fixtures/product_quality_visible_baseline_finrun.json",
+      "failure_type": "visible_wrong_citation",
+      "expected_passed": false,
+      "expected_findings": ["visible_supported_claims"],
+      "mutations": [
+        {"op": "set", "path": ["evidence", 0, "currency"], "value": "EUR"}
+      ]
+    },
+    {
+      "id": "visible_evidence_unit_million",
+      "run": "../../fixtures/product_quality_visible_baseline_finrun.json",
+      "failure_type": "visible_wrong_citation",
+      "expected_passed": false,
+      "expected_findings": ["visible_supported_claims"],
+      "mutations": [
+        {"op": "set", "path": ["evidence", 0, "unit"], "value": "million"}
+      ]
+    },
+    {
+      "id": "visible_evidence_value_null",
+      "run": "../../fixtures/product_quality_visible_baseline_finrun.json",
+      "failure_type": "visible_wrong_citation",
+      "expected_passed": false,
+      "expected_findings": ["visible_supported_claims"],
+      "mutations": [
+        {"op": "set", "path": ["evidence", 0, "value"], "value": null}
+      ]
+    },
+    {
+      "id": "visible_wrong_table_cell",
+      "run": "../../fixtures/product_quality_visible_baseline_finrun.json",
+      "failure_type": "visible_wrong_number",
+      "expected_passed": false,
+      "expected_findings": ["visible_supported_claims"],
+      "mutations": [
+        {
+          "op": "replace_text",
+          "path": ["final_output"],
+          "old": "Research output only, not investment advice.",
+          "new": "| Company | FY2025 EBITDA margin |\n|---|---|\n| Apple | 99.9% [lumenfin:sample_db:Apple:FY2025] |\n\nResearch output only, not investment advice."
+        }
+      ]
+    },
+    {
+      "id": "visible_cross_entity_citation",
+      "run": "../../fixtures/product_quality_visible_baseline_finrun.json",
+      "failure_type": "visible_wrong_citation",
+      "expected_passed": false,
+      "expected_findings": ["visible_supported_claims"],
+      "mutations": [
+        {
+          "op": "replace_text",
+          "path": ["final_output"],
+          "old": "Apple EBITDA margin is 34.27% for FY2025 [lumenfin:sample_db:Apple:FY2025].",
+          "new": "Apple EBITDA margin is 34.27% for FY2025 [sample_notes.md#p1]."
+        }
+      ]
+    }
+  ]
+}

@@ -7,7 +7,8 @@ from typing import Any
 FINRUN_SCHEMA_VERSION = "1.0"
 SUPPORTED_FINRUN_SCHEMA_VERSIONS = frozenset({"0", FINRUN_SCHEMA_VERSION})
 DEFAULT_SCORING_VERSION = "1"
-SUPPORTED_SCORING_VERSIONS = frozenset({DEFAULT_SCORING_VERSION, "2"})
+SUPPORTED_SCORING_VERSIONS = frozenset({DEFAULT_SCORING_VERSION, "2", "3"})
+SUPPORTED_EXECUTION_PATHS = frozenset({"contract_replay", "retrieval_qa", "product_workflow"})
 SUPPORTED_CASE_MODES = frozenset({"quality", "compatibility"})
 SUPPORTED_SEVERITIES = frozenset({"critical", "high", "medium", "low"})
 
@@ -94,6 +95,13 @@ def validate_case(case: dict[str, Any]) -> None:
             f"Unsupported scoring_version={scoring_version}; "
             f"supported={sorted(SUPPORTED_SCORING_VERSIONS)}"
         )
+
+    if "execution_path" in case:
+        path = str(case.get("execution_path") or "")
+        if path not in SUPPORTED_EXECUTION_PATHS:
+            raise ValidationError(
+                f"execution_path must be one of {sorted(SUPPORTED_EXECUTION_PATHS)}"
+            )
 
     case_mode = str(case.get("case_mode") or "quality")
     if case_mode not in SUPPORTED_CASE_MODES:

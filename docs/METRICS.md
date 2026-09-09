@@ -23,6 +23,10 @@ leakage proof. Release gates pair issuer and compare cases.
   most medium severity; `forbidden_entities` remain high blockers. Finding
   `target.code` / `target.confidence` carry structured codes such as
   `reasoning_leak` and `truncated_output`.
+- `visible_supported_claims`: binds entity+metric numeric assertions, units,
+  periods, comparative direction, and optional citations in `final_output` to
+  verified FinRun metrics/claims/evidence. Scoring v3 opt-in. Unverifiable prose
+  is not counted as verified.
 
 ## Financial correctness
 
@@ -69,5 +73,26 @@ case hashes. This RC did not lower any threshold.
 Scoring is explicitly versioned. Cases without `scoring_version` use scoring v1;
 their enabled metrics and weights remain unchanged. Scoring v2 cases opt in with
 `"scoring_version": "2"` and may enable `visible_output_integrity` at zero
-weight while retaining high-severity blocking. Unsupported scoring versions are
-rejected before evaluation.
+weight while retaining high-severity blocking. Scoring v3 cases opt in with
+`"scoring_version": "3"` and may enable `visible_supported_claims` in
+`enabled_metrics`. That metric is not part of the default v1 metric set, so
+historical diligence replay scores stay on the v1 contract. It binds
+numeric/entity/period/unit/direction/citation assertions in `final_output` to
+verified metrics/claims/evidence. Unsupported scoring versions are rejected
+before evaluation.
+
+`visible_supported_claims` does not treat unverifiable prose as verified. Ordinary
+non-financial counts (specialist nodes, page numbers, table numbers) and heading
+years are ignored. Opening `visible_output_integrity` is not sufficient to catch
+false percentages in the report body.
+
+## Execution path
+
+Cases may set `execution_path`:
+
+- `contract_replay`: frozen FinRun/state replay (historical v1 diligence).
+- `retrieval_qa`: retrieval/rerank/generate harnesses such as LEDGER; not the
+  product graph.
+- `product_workflow`: query (+ documents) through the LumenFin graph to the
+  user-visible report, then FinRun export.
+
