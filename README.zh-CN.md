@@ -1,34 +1,93 @@
 # FinAgentBench
+**回放财务 Agent 的输出，解释哪些断言没有通过验证。**
 
 [English](README.md) | **中文**
 
-**回放 Agent 的答案与证据，定位缺乏依据的财务断言。**
-FinAgentBench 接收 **FinRun 1.0** 导出，生成问题定位、报告和 CI 通过/失败结果，
-无需执行 Agent 本身。
+FinAgentBench 是 [LumenFin](https://github.com/majiali423/lumenfin-agent)
+项目的评测组件。它读取 **FinRun 1.0** 导出，按显式 case 检查，
+输出指标级问题以及 JSON、Markdown、HTML 报告。
+回放导出文件不需要再次运行原 Agent。
 
 [![test](https://github.com/majiali423/finagentbench-demo/actions/workflows/test.yml/badge.svg)](https://github.com/majiali423/finagentbench-demo/actions/workflows/test.yml)
 
-[快速体验](#快速体验) · [指标](docs/METRICS.md) ·
-[FinRun schema](docs/finrun_schema.md) · [文档索引](docs/README.md)
+[运行示例](#运行示例) · [评分逻辑](#一次评测如何执行) ·
+[接入其他 Agent](docs/agent_integration_guide.md) · [文档索引](docs/README.md)
 
-## 检查什么
+## 评测器解决什么问题
 
-| 层次 | 示例 |
-|---|---|
-| 执行轨迹与证据 | 漏掉公司、计算输入不一致、缺引用、缺少必需检查 |
-| 可见断言：显式启用 v3 | 正文、表格、Claim Ledger 中错误的数字、单位、币种、期间或来源 |
-| 负向对照 | 故意改错数字/主体或移除引用/风险说明，必须被拦截 |
+内部指标正确，最终报告仍可能写错百分比、公司或财年。
+FinAgentBench 同时检查结构化数据和可见输出：
 
-期间未知的证据不能支持具体年份的断言。内部指标正确，也不能抵消最终回答中的矛盾。
+| 层次 | 检查输入 | 要回答的问题 |
+|---|---|---|
+| 契约 | FinRun + case | 结构、评分版本和用例要求是否有效 |
+| 结构化证据 | 公式输入、指标、实体、引用 | 能否复算，身份是否一致，证据是否齐全 |
+| 可见输出：显式启用 v3 | 正文、表格、Claim Ledger | 受支持的财务数字、单位、期间、比较关系及引用是否匹配 |
+| 门禁 | 指标结果 + 严重性规则 | 加权分和阻断问题是否满足 case 要求 |
+
+证据期间未知，不能支持一个确定财年的断言。
+总分再高，也不能抵消 case 明确要求阻断的严重问题。
+FinAgentBench 不能替代 LumenFin 的文档任务目录。那 24 题是开发诊断用的候选 gold（派生摘录、lexical 检索）。内部字段与可见回答写成同一个错误数字时，导出检查仍可能通过，而目录检查必须失败。A 层不是正式原文准确率。LumenFin 接入策略 `lumenfin_eval_contract.v1` 通过完整 `evaluate_run` 执行适用指标，缺主体时不得默认 NVIDIA，Bench 不可用或报错不得计为通过。
+
+## 一次评测如何执行
 
 ```text
-FinRun → schema / adapter → 确定性检查 → 问题定位与报告 → CI 门禁
+Agent 状态 / FinRun
+  → Adapter 与 Schema 校验
+  → 绑定 case 预先规定的公司与检查要求
+  → 执行启用的指标
+  → 汇总得分并检查阻断问题
+  → EvalReport + 问题定位 + CI 结果
 ```
 
-## 快速体验
+### 用版本化输入隔离生成器与评分器
 
-需要 Python **3.11+**，CI 覆盖 3.11 与 3.12。
-安装会下载构建依赖，以下演示不需要 API key 或在线模型调用。
+[Schema](finagentbench/schema.py)定义运行记录、证据、指标和问题结构。
+[Adapters](finagentbench/adapters/)统一不同生成器的输出，
+指标代码无需导入 Agent 的图或 API。
+
+预期行为由 case 定义。质量用例的公司集合必须来自测试规格，
+不能由 Agent 本次输出的公司集合反向决定。
+[Case binding](finagentbench/case_binding.py)明确区分质量评测与兼容性冒烟检查。
+
+### 确定性校验，并保留可检查的失败原因
+
+[Runner](finagentbench/runner.py)校验输入、选择指标、计算加权结果，
+再应用 `block_on_severity`。
+[数值正确性](finagentbench/metrics/numeric.py)检查结构化公式结果。
+
+[Visible supported claims](finagentbench/metrics/visible_supported_claims.py)
+解析受支持的财务断言，并与导出证据比较。
+它有明确的财务词表与语法范围，未覆盖的自由叙述需要另外审阅，
+不能把解析器得分解释成所有文本的事实正确率。
+
+[产品用例](fixtures/case_lumenfin_product_quality_v1.json)显式启用 v3：
+
+```json
+{
+  "scoring_version": "3",
+  "enabled_metrics": ["visible_supported_claims", "numeric_correctness", "entity_coverage"],
+  "require_checkable_metrics": true,
+  "require_visible_claim_citations": true,
+  "block_on_severity": ["high", "critical"]
+}
+```
+
+上面仅为配置节选，运行时使用链接中的完整 case。
+
+### 用故意写错的输出检查评分器本身
+
+[突变测试](docs/MUTATION_TESTING.md)从正确 trace 出发，定向修改内容，
+检查评测器是否识别出对应问题。
+[突变集](benchmarks/mutations/suite.json)包含数值、公司、引用和来源/期间控制。
+
+CI 同时运行正例与负例。负例必须产生新的评测报告，
+报告的 run ID 要匹配，`passed=false`，退出状态也必须符合预期。
+程序崩溃不能算作成功拦截。见[工作流](.github/workflows/test.yml)。
+
+## 运行示例
+
+使用 Python **3.11+**：
 
 ```bash
 git clone https://github.com/majiali423/finagentbench-demo.git
@@ -37,89 +96,54 @@ python -m venv .venv
 ```
 
 PowerShell 激活：`.\.venv\Scripts\Activate.ps1`。
-POSIX shell 激活：`source .venv/bin/activate`。
+POSIX 激活：`source .venv/bin/activate`。
 
 ```bash
 python -m pip install -e .
 python scripts/run_offline_demo.py
-```
-
-查看生成的 JSON、Markdown 和 HTML 报告。显式运行可见输出 v3 基线：
-
-```bash
 python -m finagentbench evaluate fixtures/product_quality_visible_baseline_finrun.json --case fixtures/case_lumenfin_product_quality_v1.json --profile ci --out outputs/visible
 ```
 
-问题定位会指出指标与错误原因，例如：
-
-```text
-NVIDIA operating_income is stated for FY2025 but verified period is unknown.
-```
-
-退出码 **0** 表示通过，**1** 表示未通过（错误 fixture 的预期结果），
-其他非零值表示命令或执行错误。
-
-## 为什么单独维护评测仓？
-
-[LumenFin](https://github.com/majiali423/lumenfin-agent) 生成答案，
-FinAgentBench 评测导出产物。版本化边界使生成端、评分器及兼容性变更可以分别审查。
-其他 Agent 也可以实现同一 [FinRun 接口](docs/agent_integration_guide.md)。
-
-两个仓库由同一作者维护。它们提供作者自有的契约门禁；
-分仓或高分本身不构成第三方验证，也不等于真实问题准确率。
-
-## 评分与发布版本
-
-评分版本、Python 包版本和 FinRun schema 分别管理。
-
-| 用途 | 版本 / 证据 |
-|---|---|
-| 包含 scoring v3 的已发布源码 | [`40f7599`](https://github.com/majiali423/finagentbench-demo/commit/40f7599e408f317515583405cb90249b811179c0) |
-| 历史包与标签 | `0.1.0rc4` / `v0.1.0-rc.4`；冻结标签早于 v3 |
-| FinRun 外层协议 | `1.0` |
-| 默认评分 | v1，保留原有 case 语义 |
-| 可见输出评分 | 显式配置 v3，并启用 `visible_supported_claims` |
-| 冻结生成端兼容性 | 本仓完整 CI 使用 LumenFin `v0.1.0-rc.3` |
-
-[`40f7599` 的 2026-09-09 CI](https://github.com/majiali423/finagentbench-demo/actions/runs/34329922587)
-已通过。LumenFin 的
-[Product quality v3 门禁](https://github.com/majiali423/lumenfin-agent/actions/runs/34329999879)
-固定使用该评分器提交，rc.3/rc.4 评分器仍用于冻结契约兼容性。
-
-详细规则见[指标语义](docs/METRICS.md)与[兼容策略](docs/FINRUN_COMPATIBILITY.md)。
-历史 rc.4 结果保留在[发布报告](reports/current/FinAgentBench_Final_Release_Report.md)。
-
-## 验证
+打开输出报告，查看每项指标与问题定位。
+离线示例无需 API key 或模型调用。检查负例和单元测试：
 
 ```bash
-python -m unittest discover -s tests -v
 python scripts/run_mutation_suite.py
-python scripts/run_correctness_validation.py
+python -m unittest discover -s tests -v
 ```
 
-联合检查需要安装当前 LumenFin 源码，显式配置
-`LUMENFIN_ROOT` / `FINAGENTBENCH_DIR`，再运行
-`python scripts/validate_cross_repo.py --profile ci`。
-[验证命令](docs/VALIDATION_COMMANDS.md)说明环境配置与可选在线 RC 路径。
+[验证命令](docs/VALIDATION_COMMANDS.md)包含跨仓检查及可选 live 路径。
+[已通过的 CI](https://github.com/majiali423/finagentbench-demo/actions/runs/34340092459)
+覆盖 Python 3.11 与 3.12。
 
-## 能力边界
+## 如何用于产品评测
 
-- Case 定义必需检查与阈值；必需检查没有可检查项时失败，未知协议或评分版本会被拒绝。
-- v3 覆盖支持范围内的财务断言语法，不证明任意自然语言的真实性。
-  语义 judge 为可选项，不纳入确定性发布证据。
-- 突变检出率和冻结契约分只反映相应用例，不评估投资收益，也不认证生产就绪。
-- 来源质量与财务结论仍需人工审查。
+FinAgentBench 检查的是给定 run 与 case。
+要评价产品回答质量，还需要从原始材料独立建立 gold 答案和证据，
+不能只相信生成器自己导出的指标。
 
-## 目录导览
+[LumenFin 评测方案](https://github.com/majiali423/lumenfin-agent/blob/main/docs/evaluation_strategy.md)
+分别衡量任务成功、证据支持、拒答、检索诊断、评分器突变检测和执行成本。
+新的文档任务集与基线执行器属于待实施方案，fixture 门禁分不作为已测产品准确率展示。
 
-| 路径 | 职责 |
+两个仓库由同一作者维护。FinRun 边界让评测器可审查、可复用，
+不代表第三方独立评测。
+
+## 代码与兼容性
+
+| 入口 | 内容 |
 |---|---|
-| `finagentbench/` | 协议、适配器、指标、报告与命令行 |
-| `benchmarks/`、`fixtures/` | 用例及负向对照 |
-| `tests/` | 单测、回归及兼容性验证 |
-| `scripts/` | 正式演示和验证入口 |
-| `docs/` | 指标、接入与运行说明 |
-| `reports/` | 版本化发布证据与历史记录 |
+| [Schema](docs/finrun_schema.md) | 导出契约 |
+| [Adapter 指南](docs/adapter_guide.md) | 接入其他生成器 |
+| [指标语义](docs/METRICS.md) | 范围、容差和问题规则 |
+| [Runner](finagentbench/runner.py) | 执行评测与基线比较 |
+| [CI 门禁](docs/CI_GATE.md) | 正例、负例与发布检查 |
 
-项目自有代码采用 [MIT](LICENSE) 许可证；
-外部依赖和输入遵循[第三方声明](THIRD_PARTY_NOTICES.md)。
+FinRun schema 为 `1.0`；默认评分仍是 v1，v3 按 case 启用。
+包元数据 `0.1.0rc4`、冻结标签 `v0.1.0-rc.4` 与评分版本分开管理，
+该标签早于 v3。LumenFin 产品门禁固定已发布的 v3 评分器源码，
+rc.3/rc.4 两条路径用于冻结兼容性检查。
+见[兼容性策略](docs/FINRUN_COMPATIBILITY.md)。
+
+[MIT 许可证](LICENSE) · [第三方声明](THIRD_PARTY_NOTICES.md)。
+评测结果用于辅助人工审阅财务研究输出。

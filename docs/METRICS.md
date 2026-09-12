@@ -27,6 +27,14 @@ leakage proof. Release gates pair issuer and compare cases.
   periods, comparative direction, and optional citations in `final_output` to
   verified FinRun metrics/claims/evidence. Scoring v3 opt-in. Unverifiable prose
   is not counted as verified.
+  This is **layer A** (export consistency). LumenFin's 24-task catalog is
+  candidate gold for a development diagnostic (**layer B**). LumenFin adapter
+  policy `lumenfin_eval_contract.v1` calls `evaluate_run` for applicable
+  metrics; it does not default expected entities to NVIDIA, and it does not
+  treat Bench unavailable/error as a pass. Export checks can
+  still pass when internals and prose share the same wrong number. Layer A is
+  not source accuracy. Frozen FinRun contracts (rc.3/rc.4) are unchanged.
+
 
 ## Financial correctness
 

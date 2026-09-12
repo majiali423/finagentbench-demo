@@ -14,6 +14,9 @@ FinRun schema is `1.0`.
 - [Mutation testing](MUTATION_TESTING.md)
 - [CI gates](CI_GATE.md)
 - [Validation commands](VALIDATION_COMMANDS.md)
+- [LumenFin product evaluation](https://github.com/majiali423/lumenfin-agent/blob/main/docs/evaluation_strategy.md)
+  (24-task candidate gold diagnostic + optional LangSmith; FinAgentBench remains layer A, not source accuracy.
+  LumenFin scoring policy `lumenfin_eval_contract.v1` uses `evaluate_run` for applicable contract checks.)
 
 ## Integrate an Agent
 
